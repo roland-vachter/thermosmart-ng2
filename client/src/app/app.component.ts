@@ -12,7 +12,7 @@ export class AppComponent {
 	currentDate = new Date();
 
 	@ViewChild(ThermoComponent)
-	private thermoComponent: ThermoComponent;
+	public thermoComponent: ThermoComponent;
 
 	thermoStatisticsAction () {
 		this.thermoComponent.showHeatingStatisticsModal();

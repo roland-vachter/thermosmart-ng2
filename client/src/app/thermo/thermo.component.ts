@@ -15,8 +15,8 @@ export class ThermoComponent implements OnInit {
 
 	private dayNameByIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-	lastUpdate = null;
-	restartSensorInProgress = false;
+	lastUpdate: any = null;
+	restartSensorInProgress: boolean = false;
 	insideConditions: any = {
 		temperature: null,
 		humidity: null
