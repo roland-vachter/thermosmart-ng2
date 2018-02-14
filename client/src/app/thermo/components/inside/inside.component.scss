@@ -1,0 +1,23 @@
+@import '../../../../styles/colors/variables';
+@import '../../../../styles/icons/mixins';
+
+.thermo-inside {
+	font-size: 2.2rem;
+	font-weight: bold;
+}
+
+.thermo-inside--temp {
+	color: $red;
+}
+
+.thermo-inside--temp-icon {
+	@include icon('thermometer6');
+}
+
+.thermo-inside--humi {
+	color: $teal;
+}
+
+.thermo-inside--humi-icon {
+	@include icon('humidity');
+}

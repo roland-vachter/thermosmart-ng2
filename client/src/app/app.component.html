@@ -1,0 +1,64 @@
+<div class="navbar navbar-light navbar-expand-xl smart-navbar">
+	<div class="container">
+		<div class="smart-header">
+			SmartHome
+
+			<div class="smart-navbar--dropdown-container btn-group float-left" dropdown>
+				<button dropdownToggle class="smart-navbar--dropdown-button color-gray" data-toggle="dropdown" role="button" id="smart-navbar-dropdown" aria-haspopup="true" aria-expanded="false">
+				</button>
+				<div *dropdownMenu class="dropdown-menu" aria-labelledby="smart-navbar--dropdown" role="menu">
+					<h6 class="dropdown-header">Heating</h6>
+					<a class="dropdown-item" (click)="thermoStatisticsAction()" href="#"><i class="smart-stats"></i> Statistics</a>
+					<a class="dropdown-item" (click)="thermoConfigAction()" href="#"><i class="smart-settings" href="#"></i> Config</a>
+					<a class="dropdown-item" (click)="thermoRestartSensors()" href="#"><i class="smart-settings" href="#"></i> Restart sensors</a>
+					<div role="separator" class="dropdown-divider"></div>
+					<h6 class="dropdown-header">Security</h6>
+				</div>
+			</div>
+
+			<div class="float-right">
+				<div class="smart-refresh in-progress" [ngClass]="{'color-gray': currentDate - thermoComponent.lastUpdate < 5 * 60 * 1000, 'color-orange': currentDate - thermoComponent.lastUpdate >= 5 * 60 * 1000 && currentDate - thermoComponent.lastUpdate < 10 * 60 * 1000, 'color-red': currentDate - thermoComponent.lastUpdate >= 10 * 60 * 1000, 'smart-spin': refreshInProgress}" (click)="refresh()"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="mainContent container">
+	<div class="row">
+		<div class="col-12">
+			<thermo></thermo>
+		</div>
+
+		<!--<div class="col-xs-12 col-sm-6 col-lg-4">
+			<h3>{{todaysPlan.ref.name}}</h3>
+			<div class="thermo-component thermo-plan--vertical">
+				<div class="thermo-plan--current-time" style="top: {{percentInDay}}%;">
+					{{currentTime}}
+				</div>
+
+				<div class="thermo-plan--labels">
+					<div class="thermo-plan--label" ng-repeat="interval in todaysPlan.plan.ref.intervals" style="top: {{interval.labelPosition}}%">{{interval.label}}</div>
+					<div class="thermo-plan--label" style="top: 100%">23:59</div>
+				</div>
+
+				<div class="thermo-plan--chart clearfix">
+					<div class="thermo-plan--period color-{{interval.temp.ref.color}} clearfix" style="height: {{interval.blockPosition}}%;" ng-repeat="interval in todaysPlan.plan.ref.intervals | filter:blockPosition">
+						<i class="{{interval.temp.ref.iconClass}}"></i>
+					</div>
+					<div class="thermo-plan--pointer color-bg-{{scope().targetTemp.ref.color}}" style="top: {{percentInDay}}%;"></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-xs-12 col-lg-4">
+			<div class="thermo-component thermo-room-temps">
+				<div ng-repeat="(id, data) in inside.individual">
+					<div class="color-{{data.active ? 'green' : 'red'}}">
+						<div class="thermo-room--label">{{roomIdToLabel[id] || id}} ({{id}})</div>
+						<i class="icon-thermometer6"></i> <span ng-bind-html="data.temperature | float"></span> <i class="icon-humidity"></i> {{data.humidity}}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>-->
+</div>

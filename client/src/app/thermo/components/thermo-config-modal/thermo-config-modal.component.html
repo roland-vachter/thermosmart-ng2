@@ -1,0 +1,42 @@
+<div class="modal-header">
+	<h4 class="modal-title">Settings</h4>
+	<button type="button" class="close" aria-label="Close" (click)="bsModalRef.hide()">
+		<span aria-hidden="true">&times;</span>
+	</button>
+</div>
+<div class="modal-body">
+	<div class="row">
+		<div class="col-12">
+			<h2>Temperature settings</h2>
+			<div class="thermo-temps row">
+				<div class="thermo-temps--temp col-xs-6 col-md-4 col-lg-3" *ngFor="let temp of temps">
+					<div class="color-{{temp.ref.color}}">
+						<i class="{{temp.ref.iconClass}}"></i> <span class="thermo-temps--temp-name">{{temp.ref.name}}</span>
+						<div class="thermo-temps--temp-control" data-id="{{temp.ref._id}}">
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="tempAdjust(temp.ref, -0.1)">-</button>
+							<span class="thermo-temps--temp-value">{{temp.ref.value | integer}}<span class="decimal">.{{temp.ref.value | decimal}}</span> &deg;C</span>
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase" (click)="tempAdjust(temp.ref, 0.1)">+</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-12">
+			<h2>Plan for the week</h2>
+			<div class="thermo-default-plans clearfix">
+				<div class="thermo-default-plans--plan" *ngFor="let defaultPlan of heatingDefaultPlans | slice:1" (click)="changePlan(defaultPlan.dayOfWeek)">
+					<div class="thermo-default-plans--day-name">{{defaultPlan.nameOfDay}}</div>
+
+					<i class="{{defaultPlan.plan.ref.iconClass}}"></i>
+				</div>
+
+				<div class="thermo-default-plans--plan" (click)="changePlan(0)">
+					<div class="thermo-default-plans--day-name">{{heatingDefaultPlans[0].nameOfDay}}</div>
+
+					<i class="{{heatingDefaultPlans[0].plan.ref.iconClass}}"></i>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

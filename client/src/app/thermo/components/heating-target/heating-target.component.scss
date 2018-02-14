@@ -1,0 +1,39 @@
+@import '../../../../styles/colors/variables';
+@import '../../../../styles/icons/mixins';
+
+.thermo-target--control {
+	vertical-align: middle;
+}
+
+.thermo-target--button {
+	border: 0;
+	background: none;
+	font-size: 3.1rem;
+	vertical-align: middle;
+	color: $gray;
+	margin: 0 30px;
+	outline: 0;
+	cursor: pointer;
+
+	&:first-child {
+		margin-left: 0;
+	}
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+.thermo-target--decrease {
+
+}
+
+.thermo-target--increase {
+
+}
+
+.thermo-target--value {
+	font-size: 3.1rem;
+	font-weight: bold;
+	vertical-align: middle;
+}

@@ -1,0 +1,49 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import 'styles/assets';
+@import 'styles/icons/assets';
+@import 'styles/icons/classes';
+@import 'styles/colors/classes';
+@import 'styles/bootstrap-helpers';
+
+* {
+	outline: 0;
+}
+
+body {
+	font-family: 'Jura';
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-attachment: fixed;
+	overflow-x: hidden;
+}
+
+.clearfix:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin-top: 0;
+	text-align: center;
+}
+
+.decimal {
+	font-size: 0.5em;
+}
+
+.component {
+	background: rgba(255, 255, 255, 0.85);
+	box-shadow: 2px 2px 9px 0px rgba(97,97,97,0.2);
+	color: $dark-gray;
+	padding: 10px;
+	box-sizing: border-box;
+	margin-bottom: 10px;
+}

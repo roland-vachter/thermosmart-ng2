@@ -1,0 +1,7 @@
+@import '../../../../styles/icons/mixins';
+
+.thermo-status--icon {
+	font-size: 3.1rem;
+
+	@include icon('air-conditioner-3');
+}

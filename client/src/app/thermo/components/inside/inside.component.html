@@ -1,0 +1,12 @@
+<div class="thermo-inside">
+	<div class="thermo-inside--value thermo-inside--temp">
+		<i class="thermo-inside--temp-icon"></i>
+		<span>
+			{{temperature | integer}}<span class="decimal">.{{temperature | decimal}}</span>
+		</span>
+	</div>
+
+	<div class="thermo-inside--value thermo-inside--humi">
+		<i class="thermo-inside--humi-icon"></i> {{humidity | integer}}
+	</div>
+</div>

@@ -1,0 +1,13 @@
+<div class="thermo-outside">
+	<div class="thermo-outside--weather">
+		<i class="{{weatherIconClass}}"></i>
+	</div>
+
+	<div class="thermo-outside--value thermo-outside--temp">
+		{{temperature | integer}}<span class="decimal">.{{temperature | decimal}}</span>
+	</div>
+
+	<div class="thermo-outside--value thermo-outside--humi">
+		{{humidity | integer}}
+	</div>
+</div>

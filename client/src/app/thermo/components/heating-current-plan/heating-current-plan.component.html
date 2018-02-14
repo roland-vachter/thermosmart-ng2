@@ -1,0 +1,11 @@
+<div class="thermo-current-plan">
+	<h3>{{todaysPlan.plan.ref.name}}</h3>
+	<i class="icon-settings-1 color-maroon thermo-current-plan--change" (click)="changePlan()"></i>
+
+	<div class="thermo-current-plan--current-time" [ngClass]="{'thermo-current-plan--last-part': percentInDay > 80}" [style.left]="percentInDay | percentString">
+		<div class="thermo-current-plan--pointer color-bg-{{targetTemp.ref.color}}" [style.left]="percentInDay | percentString"></div>
+		{{currentTime}}
+	</div>
+
+	<thermo-heating-plan [plan]="todaysPlan.plan.ref"></thermo-heating-plan>
+</div>

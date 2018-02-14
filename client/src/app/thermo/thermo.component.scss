@@ -1,0 +1,54 @@
+@import '../../styles/icons/mixins';
+@import '../../styles/colors/variables';
+
+.thermo {
+	padding-top: 20px;
+	text-align: center;
+}
+
+.thermo-house--icon {
+	font-size: 15rem;
+	font-weight: 100;
+	margin: 0 -1rem;
+}
+
+.thermo-house--outside {
+	display: inline-block;
+}
+
+.thermo-house--inside {
+	position: relative;
+	display: inline-block;
+	margin-left: -7px;
+	padding: 20px 0 20px 0;
+	text-align: left;
+}
+
+.thermo-heating--target {
+	display: inline-block;
+	width: 100%;
+	text-align: center;
+	margin-top: 20px;
+}
+
+.thermo--inside {
+	position: absolute;
+	left: 40px;
+	top: 110px;
+}
+
+.thermo-heating--status {
+	position: absolute;
+	left: 0;
+	top: 40px;
+	width: 100%;
+	text-align: center;
+}
+
+.thermo-heating--duration {
+	position: absolute;
+	top: 220px;
+	left: 65px;
+	font-size: 1rem;
+	color: $dark-gray;
+}

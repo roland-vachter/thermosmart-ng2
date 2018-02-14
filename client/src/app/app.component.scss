@@ -1,0 +1,69 @@
+@import '../styles/variables';
+@import '../styles/icons/mixins';
+@import '../styles/icons/classes';
+
+.smart-navbar--dropdown-button {
+	border: 0;
+	background: none;
+	cursor: pointer;
+
+	@include icon('hamburger-menu-2');
+}
+
+.smart-navbar {
+	background: $white;
+	border-bottom: 1px solid $gray;
+	color: $orange;
+	font-size: 1.87rem;
+	text-align: center;
+	width: 100%;
+	padding: 5px 0;
+	font-family: 'Jura';
+	position: fixed;
+	top: 0;
+	z-index: 10;
+}
+
+.mainContent {
+	margin-top: 75px;
+}
+
+.smart-refresh {
+	vertical-align: middle;
+	cursor: pointer;
+	padding-top: 4px;
+
+	@include icon('continuous');
+}
+
+@keyframes spin {
+	0% {}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+.smart-spin {
+	animation: spin 1s 16 ease;
+}
+
+.smart-header {
+	width: 100%;
+
+	.dropdown-menu {
+		.dropdown-header {
+			font-size: 1.3rem;
+		}
+
+		li {
+			font-size: 0.9rem;
+		}
+	}
+}
+
+.smart-stats {
+	@include icon('stats');
+}
+
+.smart-settings {
+	@include icon('settings');
+}
