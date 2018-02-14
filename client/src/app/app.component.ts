@@ -9,7 +9,7 @@ import { ThermoComponent }  from './thermo/thermo.component';
 export class AppComponent {
 	title = 'app';
 	refreshInProgress = false;
-	currentDate = new Date();
+	currentDate: any = new Date().getTime();
 
 	@ViewChild(ThermoComponent)
 	public thermoComponent: ThermoComponent;
@@ -37,7 +37,7 @@ export class AppComponent {
 
 	ngOnInit () {
 		setTimeout(() => {
-			this.currentDate = new Date();
+			this.currentDate = new Date().getTime();
 		}, 60000);
 	}
 }
