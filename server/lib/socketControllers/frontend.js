@@ -7,6 +7,7 @@ const heatingService = require('../services/heating');
 const statisticsService = require('../services/statistics');
 const security = require('../services/security');
 const restartSensorService = require('../services/restartSensor');
+const config = require('../services/config');
 const Temperature = require('../models/Temperature');
 const HeatingDefaultPlan = require('../models/HeatingDefaultPlan');
 
@@ -53,6 +54,12 @@ exports.init = function () {
 	restartSensorService.evts.on('change', data => {
 		io.emit('update', {
 			restartSensorInProgress: data
+		});
+	});
+
+	config.evts.on('change', data => {
+		io.emit('update', {
+			config: data
 		});
 	});
 

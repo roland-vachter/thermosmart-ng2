@@ -31,11 +31,10 @@ export class SensorComponent implements OnInit {
 		}
 
 		const modalRef = this.modalService.show(ChangeSensorLabelModalComponent, {
-			initialState,
-			class: 'modal-lg'
+			initialState
 		});
 
-		modalRef.content.onResult(result => {
+		modalRef.content.onResult.subscribe(result => {
 			if (result) {
 				this.serverApiService.changeSensorLabel(this.id, result);
 			}

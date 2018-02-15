@@ -8,6 +8,7 @@ const heatingService = require('../services/heating');
 const statisticsService = require('../services/statistics');
 const restartSensorService = require('../services/restartSensor');
 const security = require('../services/security');
+const configService = require('../services/config');
 
 const moment = require('moment-timezone');
 
@@ -23,13 +24,15 @@ exports.init = function (req, res, next) {
 			.find()
 			.exec(),
 		statisticsService
-			.getStatisticsForToday()
+			.getStatisticsForToday(),
+		configService.getAll()
 	]).then(results => {
 		const [
 			temps,
 			heatingDefaultPlans,
 			heatingPlans,
-			statisticsForToday
+			statisticsForToday,
+			config
 		] = results;
 
 		res.json({
@@ -45,7 +48,8 @@ exports.init = function (req, res, next) {
 				security: {
 					status: security.getStatus()
 				},
-				restartInProgress: restartSensorService.getStatus()
+				restartInProgress: restartSensorService.getStatus(),
+				config: config
 			}
 		});
 	}).catch((err) => {
@@ -229,5 +233,12 @@ exports.statistics = async (req, res) => {
 			statisticsForLastMonth,
 			statisticsByMonth
 		}
+	});
+};
+
+exports.changeConfig = async (req, res) => {
+	await configService.set(req.body.name, req.body.value);
+	res.json({
+		status: 'ok'
 	});
 };

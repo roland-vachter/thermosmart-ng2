@@ -1,5 +1,6 @@
 const insideConditions = require('./insideConditions');
 const targetTempService = require('./targetTemp');
+const configService = require('./config');
 
 const EventEmitter = require('events');
 const evts = new EventEmitter();
@@ -63,19 +64,37 @@ function turnHeatingOff () {
 	lastChangeEventStatus = isOn;
 }
 
-function updateHeatingStatus () {
+async function updateHeatingStatus () {
 	if (!initialized) {
 		return Promise.resolve();
 	}
 
-	return targetTempService().then(target => {
-		if (!isOn && avgValues.temperature <= target - 0.2) {
+	try {
+		[switchThresholdBelow, switchThresholdAbove] = await Promise.all([
+			configService.get('switchThresholdBelow'),
+			configService.get('switchThresholdAbove')
+		]);
+
+		if (!switchThresholdBelow) {
+			switchThresholdBelow = {
+				value: 0.2
+			};
+		}
+
+		if (!switchThresholdAbove) {
+			switchThresholdAbove = {
+				value: 0.2
+			};
+		}
+
+		const target = await targetTempService();
+		if (!isOn && avgValues.temperature <= target - switchThresholdBelow.value) {
 			turnHeatingOn();
-		} else if (avgValues.temperature >= target + 0.2) {
+		} else if (avgValues.temperature >= target + switchThresholdAbove.value) {
 			turnHeatingOff();
 		}
-	}).catch((err) => {
+	} catch(err) {
 		console.log("Error occured while fetching the heating plan for today", err);
-	});
+	}
 }
 setInterval(updateHeatingStatus, 10000);

@@ -13,11 +13,36 @@
 					<div class="color-{{temp.ref.color}}">
 						<i class="{{temp.ref.iconClass}}"></i> <span class="thermo-temps--temp-name">{{temp.ref.name}}</span>
 						<div class="thermo-temps--temp-control" data-id="{{temp.ref._id}}">
-							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="tempAdjust(temp.ref, -0.1)">-</button>
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="switchAdjust(temp.ref, -0.1)">-</button>
 							<span class="thermo-temps--temp-value">{{temp.ref.value | integer}}<span class="decimal">.{{temp.ref.value | decimal}}</span> &deg;C</span>
 							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase" (click)="tempAdjust(temp.ref, 0.1)">+</button>
 						</div>
 					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-12">
+			<h2>
+				Switch thresholds
+				<br/>
+				<small><small><small>(compared to the target temperature)</small></small></small>
+			</h2>
+			<div class="thermo-switch--config row">
+				<div class="thermo-switch--value col-6">
+					<h5>Switch on</h5>
+
+					<button type="button" class="thermo-switch--button thermo-switch--decrease" (click)="switchAdjust(switchThresholdBelow, -0.1)">-</button>
+					<span class="thermo-switch-value">{{switchThresholdBelow.value | integer}}<span class="decimal">.{{switchThresholdBelow.value | decimal}}</span> &deg;C</span>
+					<button type="button" class="thermo-switch--button thermo-switch--increase" (click)="switchAdjust(switchThresholdBelow, 0.1)">+</button>
+				</div>
+
+				<div class="thermo-switch--value col-6">
+					<h5>Switch off</h5>
+
+					<button type="button" class="thermo-switch--button thermo-switch--decrease" (click)="switchAdjust(switchThresholdAbove, -0.1)">-</button>
+					<span class="thermo-switch-value">{{switchThresholdAbove.value | integer}}<span class="decimal">.{{switchThresholdAbove.value | decimal}}</span> &deg;C</span>
+					<button type="button" class="thermo-switch--button thermo-switch--increase" (click)="switchAdjust(switchThresholdAbove, 0.1)">+</button>
 				</div>
 			</div>
 		</div>

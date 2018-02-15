@@ -51,6 +51,7 @@ export class ThermoComponent implements OnInit {
 	percentInDay: any = 0;
 	currentTime: any = null;
 	currentDate: any = null;
+	config: any = {};
 
 	constructor(
 			private serverUpdateService: ServerUpdateService,
@@ -60,6 +61,19 @@ export class ThermoComponent implements OnInit {
 
 	handleServerData (data: any) {
 		this.lastUpdate = new Date();
+
+		if (data.config) {
+			Object.keys(data.config).forEach(configName => {
+				if (!this.config[configName]) {
+					this.config[configName] = {
+						name: configName,
+						value: ''
+					};
+				}
+
+				this.config[configName].value = data.config[configName];
+			});
+		}
 
 		if (data.sensors) {
 			const ids = Object.keys(data.sensors);
@@ -244,10 +258,22 @@ export class ThermoComponent implements OnInit {
 	}
 
 	showHeatingConfigModal () {
+		this.config['switchThresholdBelow'] = this.config['switchThresholdBelow'] || {
+			name: 'switchThresholdBelow',
+			value: 0.2
+		};
+
+		this.config['switchThresholdAbove'] = this.config['switchThresholdAbove'] || {
+			name: 'switchThresholdAbove',
+			value: 0.2
+		};
+
 		const modalRef = this.modalService.show(ThermoConfigModalComponent, {
 			initialState: {
 				temps: this.temperatureList,
-				heatingDefaultPlans: this.defaultHeatingPlans
+				heatingDefaultPlans: this.defaultHeatingPlans,
+				switchThresholdBelow: this.config['switchThresholdBelow'],
+				switchThresholdAbove: this.config['switchThresholdAbove']
 			},
 			class: 'modal-lg'
 		});

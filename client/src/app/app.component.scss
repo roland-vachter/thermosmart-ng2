@@ -60,6 +60,10 @@
 	}
 }
 
+.smart-header--content {
+	padding: 0 15px;
+}
+
 .smart-stats {
 	@include icon('stats');
 }

@@ -1,23 +1,25 @@
 <div class="navbar navbar-light navbar-expand-xl smart-navbar">
 	<div class="container">
 		<div class="smart-header">
-			SmartHome
+			<div class="smart-header--content">
+				SmartHome
 
-			<div class="smart-navbar--dropdown-container btn-group float-left" dropdown>
-				<button dropdownToggle class="smart-navbar--dropdown-button color-gray" data-toggle="dropdown" role="button" id="smart-navbar-dropdown" aria-haspopup="true" aria-expanded="false">
-				</button>
-				<div *dropdownMenu class="dropdown-menu" aria-labelledby="smart-navbar--dropdown" role="menu">
-					<h6 class="dropdown-header">Heating</h6>
-					<a class="dropdown-item" (click)="thermoStatisticsAction()" href="#"><i class="smart-stats"></i> Statistics</a>
-					<a class="dropdown-item" (click)="thermoConfigAction()" href="#"><i class="smart-settings" href="#"></i> Config</a>
-					<a class="dropdown-item" (click)="thermoRestartSensors()" href="#"><i class="smart-settings" href="#"></i> Restart sensors</a>
-					<div role="separator" class="dropdown-divider"></div>
-					<h6 class="dropdown-header">Security</h6>
+				<div class="smart-navbar--dropdown-container btn-group float-left" dropdown>
+					<button dropdownToggle class="smart-navbar--dropdown-button color-gray" data-toggle="dropdown" role="button" id="smart-navbar-dropdown" aria-haspopup="true" aria-expanded="false">
+					</button>
+					<div *dropdownMenu class="dropdown-menu" aria-labelledby="smart-navbar--dropdown" role="menu">
+						<h6 class="dropdown-header">Heating</h6>
+						<a class="dropdown-item" (click)="thermoStatisticsAction()" href="#"><i class="smart-stats"></i> Statistics</a>
+						<a class="dropdown-item" (click)="thermoConfigAction()" href="#"><i class="smart-settings" href="#"></i> Config</a>
+						<a class="dropdown-item" (click)="thermoRestartSensors()" href="#"><i class="smart-settings" href="#"></i> Restart sensors</a>
+						<div role="separator" class="dropdown-divider"></div>
+						<h6 class="dropdown-header">Security</h6>
+					</div>
 				</div>
-			</div>
 
-			<div class="float-right">
-				<div class="smart-refresh in-progress" [ngClass]="{'color-gray': currentDate - thermoComponent.lastUpdate < 5 * 60 * 1000, 'color-orange': currentDate - thermoComponent.lastUpdate >= 5 * 60 * 1000 && currentDate - thermoComponent.lastUpdate < 10 * 60 * 1000, 'color-red': currentDate - thermoComponent.lastUpdate >= 10 * 60 * 1000, 'smart-spin': refreshInProgress}" (click)="refresh()"></div>
+				<div class="float-right">
+					<div class="smart-refresh in-progress" [ngClass]="{'color-gray': currentDate - thermoComponent.lastUpdate < 5 * 60 * 1000, 'color-orange': currentDate - thermoComponent.lastUpdate >= 5 * 60 * 1000 && currentDate - thermoComponent.lastUpdate < 10 * 60 * 1000, 'color-red': currentDate - thermoComponent.lastUpdate >= 10 * 60 * 1000, 'smart-spin': refreshInProgress}" (click)="refresh()"></div>
+				</div>
 			</div>
 		</div>
 	</div>

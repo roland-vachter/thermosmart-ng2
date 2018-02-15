@@ -11,6 +11,14 @@ export class ThermoConfigModalComponent implements OnInit {
 
 	@Input() temps = [];
 	@Input() heatingDefaultPlans = [];
+	@Input() switchThresholdBelow = {
+		name: '',
+		value: NaN
+	};
+	@Input() switchThresholdAbove = {
+		name: '',
+		value: NaN
+	};
 	@Output() onChangePlan: EventEmitter<any> = new EventEmitter();
 
 	constructor(
@@ -26,6 +34,10 @@ export class ThermoConfigModalComponent implements OnInit {
 
 	changePlan (dayOfWeek) {
 		this.onChangePlan.emit(dayOfWeek);
+	}
+
+	switchAdjust (switchConfig, diff) {
+		this.serverApiService.changeConfig(switchConfig.name, switchConfig.value + diff);
 	}
 
 }
