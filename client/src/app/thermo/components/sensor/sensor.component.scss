@@ -2,19 +2,26 @@
 @import '../../../../styles/icons/mixins';
 
 .thermo-room {
-	font-size: 1.9rem;
+	font-size: 1.4rem;
 	position: relative;
 }
 
 .thermo-room--label {
 	text-align: center;
-	font-size: 1.12rem;
+	font-size: 1rem;
 	cursor: pointer;
 
 	span {
 		font-size: 0.75rem;
 		vertical-align: super;
 	}
+}
+
+.thermo-room-label-container {
+	overflow: hidden;
+	width: 100%;
+	text-align: left;
+	height: 2rem;
 }
 
 .thermo-room--temperature {
@@ -27,16 +34,20 @@
 	color: $aqua;
 }
 
+.thermo-room--temperature,
+.thermo-room--humidity {
+	i {
+		font-size: 1rem;
+	}
+}
+
 .thermo-room--disabled .thermo-room--humidity,
 .thermo-room--disabled .thermo-room--temperature {
 	color: $gray;
 }
 
 .thermo-room--status {
-	position: absolute;
-	right: 10px;
-	top: 10px;
-	font-size: 1.06rem;
+	font-size: 1rem;
 }
 
 .thermo-room:hover .thermo-room--status {
@@ -45,14 +56,15 @@
 
 .thermo-room--switch {
 	display: none;
+
+	/*position: absolute;
+	right: 0;
+	top: 0;*/
+	font-size: 1rem;
+	color: $dark-gray;
+	cursor: pointer;
 }
 
 .thermo-room:hover .thermo-room--switch {
-	display: block;
-	position: absolute;
-	right: 10px;
-	top: 10px;
-	font-size: 1.06rem;
-	color: $dark-gray;
-	cursor: pointer;
+	display: inline-block;
 }

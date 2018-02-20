@@ -1,6 +1,6 @@
 <div class="thermo">
 	<div class="row">
-		<div class="col-12 col-md-7 col-lg-5 col-xl-4">
+		<div class="col-12 col-md-6 col-lg-5 col-xl-4">
 			<div class="component">
 				<div class="thermo-house--outside">
 					<thermo-outside [temperature]="outsideConditions.temperature" [humidity]="outsideConditions.humidity" [weatherIconClass]="outsideConditions.weatherIconClass"></thermo-outside>
@@ -28,7 +28,7 @@
 			</div>
 		</div>
 
-		<div class="col-12 col-md-5 col-lg-7 col-xl-8">
+		<div class="col-12 col-md-6 col-lg-7 col-xl-8">
 			<div class="row">
 				<div *ngFor="let sensor of sensorList" class="col-12 col-lg-6">
 					<div class="component">
@@ -45,6 +45,7 @@
 				</div>
 			</div>
 		</div>
+
 
 		<div class="col-12">
 			<div class="component">

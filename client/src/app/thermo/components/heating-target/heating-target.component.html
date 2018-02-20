@@ -1,6 +1,4 @@
-<div class="thermo-target--control">
-	<h4>Target</h4>
-	
+<div class="thermo-target--control">	
 	<button type="button" class="thermo-target--button thermo-target--decrease" (click)="tempAdjust(-0.1)">-</button>
 	<span class="thermo-target--value color-{{targetTemp.ref.color}}">
 		{{targetTemp.ref.value | integer}}<span class="decimal">.{{targetTemp.ref.value | decimal}}</span>
