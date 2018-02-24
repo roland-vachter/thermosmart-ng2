@@ -82,6 +82,8 @@ export class ThermoComponent implements OnInit {
 				if (!this.sensorsById[id]) {
 					this.sensorsById[id] = data.sensors[id];
 					this.sensorList.push(data.sensors[id]);
+				} else {
+					Object.assign(this.sensorsById[id], data.sensors[id]);
 				}
 			});
 
