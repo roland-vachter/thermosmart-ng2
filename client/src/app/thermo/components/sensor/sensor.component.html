@@ -1,6 +1,6 @@
 <div class="thermo-room" [ngClass]="{'thermo-room--disabled': !enabled}">
 	<div class="row no-gutters">
-		<div class="col-6">
+		<div class="col-12">
 			<div class="thermo-room-label-container">
 				<span class="thermo-room--status icon-wifi color-{{restartSensorInProgress ? 'yellow' : (!enabled ? 'gray' : active ? 'mint' : 'red')}}"></span>
 				<i class="thermo-room--switch icon-power-button" (click)="toggleSensorStatus()"></i>
@@ -9,13 +9,13 @@
 				</span>
 			</div>
 		</div>
-		<div class="col-3">
+		<div class="col-6">
 			<div class="thermo-room--temperature">
 				<i class="icon-thermometer6"></i>
 				{{temperature | integer}}<span class="decimal">.{{temperature | decimal}}</span>
 			</div>
 		</div>
-		<div class="col-3">
+		<div class="col-6">
 			<div class="thermo-room--humidity">
 				<i class="icon-humidity"></i>
 				{{humidity}}

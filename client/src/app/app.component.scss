@@ -2,14 +2,6 @@
 @import '../styles/icons/mixins';
 @import '../styles/icons/classes';
 
-.smart-navbar--dropdown-button {
-	border: 0;
-	background: none;
-	cursor: pointer;
-
-	@include icon('hamburger-menu-2');
-}
-
 .smart-navbar {
 	background: $white;
 	border-bottom: 1px solid $gray;
@@ -22,6 +14,30 @@
 	position: fixed;
 	top: 0;
 	z-index: 10;
+
+	.smart-navbar--dropdown-menu {
+		h4.smart-navbar--dropdown-header {
+			font-size: 1.6rem;
+			font-weight: bold;
+		}
+
+		a {
+			font-size: 1.2rem;
+
+			i {
+				font-size: 1.5rem;
+				vertical-align: middle;
+			}
+		}
+	}
+
+	.smart-navbar--dropdown-button {
+		border: 0;
+		background: none;
+		cursor: pointer;
+
+		@include icon('hamburger-menu-2');
+	}
 }
 
 .mainContent {

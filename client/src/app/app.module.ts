@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { ChartsModule } from 'ng2-charts';
 import { ModalModule, BsDropdownModule  } from 'ngx-bootstrap';
 import { AppComponent } from './app.component';
+import { LoginStatusService } from './shared/login-status.service';
 
 
 @NgModule({
@@ -24,7 +25,9 @@ import { AppComponent } from './app.component';
 		SharedModule,
 		ThermoModule
 	],
-	providers: [],
+	providers: [
+		LoginStatusService
+	],
 	bootstrap: [AppComponent],
 	exports: [
 		FormsModule

@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ObjectKeysPipe } from './object-keys.pipe';
 import { PercentStringPipe } from './percent-string.pipe';
 import { DayOfWeekNamePipe } from './day-of-week-name.pipe';
+import { LoginStatusService } from './login-status.service';
 
 const config: SocketIoConfig = {
 	url: '/frontend',
@@ -35,6 +36,7 @@ const config: SocketIoConfig = {
 		ObjectKeysPipe,
 		PercentStringPipe,
 		DayOfWeekNamePipe
-	]
+	],
+	providers: [LoginStatusService]
 })
 export class SharedModule { }

@@ -128,7 +128,7 @@ exports.changeDefaultPlan = function (req, res, next) {
 	.catch(next);
 };
 
-exports.securityToggleAlarm = function (req, res) {
+exports.securityToggleAlarm = (req, res) => {
 	security.toggleArm();
 
 	res.json({
@@ -136,7 +136,7 @@ exports.securityToggleAlarm = function (req, res) {
 	});
 };
 
-exports.restartSensor = function (req, res) {
+exports.restartSensor = (req, res) => {
 	restartSensorService.initiate();
 
 	res.json({
@@ -144,7 +144,7 @@ exports.restartSensor = function (req, res) {
 	});
 };
 
-exports.toggleSensorStatus = async function (req, res, next) {
+exports.toggleSensorStatus = async (req, res, next) => {
 	if (!req.body.id) {
 		return res.status(400);
 	}
