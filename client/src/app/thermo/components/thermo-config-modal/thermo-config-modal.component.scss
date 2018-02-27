@@ -54,6 +54,7 @@
 
 .thermo-default-plans {
 	border: 2px solid $silver;
+	background-color: $silver;
 
 	.thermo-default-plans--plan {
 		width: 14.28%;
@@ -62,6 +63,7 @@
 		float: left;
 		box-sizing: border-box;
 		border: 2px solid $silver;
+		background-color: $white;
 		cursor: pointer;
 
 		&:hover {

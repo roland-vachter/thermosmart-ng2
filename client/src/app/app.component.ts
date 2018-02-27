@@ -12,6 +12,7 @@ export class AppComponent {
 	refreshInProgress = false;
 	currentDate: any = new Date().getTime();
 	updateStatus = 'fresh';
+	lastVisible = new Date();
 
 	@ViewChild(ThermoComponent)
 	public thermoComponent: ThermoComponent;
@@ -60,15 +61,23 @@ export class AppComponent {
 	ngOnInit () {
 		setTimeout(this.updateFreshnessStatus.bind(this), 60000);
 
-		document.addEventListener("visibilitychange", function() {
-			if (document.visibilityState === 'visible' && this.updateStatus === 'outdated') {
-				this.refresh();
-
-				this.loginStatusService.check().subscribe(res => {
-					if (res.status !== 200) {
+		document.addEventListener("visibilitychange", () => {
+			if (document.visibilityState === 'visible') {
+				if ((this.updateStatus === 'outdated' || new Date().getTime() - this.lastVisible.getTime() > 60000)) {
+					if (new Date().getTime() - this.lastVisible.getTime() > 4 * 60000) {
 						window.location.href = '';
 					}
-				});
+
+					this.refresh();
+
+					this.loginStatusService.check().subscribe(res => {
+						if (res.status !== 200) {
+							window.location.href = '';
+						}
+					});
+				}
+
+				this.lastVisible = new Date();
 			}
 		});
 	}

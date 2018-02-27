@@ -255,7 +255,7 @@ export class ThermoComponent implements OnInit {
 
 	showHeatingStatisticsModal () {
 		this.modalService.show(StatisticsModalComponent, {
-			class: 'modal-lg'
+			class: 'modal-xl'
 		});
 	}
 
