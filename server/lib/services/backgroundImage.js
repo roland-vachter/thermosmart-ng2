@@ -34,11 +34,16 @@ const images = {
 	'fog.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
 		conditions: ['fog'],
-		daytime: ['day', 'night']
+		daytime: ['all']
 	},
 	'not_winter_night_rain1.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
-		conditions: ['rain'],
+		conditions: ['rain', 'snow', 'fog'],
+		daytime: ['night']
+	},
+	'not_winter_night_rain2.jpg': {
+		seasons: ['spring', 'summer', 'autumn'],
+		conditions: ['rain', 'snow', 'fog'],
 		daytime: ['night']
 	},
 	'raining1.jpg': {
@@ -58,12 +63,12 @@ const images = {
 	},
 	'not_winter_sunset1.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
-		conditions: ['clear'],
+		conditions: ['clear', 'cloudy', 'fog'],
 		daytime: ['night']
 	},
 	'not_winter_sunset2.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
-		conditions: ['clear'],
+		conditions: ['clear', 'cloudy', 'fog'],
 		daytime: ['night']
 	},
 	'spring_clear1.jpg': {
@@ -107,7 +112,7 @@ const images = {
 		daytime: ['day']
 	},
 	'winter_daylight_snowing1.jpg': {
-		seasons: ['winter'],
+		seasons: ['all'],
 		conditions: ['snow'],
 		daytime: ['day']
 	},
@@ -117,7 +122,7 @@ const images = {
 		daytime: ['day']
 	},
 	'winter_daylight_snowing3.jpg': {
-		seasons: ['winter'],
+		seasons: ['all'],
 		conditions: ['snow'],
 		daytime: ['day']
 	},
