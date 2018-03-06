@@ -18,7 +18,7 @@
 				</div>
 
 				<div class="float-right">
-					<div class="smart-refresh in-progress" [ngClass]="{'color-gray': updateStatus === 'fresh', 'color-orange': updateStatus === 'idle', 'color-red': updateStatus === 'outdated', 'smart-spin': refreshInProgress}" (click)="refresh()"></div>
+					<div class="smart-refresh in-progress" [ngClass]="{'color-gray': updateStatus === 'fresh', 'color-orange': updateStatus === 'idle', 'color-red': updateStatus === 'outdated', 'smart-spin': refreshInProgress}" (click)="refresh(true)"></div>
 				</div>
 			</div>
 		</div>

@@ -49,8 +49,8 @@ export class AppComponent {
 		}
 	}
 
-	checkLoginStatus () {
-		if (new Date().getTime() - this.lastLoginStatusCheck.getTime() > 10 * 60 * 1000) {
+	checkLoginStatus (onDemand = false) {
+		if (onDemand || !this.lastLoginStatusCheck || new Date().getTime() - this.lastLoginStatusCheck.getTime() > 10 * 60 * 1000) {
 			this.lastLoginStatusCheck = new Date();
 
 			this.loginStatusService.check().subscribe(res => {
@@ -61,8 +61,8 @@ export class AppComponent {
 		}
 	}
 
-	refresh () {
-		this.checkLoginStatus();
+	refresh (onDemand = false) {
+		this.checkLoginStatus(onDemand);
 		this.thermoComponent.refresh();
 
 		this.refreshInProgress = true;
@@ -76,7 +76,7 @@ export class AppComponent {
 		setTimeout(this.updateFreshnessStatus.bind(this), 60000);
 		setTimeout(this.checkLoginStatus, 60 * 60 * 1000);
 
-		document.addEventListener("visibilitychange", () => {
+		document.addEventListener("visibilitychange", (() => {
 			if (document.visibilityState === 'visible') {
 				this.checkLoginStatus();
 				this.updateFreshnessStatus();
@@ -87,6 +87,6 @@ export class AppComponent {
 
 				this.lastVisible = new Date();
 			}
-		});
+		}).bind(this));
 	}
 }
