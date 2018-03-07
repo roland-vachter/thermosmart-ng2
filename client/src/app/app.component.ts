@@ -53,11 +53,18 @@ export class AppComponent {
 		if (onDemand || !this.lastLoginStatusCheck || new Date().getTime() - this.lastLoginStatusCheck.getTime() > 10 * 60 * 1000) {
 			this.lastLoginStatusCheck = new Date();
 
-			this.loginStatusService.check().subscribe(res => {
-				if (res.status !== 200) {
-					window.location.href = '';
+			this.loginStatusService.check().subscribe(
+				res => {
+					if (res.status !== 200) {
+						window.location.href = '';
+					}
+				},
+				err => {
+					if (res.status !== 200) {
+						window.location.href = '';
+					}	
 				}
-			});
+			);
 		}
 	}
 
