@@ -16,6 +16,7 @@ const images = {
 		conditions: ['cloudy'],
 		daytime: ['day']
 	},
+	'not_winter_partly_cloudy'
 	'not_winter_night_clear1.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
 		conditions: ['clear'],
@@ -31,19 +32,24 @@ const images = {
 		conditions: ['clear'],
 		daytime: ['night']
 	},
-	'fog.jpg': {
-		seasons: ['spring', 'summer', 'autumn'],
+	'fog1.jpg': {
+		seasons: ['all'],
+		conditions: ['fog'],
+		daytime: ['all']
+	},
+	'fog2.jpg': {
+		seasons: ['all'],
 		conditions: ['fog'],
 		daytime: ['all']
 	},
 	'not_winter_night_rain1.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
-		conditions: ['rain', 'snow', 'fog'],
+		conditions: ['rain', 'snow'],
 		daytime: ['night']
 	},
 	'not_winter_night_rain2.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
-		conditions: ['rain', 'snow', 'fog'],
+		conditions: ['rain', 'snow'],
 		daytime: ['night']
 	},
 	'raining1.jpg': {
