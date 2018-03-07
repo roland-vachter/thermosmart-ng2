@@ -352,6 +352,22 @@ exports.getStatisticsByDay = async (dateStart, dateEnd) => {
 		})
 		.exec();
 
+	if (new Date(moment(dateEnd).tz("Europe/Bucharest").endOf('day')).getTime() === new Date(moment().tz("Europe/Bucharest").endOf('day')).getTime()) {
+		await [todayOutsideCondition, todayTargetTemp, todayRunningMinutes] = await Promise.all([
+				calculateAvgOutsideCondition(),
+				calculateAvgTargetTemp(),
+				calculateHeatingDuration()
+			]);
+
+		heatingStatistics.push({
+			avgOutsideHumi: todayOutsideCondition.h,
+			avgOutsideTemp: todayOutsideCondition.t,
+			avgTargetTemp: todayTargetTemp,
+			date: new Date((new Date(moment().tz("Europe/Bucharest").startOf('day'))).getTime() + 12 * 60 * 60 * 1000),
+			runningMinutes: todayRunningMinutes
+		});
+	}
+
 	return heatingStatistics || [];
 };
 
