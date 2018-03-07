@@ -16,7 +16,6 @@ const images = {
 		conditions: ['cloudy'],
 		daytime: ['day']
 	},
-	'not_winter_partly_cloudy'
 	'not_winter_night_clear1.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
 		conditions: ['clear'],

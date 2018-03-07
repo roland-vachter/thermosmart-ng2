@@ -353,7 +353,7 @@ exports.getStatisticsByDay = async (dateStart, dateEnd) => {
 		.exec();
 
 	if (new Date(moment(dateEnd).tz("Europe/Bucharest").endOf('day')).getTime() === new Date(moment().tz("Europe/Bucharest").endOf('day')).getTime()) {
-		await [todayOutsideCondition, todayTargetTemp, todayRunningMinutes] = await Promise.all([
+		const [todayOutsideCondition, todayTargetTemp, todayRunningMinutes] = await Promise.all([
 				calculateAvgOutsideCondition(),
 				calculateAvgTargetTemp(),
 				calculateHeatingDuration()
