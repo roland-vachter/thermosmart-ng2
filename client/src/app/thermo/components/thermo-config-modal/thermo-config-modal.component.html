@@ -13,7 +13,7 @@
 					<div class="color-{{temp.ref.color}}">
 						<i class="{{temp.ref.iconClass}}"></i> <span class="thermo-temps--temp-name">{{temp.ref.name}}</span>
 						<div class="thermo-temps--temp-control" data-id="{{temp.ref._id}}">
-							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="switchAdjust(temp.ref, -0.1)">-</button>
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="tempAdjust(temp.ref, -0.1)">-</button>
 							<span class="thermo-temps--temp-value">{{temp.ref.value | integer}}<span class="decimal">.{{temp.ref.value | decimal}}</span> &deg;C</span>
 							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase" (click)="tempAdjust(temp.ref, 0.1)">+</button>
 						</div>
