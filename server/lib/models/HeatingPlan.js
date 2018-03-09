@@ -5,6 +5,10 @@ const Schema = mongoose.Schema;
 
 const heatingPlanSchema = new Schema({
 	_id: Number,
+	displayOrder: {
+		type: Number,
+		index: true
+	},
 	name: {
 		type: String,
 		index: true
@@ -21,6 +25,7 @@ const heatingPlanSchema = new Schema({
 });
 
 heatingPlanSchema.index({name: 1});
+heatingPlanSchema.index({displayOrder: 1});
 heatingPlanSchema.set('versionKey', false);
 
 module.exports = mongoose.model('HeatingPlan', heatingPlanSchema);

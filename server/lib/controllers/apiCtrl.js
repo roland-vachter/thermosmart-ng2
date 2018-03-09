@@ -22,6 +22,9 @@ exports.init = function (req, res, next) {
 			.exec(),
 		HeatingPlan
 			.find()
+			.sort({
+				displayOrder: 1
+			})
 			.exec(),
 		statisticsService
 			.getStatisticsForToday(),
