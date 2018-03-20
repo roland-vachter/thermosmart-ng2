@@ -42,6 +42,11 @@ export class ThermoComponent implements OnInit {
 			ref: {}
 		}
 	};
+	nextDaysPlan: any = {
+		plan: {
+			ref: {}
+		}
+	};
 	targetTemp: any = {
 		ref: {
 			value: 0,
@@ -168,6 +173,7 @@ export class ThermoComponent implements OnInit {
 		}
 
 		this.todaysPlan = this.defaultHeatingPlans[new Date().getDay()];
+		this.nextDaysPlan = this.defaultHeatingPlans[new Date(new Date().getTime() + 24 * 60 * 60 * 1000).getDay()];
 
 		this.update();
 	}

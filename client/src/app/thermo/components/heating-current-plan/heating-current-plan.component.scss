@@ -43,5 +43,16 @@
 		display: table-cell;
 		vertical-align: middle;
 		text-align: center;
+		font-weight: bold;
+	}
+}
+
+
+.thermo-current-plan--next-plan {
+	text-align: left;
+	font-size: 1.1rem;
+
+	i {
+		font-size: 0.9rem;
 	}
 }

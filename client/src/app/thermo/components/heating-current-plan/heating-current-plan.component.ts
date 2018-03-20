@@ -9,6 +9,7 @@ import { ChangeHeatingPlanModalComponent } from '../change-heating-plan-modal/ch
 export class HeatingCurrentPlanComponent implements OnInit {
 
 	@Input() todaysPlan;
+	@Input() nextDaysPlan;
 	@Input() targetTemp;
 	@Input() currentTime;
 	@Input() percentInDay;
