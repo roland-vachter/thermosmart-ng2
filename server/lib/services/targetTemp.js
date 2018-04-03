@@ -3,7 +3,7 @@ const moment = require('moment-timezone');
 
 module.exports = function () {
 	return HeatingDefaultPlan.findOne({
-			dayOfWeek: new Date().getDay()
+			dayOfWeek: moment().tz("Europe/Bucharest").day()
 		})
 		.populate({
 			path: 'plan',
