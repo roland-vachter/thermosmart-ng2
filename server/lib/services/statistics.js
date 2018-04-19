@@ -400,8 +400,9 @@ exports.getStatisticsByMonth = async (dateStart, dateEnd) => {
 		}
 
 		const currentAvg = totals[totals.length - 1];
+		currentAvg.daysRunningMinutes++;
+
 		if (statistic.runningMinutes) {
-			currentAvg.daysRunningMinutes++;
 			currentAvg.runningMinutesTotal += statistic.runningMinutes;
 		}
 
