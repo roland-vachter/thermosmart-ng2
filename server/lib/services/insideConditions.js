@@ -7,6 +7,14 @@ let sensorData = {};
 
 exports.set = async (data) => {
 	try {
+		if (
+				!(sensorData[data.id] && Math.abs(data.temperature - sensorData[data.id].temperature) < 10) &&
+				!(!sensorData[data.id] && data.temperature > 10)
+			) {
+			console.log(`INVALID SENSOR VALUES - id: ${data.id}, temperature: ${data.temperature}, humidity: ${data.humidity}`);
+			return;
+		}
+
 		if (!sensorData[data.id]) {
 			sensorData[data.id] = {
 				id: data.id
