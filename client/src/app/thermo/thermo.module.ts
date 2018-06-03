@@ -9,7 +9,7 @@ import { HeatingTargetComponent } from './components/heating-target/heating-targ
 import { HeatingPlanComponent } from './components/heating-plan/heating-plan.component';
 import { ThermoComponent } from './thermo.component';
 import { ServerUpdateService } from '../shared/server-update.service';
-import { ServerApiService } from '../shared/server-api.service';
+import { ServerApiService } from './services/server-api.service';
 import { SensorComponent } from './components/sensor/sensor.component';
 import { ChangeHeatingPlanModalComponent } from './components/change-heating-plan-modal/change-heating-plan-modal.component';
 import { ChangeSensorLabelModalComponent } from './components/change-sensor-label-modal/change-sensor-label-modal.component';

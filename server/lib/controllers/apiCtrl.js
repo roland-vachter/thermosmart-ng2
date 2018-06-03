@@ -9,6 +9,10 @@ const statisticsService = require('../services/statistics');
 const restartSensorService = require('../services/restartSensor');
 const security = require('../services/security');
 const configService = require('../services/config');
+const SecurityMovementHistory = require('../models/SecurityMovementHistory');
+const SecurityArmingHistory = require('../models/SecurityArmingHistory');
+
+
 
 const moment = require('moment-timezone');
 
@@ -131,11 +135,65 @@ exports.changeDefaultPlan = function (req, res, next) {
 	.catch(next);
 };
 
-exports.securityToggleAlarm = (req, res) => {
+exports.securityToggleArm = (req, res) => {
 	security.toggleArm();
 
 	res.json({
 		status: 'ok'
+	});
+};
+
+exports.securityStatus = (req, res) => {
+	res.json({
+		status: 'ok',
+		data: {
+			security: {
+				status: security.getStatus()
+			}
+		}
+	});
+};
+
+exports.securityInit = (req, res) => {
+	Promise.all([
+		SecurityMovementHistory
+			.findOne()
+			.sort({
+				datetime: -1
+			})
+			.exec(),
+		SecurityArmingHistory
+			.findOne({
+				status: 'arming'
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec()
+	]).then(results => {
+		const [movementHistory, lastArmed] = results;
+
+		SecurityArmingHistory
+			.count({
+				status: 'alarm',
+				datetime: {
+					$gt: lastArmed.datetime
+				}
+			})
+			.exec()
+			.then(triggeredTimes => {
+				res.json({
+					status: 'ok',
+					data: {
+						security: {
+							status: security.getStatus(),
+							lastActivity: movementHistory.datetime,
+							lastArmedAt: lastArmed.datetime,
+							alarmTriggered: security.getStatus() === 'disarmed' ? 0 : triggeredTimes
+						}
+					}
+				});
+			});
 	});
 };
 
@@ -179,29 +237,27 @@ exports.changeSensorLabel = async (req, res, next) => {
 	}
 };
 
+exports.securityMovement = function (req, res) {
+	security.movementDetected();
+
+	res.json({
+		status: security.getStatus()
+	});
+}
+
 exports.sensorPolling = function (req, res) {
-	if (req.query.move) {
-		security.movementDetected();
-	}
+	const id = req.query.id || 1;
 
-	if (!isNaN(req.query.t) && !isNaN(req.query.h)) {
-		const id = req.query.id || 1;
+	insideConditions.set({
+		id: id,
+		temperature: parseFloat(req.query.t),
+		humidity: parseFloat(req.query.h)
+	});
 
-		insideConditions.set({
-			id: id,
-			temperature: parseFloat(req.query.t),
-			humidity: parseFloat(req.query.h)
-		});
-
-		setTimeout(() => res.json({
-			isHeatingOn: heatingService.isHeatingOn(),
-			restart: restartSensorService.getStatus()
-		}), 200);
-	} else {
-		res.json({
-			status: security.getStatus()
-		});
-	}
+	setTimeout(() => res.json({
+		isHeatingOn: heatingService.isHeatingOn(),
+		restart: restartSensorService.getStatus()
+	}), 200);
 };
 
 exports.statistics = async (req, res) => {
@@ -220,11 +276,11 @@ exports.statistics = async (req, res) => {
 	]);
 
 	statisticsForToday.unshift({
-		datetime: new Date(moment().tz("Europe/Bucharest").subtract(1, 'day')),
+		datetime: new Date(moment().tz('Europe/Bucharest').subtract(1, 'day')),
 		status: statisticsForToday[0] ? !statisticsForToday[0].status : false
 	});
 	statisticsForToday.push({
-		datetime: new Date(moment().tz("Europe/Bucharest")),
+		datetime: new Date(moment().tz('Europe/Bucharest')),
 		status: statisticsForToday.length ? statisticsForToday[statisticsForToday.length - 1].status : false
 	});
 

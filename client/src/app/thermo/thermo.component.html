@@ -1,7 +1,7 @@
 <div class="thermo">
 	<div class="row">
-		<div class="col-12 col-md-6 col-lg-5 col-xl-4">
-			<div class="component">
+		<div class="col-12 col-md-6 col-lg-5 col-xl-4 thermo-house--component-wrapper">
+			<div class="component thermo-house--component">
 				<div class="thermo-house--outside">
 					<thermo-outside [temperature]="outsideConditions.temperature" [humidity]="outsideConditions.humidity" [weatherIconClass]="outsideConditions.weatherIconClass"></thermo-outside>
 				</div>
@@ -43,20 +43,19 @@
 						</thermo-sensor>
 					</div>
 				</div>
-			</div>
-		</div>
 
-
-		<div class="col-12">
-			<div class="component">
-				<thermo-heating-current-plan
-					[targetTemp]="targetTemp"
-					[todaysPlan]="todaysPlan"
-					[nextDaysPlan]="nextDaysPlan"
-					[currentTime]="currentTime"
-					[percentInDay]="percentInDay"
-					(onChangePlan)="showChangePlanModal($event)">
-				</thermo-heating-current-plan>
+				<div class="col-12">
+					<div class="component">
+						<thermo-heating-current-plan
+							[targetTemp]="targetTemp"
+							[todaysPlan]="todaysPlan"
+							[nextDaysPlan]="nextDaysPlan"
+							[currentTime]="currentTime"
+							[percentInDay]="percentInDay"
+							(onChangePlan)="showChangePlanModal($event)">
+						</thermo-heating-current-plan>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

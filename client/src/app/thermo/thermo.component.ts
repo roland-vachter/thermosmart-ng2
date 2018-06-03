@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ServerUpdateService } from '../shared/server-update.service';
-import { ServerApiService } from '../shared/server-api.service';
+import { ServerApiService } from './services/server-api.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { StatisticsModalComponent } from './components/statistics-modal/statistics-modal.component';
 import { ThermoConfigModalComponent } from './components/thermo-config-modal/thermo-config-modal.component';

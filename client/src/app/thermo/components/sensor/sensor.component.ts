@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ServerApiService } from '../../../shared/server-api.service';
+import { ServerApiService } from '../../services/server-api.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { ChangeSensorLabelModalComponent } from '../change-sensor-label-modal/change-sensor-label-modal.component';
 

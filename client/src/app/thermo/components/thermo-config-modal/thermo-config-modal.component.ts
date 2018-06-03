@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
-import { ServerApiService } from '../../../shared/server-api.service';
+import { ServerApiService } from '../../services/server-api.service';
 
 @Component({
 	selector: 'thermo-config-modal',

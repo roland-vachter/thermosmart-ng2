@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ServerApiService } from '../../../shared/server-api.service';
+import { ServerApiService } from '../../services/server-api.service';
 import { Chart } from 'chart.js';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import * as moment from 'moment';

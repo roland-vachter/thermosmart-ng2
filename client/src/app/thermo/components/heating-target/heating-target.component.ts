@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ServerApiService } from '../../../shared/server-api.service';
+import { ServerApiService } from '../../services/server-api.service';
 
 @Component({
   selector: 'thermo-heating-target',

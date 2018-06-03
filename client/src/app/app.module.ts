@@ -2,6 +2,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ThermoModule } from './thermo/thermo.module';
+import { SecurityModule } from './security/security.module';
+import { PlantwateringModule } from './plantwatering/plantwatering.module';
 import { SharedModule } from './shared/shared.module';
 import { MomentModule } from 'angular2-moment';
 import { FormsModule } from '@angular/forms';
@@ -23,7 +25,9 @@ import { LoginStatusService } from './shared/login-status.service';
 		MomentModule,
 		ChartsModule,
 		SharedModule,
-		ThermoModule
+		ThermoModule,
+		SecurityModule,
+		PlantwateringModule
 	],
 	providers: [
 		LoginStatusService

@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ng-socket-io';
 import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
 
 @Injectable()
 export class ServerUpdateService {
 
-	private observer: Subscriber<any>;
-	private observable: Observable<any> = new Observable(observer => {
-		this.observer = observer;
-	});
+	private observers = [];
+	private observable = Observable.create(function (observer) {
+		console.log('create observer');
+		this.observers.push(observer);
+	}.bind(this));
 
 	constructor(private socket: Socket) {
 		this.socket
 			.fromEvent('update')
 			.subscribe((data: any) => {
-				this.observer.next(data);
+				this.observers.forEach(ob => ob.next(data));
 			});
 	}
 	
@@ -24,9 +24,7 @@ export class ServerUpdateService {
 	}
 
 	createUpdate (data) {
-		if (this.observer) {
-			this.observer.next(data);
-		}
+		this.observers.forEach(ob => ob.next(data));
 	}
 
 }

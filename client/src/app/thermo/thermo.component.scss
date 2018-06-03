@@ -2,8 +2,15 @@
 @import '../../styles/colors/variables';
 
 .thermo {
-	padding-top: 20px;
 	text-align: center;
+}
+
+.thermo-house--component {
+	height: 100%;
+}
+
+.thermo-house--component {
+	padding-bottom: 10px;
 }
 
 .thermo-house--icon {

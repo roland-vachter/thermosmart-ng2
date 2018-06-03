@@ -1,17 +1,20 @@
+const EventEmitter = require('events');
+const evts = new EventEmitter();
+
+const SecurityMovementHistory = require('../models/SecurityMovementHistory');
+const SecurityArmingHistory = require('../models/SecurityArmingHistory');
+
 const STATUSES = {
 	DISARMED: 'disarmed',
 	ARMING: 'arming',
 	ARMED: 'armed',
-	PREACTIVATED: 'preactivated',
-	ACTIVATED: 'activated'
+	PREALARM: 'prealarm',
+	ALARM: 'alarm'
 };
 
-const ARMED_STATUSES = [STATUSES.ARMED, STATUSES.PREACTIVATED, STATUSES.ACTIVATED];
+const ARMED_STATUSES = [STATUSES.ARMED, STATUSES.PREALARM, STATUSES.ALARM];
 
 let status = STATUSES.DISARMED;
-
-const EventEmitter = require('events');
-const evts = new EventEmitter();
 
 let timeout;
 
@@ -19,9 +22,30 @@ exports.evts = evts;
 
 exports.getStatus = () => status;
 
+SecurityArmingHistory
+	.findOne()
+	.sort({
+		datetime: -1
+	})
+	.exec()
+	.then((result) => {
+		if (result && ARMED_STATUSES.indexOf(result.status) !== -1) {
+			if (status !== STATUSES.ARMED) {
+				changeStatus(STATUSES.ARMED);
+			} else {
+				status = STATUSES.ARMED;
+			}
+		}
+	});
+
 const changeStatus = (newStatus) => {
 	status = newStatus;
 	evts.emit('status', status);
+
+	new SecurityArmingHistory({
+		datetime: new Date(),
+		status: newStatus
+	}).save();
 };
 
 const arm = () => {
@@ -49,14 +73,17 @@ exports.toggleArm = () => {
 
 exports.movementDetected = () => {
 	evts.emit('movement', true);
+	new SecurityMovementHistory({
+		datetime: new Date()
+	}).save();
 
-	if (ARMED_STATUSES.includes(status)) {
-		changeStatus(STATUSES.PREACTIVATED);
+	if (status === STATUSES.ARMED && ARMED_STATUSES.includes(status)) {
+		changeStatus(STATUSES.PREALARM);
 
 		clearTimeout(timeout);
 		timeout = setTimeout(() => {
 			evts.emit('alarm', true);
-			changeStatus(STATUSES.ACTIVATED);
+			changeStatus(STATUSES.ALARM);
 
 			clearTimeout(timeout);
 			timeout = setTimeout(() => {

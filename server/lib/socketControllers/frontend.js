@@ -110,4 +110,12 @@ exports.init = function () {
 			}
 		});
 	});
+
+	security.evts.on('movement', data => {
+		io.emit('update', {
+			security: {
+				movement: data
+			}
+		});
+	});
 };
