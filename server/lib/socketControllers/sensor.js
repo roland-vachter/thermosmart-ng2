@@ -1,5 +1,5 @@
 const socket = require('../services/socketio');
-const heatingService = require('../services/heating');
+const security = require('../services/security');
 
 const authorizedSockets = [];
 
@@ -8,25 +8,29 @@ function isSocketAuthorized (socket) {
 }
 
 exports.init = function () {
-	const frontendIo = socket.io.of('/sensor');
+	const frontendIo = socket.io;
 
 	frontendIo.on('connection', (socket) => {
-		socket.on('disconnect', () => {
-			if (isSocketAuthorized(socket)) {
-				authorizedSockets.splice(authorizedSockets.indexOf(socket), 1);
-			}
+		console.log('connected');
+
+		security.evts.on('status', data => {
+			//socket.forEach(io => {
+				socket.emit('update', {
+					security: {
+						status: data
+					}
+				});
+			//});
 		});
 
-		socket.on('authorize', (data) => {
-			if (data.key === process.env.AUTHORIZATION_KEY) {
-				authorizedSockets.push(socket);
-			}
-		});
-
-		socket.on('sensorChange', (data) => {
-			if (isSocketAuthorized(socket)) {
-				heatingService.setSensorData(data);
-			}
+		security.evts.on('alarm', data => {
+			//socket.forEach(io => {
+				socket.emit('update', {
+					security: {
+						alarm: data
+					}
+				});
+			//});
 		});
 	});
 };

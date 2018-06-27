@@ -87,7 +87,7 @@ exports.movementDetected = () => {
 
 			clearTimeout(timeout);
 			timeout = setTimeout(() => {
-				evts.emit('alarm', false);
+				evts.emit('alarm', 'false');
 				changeStatus(STATUSES.ARMED);
 			}, 60 * 1000);
 		}, 30 * 1000);

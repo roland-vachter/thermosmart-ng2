@@ -28,7 +28,7 @@ var server = http.createServer(app);
 
 require('../lib/services/socketio').init(server);
 require('../lib/socketControllers/frontend').init();
-require('../lib/socketControllers/sensor');
+require('../lib/socketControllers/sensor').init();
 
 /**
  * Listen on provided port, on all network interfaces.

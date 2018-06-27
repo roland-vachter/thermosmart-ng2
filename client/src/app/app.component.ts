@@ -1,5 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { ThermoComponent }  from './thermo/thermo.component';
+import { SecurityComponent } from './security/security.component';
 import { LoginStatusService } from './shared/login-status.service';
 
 @Component({
@@ -17,6 +18,9 @@ export class AppComponent {
 
 	@ViewChild(ThermoComponent)
 	public thermoComponent: ThermoComponent;
+
+	@ViewChild(SecurityComponent)
+	public securityComponent: SecurityComponent;
 
 
 	constructor(
@@ -69,6 +73,7 @@ export class AppComponent {
 	refresh (onDemand = false) {
 		this.checkLoginStatus(onDemand);
 		this.thermoComponent.refresh();
+		this.securityComponent.refresh();
 
 		this.refreshInProgress = true;
 		setTimeout(() => {

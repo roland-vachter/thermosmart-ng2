@@ -243,7 +243,7 @@ exports.securityMovement = function (req, res) {
 	res.json({
 		status: security.getStatus()
 	});
-}
+};
 
 exports.sensorPolling = function (req, res) {
 	const id = req.query.id || 1;

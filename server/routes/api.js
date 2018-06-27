@@ -19,8 +19,9 @@ router.get('/statistics', loginMiddleware, cors(), apiCtrl.statistics);
 router.post('/changeconfig', loginMiddleware, cors(), apiCtrl.changeConfig);
 
 router.post('/security/togglearm', loginMiddleware, cors(), apiCtrl.securityToggleArm);
-router.get('/security/movement', apiKeyMiddleware, cors(), apiCtrl.securityMovement);
-router.get('/security/status', apiKeyMiddleware, cors(), apiCtrl.securityStatus);
 router.get('/security/init', loginMiddleware, cors(), apiCtrl.securityInit);
+router.get('/security/sensor/status', apiKeyMiddleware, cors(), apiCtrl.securityStatus);
+router.post('/security/sensor/togglearm', apiKeyMiddleware, cors(), apiCtrl.securityToggleArm);
+router.get('/security/sensor/movement', apiKeyMiddleware, cors(), apiCtrl.securityMovement);
 
 module.exports = router;

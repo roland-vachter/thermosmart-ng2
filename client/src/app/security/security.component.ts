@@ -68,6 +68,10 @@ export class SecurityComponent implements OnInit {
 			.subscribe(this.handleServerData.bind(this));
 	}
 
+	refresh () {
+		this.init();
+	}
+
 	ngOnInit() {
 		this.init();
 

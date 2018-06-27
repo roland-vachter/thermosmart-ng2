@@ -1,30 +1,35 @@
 import { Injectable } from '@angular/core';
-import { Socket } from 'ng-socket-io';
 import { Observable } from 'rxjs/Observable';
+import * as io from 'socket.io-client';
 
 @Injectable()
 export class ServerUpdateService {
+	private socket: SocketIOClient.Socket;
 
 	private observers = [];
 	private observable = Observable.create(function (observer) {
-		console.log('create observer');
 		this.observers.push(observer);
 	}.bind(this));
 
-	constructor(private socket: Socket) {
-		this.socket
-			.fromEvent('update')
-			.subscribe((data: any) => {
-				this.observers.forEach(ob => ob.next(data));
-			});
+	constructor() {
+		this.socket = io('/frontend');
+
+		this.socket.on('update', data => {
+			this.observers.forEach(ob => ob.next(data));
+		});
 	}
-	
-	onUpdate () {
+
+	// EMITTER
+	sendMessage(msg: string) {
+		this.socket.emit('sendMessage', { message: msg });
+	}
+
+	// HANDLER
+	onUpdate() {
 		return this.observable;
 	}
 
 	createUpdate (data) {
 		this.observers.forEach(ob => ob.next(data));
 	}
-
 }
