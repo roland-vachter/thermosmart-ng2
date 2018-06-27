@@ -6,11 +6,7 @@
 }
 
 .thermo-house--component {
-	height: 100%;
-}
-
-.thermo-house--component {
-	padding-bottom: 10px;
+	height: calc(100% - 10px);
 }
 
 .thermo-house--icon {
