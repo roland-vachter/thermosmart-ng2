@@ -1,9 +1,9 @@
 <div class="plantwatering">
 	<div class="component">
 		<div class="row">
-			<div class="plantwatering-status col-12">
+			<div class="plantwatering-status plantwatering-status--{{status ? 'wet' : 'dry'}} col-12">
 				<i class="icon-plantwatering plantwatering-icon"></i>
-				<span class="plantwatering-status--text">Dry</span>
+				<span class="plantwatering-status--text">{{status ? 'Wet' : 'Dry'}}</span>
 			</div>
 		</div>
 	</div>

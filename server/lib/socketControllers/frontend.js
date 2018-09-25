@@ -6,6 +6,7 @@ const insideConditions = require('../services/insideConditions');
 const heatingService = require('../services/heating');
 const statisticsService = require('../services/statistics');
 const security = require('../services/security');
+const plantWatering = require('../services/plantWatering');
 const restartSensorService = require('../services/restartSensor');
 const config = require('../services/config');
 const Temperature = require('../models/Temperature');
@@ -117,5 +118,14 @@ exports.init = function () {
 				movement: data
 			}
 		});
+	});
+
+
+	plantWatering.evts.on('change', data => {
+		io.emit('update', {
+			plantWatering: {
+				status: data
+			}
+		})
 	});
 };

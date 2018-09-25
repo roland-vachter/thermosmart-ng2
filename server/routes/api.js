@@ -24,4 +24,7 @@ router.get('/security/sensor/status', apiKeyMiddleware, cors(), apiCtrl.security
 router.post('/security/sensor/togglearm', apiKeyMiddleware, cors(), apiCtrl.securityToggleArm);
 router.get('/security/sensor/movement', apiKeyMiddleware, cors(), apiCtrl.securityMovement);
 
+router.get('/plantwatering/init', loginMiddleware, cors(), apiCtrl.plantWateringInit);
+router.get('/plantwatering/sensor', apiKeyMiddleware, cors(), apiCtrl.plantWateringSensor);
+
 module.exports = router;

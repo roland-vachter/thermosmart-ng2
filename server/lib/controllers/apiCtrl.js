@@ -11,7 +11,7 @@ const security = require('../services/security');
 const configService = require('../services/config');
 const SecurityMovementHistory = require('../models/SecurityMovementHistory');
 const SecurityArmingHistory = require('../models/SecurityArmingHistory');
-
+const plantWateringService = require('../services/plantWatering');
 
 
 const moment = require('moment-timezone');
@@ -297,6 +297,37 @@ exports.statistics = async (req, res) => {
 
 exports.changeConfig = async (req, res) => {
 	await configService.set(req.body.name, req.body.value);
+	res.json({
+		status: 'ok'
+	});
+};
+
+
+exports.plantWateringInit = async (req, res) => {
+	res.json({
+		status: 'ok',
+		data: {
+			plantWatering: {
+				status: plantWateringService.getStatus()
+			}
+		}
+	});
+};
+
+exports.plantWateringSensor = async (req, res) => {
+	if (!req.query.id || !req.query.status) {
+		return res.status(400).json({
+			status: 'error',
+			reason: 'id or status parameters missing'
+		});
+	}
+
+	if (req.query.status === 'wet') {
+		plantWateringService.changeStatus(req.query.id, true);
+	} else if (req.query.status === 'dry') {
+		plantWateringService.changeStatus(req.query.id, false);
+	}
+
 	res.json({
 		status: 'ok'
 	});
