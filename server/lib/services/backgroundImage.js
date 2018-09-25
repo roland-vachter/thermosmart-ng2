@@ -11,6 +11,11 @@ const images = {
 		conditions: ['clear'],
 		daytime: ['day']
 	},
+	'autumn_clear3.jpg': {
+		seasons: ['autumn'],
+		conditions: ['clear'],
+		daytime: ['day']
+	},
 	'not_winter_cloudy1.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
 		conditions: ['cloudy'],
@@ -72,6 +77,11 @@ const images = {
 		daytime: ['night']
 	},
 	'not_winter_sunset2.jpg': {
+		seasons: ['spring', 'summer', 'autumn'],
+		conditions: ['clear', 'cloudy', 'fog'],
+		daytime: ['night']
+	},
+	'not_winter_sunset3.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
 		conditions: ['clear', 'cloudy', 'fog'],
 		daytime: ['night']
