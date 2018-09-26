@@ -10,7 +10,7 @@
 		"test": "ng test",
 		"lint": "ng lint",
 		"e2e": "ng e2e",
-		"postinstall": "ln -s node_modules client/node_modules && ng build"
+		"postinstall": "ln -s \"$(readlink -f node_modules)\" client/node_modules && ng build"
 	},
 	"private": true,
 	"dependencies": {
