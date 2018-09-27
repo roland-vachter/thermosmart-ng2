@@ -1,0 +1,33 @@
+@import '../../../../styles/colors/variables';
+@import '../../../../styles/icons/mixins';
+
+.thermo-sensor-setting--container {
+	font-size: 2em;
+	text-align: center;
+}
+
+.thermo-sensor-setting--value {
+	font-size: 1.6rem;
+	text-align: center;
+	margin-bottom: 20px;
+	font-weight: bold;
+	vertical-align: middle;
+	color: $sienna;
+
+	i {
+		font-size: 1.6rem;
+		vertical-align: middle;
+	}
+}
+
+.thermo-sensor-setting--button--container {
+	text-align: center;
+}
+
+.thermo-sensor-setting--button {
+	outline: 0;
+	border: 0;
+	background: none;
+	color: $gray;
+	cursor: pointer;
+}

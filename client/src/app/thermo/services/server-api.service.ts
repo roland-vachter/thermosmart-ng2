@@ -27,10 +27,12 @@ export class ServerApiService {
 		return obs;
 	}
 
-	changeSensorLabel (id, label) {
-		const obs = this.http.post('/api/changesensorlabel', {
+	changeSensorSettings (id, options) {
+		const obs = this.http.post('/api/changesensorsettings', {
 			id,
-			label
+			label: options.label,
+			tempadjust: options.tempAdjust,
+			humidityadjust: options.humidityAdjust
 		});
 
 		obs.subscribe();

@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ServerApiService } from '../../services/server-api.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { ChangeSensorLabelModalComponent } from '../change-sensor-label-modal/change-sensor-label-modal.component';
+import { ChangeSensorSettingsModalComponent } from '../change-sensor-settings-modal/change-sensor-settings-modal.component';
 
 @Component({
 	selector: 'thermo-sensor',
@@ -16,6 +16,8 @@ export class SensorComponent implements OnInit {
 	@Input() active;
 	@Input() enabled;
 	@Input() label;
+	@Input() tempAdjust;
+	@Input() humidityAdjust;
 	@Input() restartSensorInProgress;
 
 	toggleSensorStatus () {
@@ -24,19 +26,18 @@ export class SensorComponent implements OnInit {
 
 	changeLabel () {
 		const initialState = {
-			label: ''
+			label: this.label || '',
+			tempAdjust: this.tempAdjust || 0,
+			humidityAdjust: this.humidityAdjust || 0
 		};
-		if (this.label) {
-			initialState.label = this.label;
-		}
 
-		const modalRef = this.modalService.show(ChangeSensorLabelModalComponent, {
+		const modalRef = this.modalService.show(ChangeSensorSettingsModalComponent, {
 			initialState
 		});
 
 		modalRef.content.onResult.subscribe(result => {
 			if (result) {
-				this.serverApiService.changeSensorLabel(this.id, result);
+				this.serverApiService.changeSensorSettings(this.id, result);
 			}
 		});
 	}

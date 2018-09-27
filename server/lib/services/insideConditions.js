@@ -21,19 +21,6 @@ exports.set = async (data) => {
 			};
 		}
 
-		let changesMade = false;
-
-		if (sensorData[data.id].temperature !== data.temperature ||
-				sensorData[data.id].humidity !== data.humidity ||
-				sensorData[data.id].active !== true) {
-			changesMade = true;
-		}
-
-		sensorData[data.id].temperature = data.temperature;
-		sensorData[data.id].humidity = data.humidity;
-
-		sensorData[data.id].lastUpdate = new Date();
-		sensorData[data.id].active = true;
 
 		let sensorSetting = await SensorSetting.findOne({
 			_id: data.id
@@ -44,13 +31,35 @@ exports.set = async (data) => {
 				_id: data.id,
 				order: data.id,
 				label: data.id,
-				enabled: true
+				enabled: true,
+				tempAdjust: 0,
+				humidityAdjust: 0
 			});
 			await sensorSetting.save();
 		}
 
+
+		let changesMade = false;
+
+		if (sensorData[data.id].temperature !== data.temperature + sensorSetting.tempAdjust ||
+				sensorData[data.id].humidity !== data.humidity + sensorSetting.humidityAdjust ||
+				sensorData[data.id].active !== true) {
+			changesMade = true;
+		}
+
+		sensorData[data.id].temperature = data.temperature + sensorSetting.tempAdjust;
+		sensorData[data.id].humidity = data.humidity + sensorSetting.humidityAdjust;
+
+		sensorData[data.id].reportedTemperature = data.temperature;
+		sensorData[data.id].reportedHumidity = data.humidity;
+
+		sensorData[data.id].lastUpdate = new Date();
+		sensorData[data.id].active = true;
+
 		sensorData[data.id].enabled = sensorSetting.enabled;
 		sensorData[data.id].label = sensorSetting.label;
+		sensorData[data.id].tempAdjust = sensorSetting.tempAdjust;
+		sensorData[data.id].humidityAdjust = sensorSetting.humidityAdjust;
 
 		if (changesMade) {
 			evts.emit('change', sensorData[data.id]);
@@ -65,7 +74,7 @@ exports.get = () => {
 };
 
 exports.toggleSensorStatus = async (id) => {
-	let sensorSetting = await SensorSetting.findOne({
+	const sensorSetting = await SensorSetting.findOne({
 		_id: id
 	});
 
@@ -84,14 +93,24 @@ exports.toggleSensorStatus = async (id) => {
 	return false;
 };
 
-exports.changeSensorLabel = async (id, label) => {
-	let sensorSetting = await SensorSetting.findOne({
+exports.changeSensorSettings = async (id, settings) => {
+	const sensorSetting = await SensorSetting.findOne({
 		_id: id
 	});
 
 	if (sensorSetting) {
-		sensorSetting.label = label;
-		sensorData[id].label = sensorSetting.label;
+		sensorSetting.label = settings.label;
+		sensorSetting.tempAdjust = settings.tempAdjust;
+		sensorSetting.humidityAdjust = settings.humidityAdjust;
+
+		if (sensorData[id]) {
+			sensorData[id].label = sensorSetting.label;
+			sensorData[id].tempAdjust = sensorSetting.tempAdjust;
+			sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
+			sensorData[id].temperature = sensorData[id].reportedTemperature + sensorSetting.tempAdjust;
+			sensorData[id].humidity = sensorData[id].reportedHumidity + sensorSetting.humidityAdjust
+		}
+
 		await sensorSetting.save();
 
 		evts.emit('change', sensorData[id]);
@@ -103,7 +122,6 @@ exports.changeSensorLabel = async (id, label) => {
 };
 
 setInterval(() => {
-	let changesMade = false;
 	Object.keys(sensorData).forEach(id => {
 		if (new Date().getTime() - sensorData[id].lastUpdate.getTime() > 5 * 60 * 1000) {
 			sensorData[id].active = false;

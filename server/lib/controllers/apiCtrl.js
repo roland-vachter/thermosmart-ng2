@@ -67,7 +67,7 @@ exports.init = function (req, res, next) {
 
 exports.tempAdjust = function (req, res, next) {
 	if (isNaN(req.body.id) || isNaN(req.body.value)) {
-		res.status(400).json({
+		res.sendStatus(400).json({
 			status: 'error',
 			message: 'Missing or incorrect parameters'
 		});
@@ -102,7 +102,7 @@ exports.tempAdjust = function (req, res, next) {
 
 exports.changeDefaultPlan = function (req, res, next) {
 	if (isNaN(req.body.dayOfWeek) || isNaN(req.body.planId)) {
-		res.status(400).json({
+		res.sendStatus(400).json({
 			status: 'error',
 			message: 'Missing or incorrect parameters'
 		});
@@ -207,7 +207,7 @@ exports.restartSensor = (req, res) => {
 
 exports.toggleSensorStatus = async (req, res, next) => {
 	if (!req.body.id) {
-		return res.status(400);
+		return res.sendStatus(400);
 	}
 
 	const result = await insideConditions.toggleSensorStatus(req.body.id);
@@ -219,21 +219,32 @@ exports.toggleSensorStatus = async (req, res, next) => {
 			status: 'ok'
 		});
 	}
-}
+};
 
-exports.changeSensorLabel = async (req, res, next) => {
-	if (!req.body.id || !req.body.label) {
-		return res.status(400);
-	}
+exports.changeSensorSettings = async (req, res, next) => {
+	try {
+		if (!req.body.id || !req.body.label || !req.body.hasOwnProperty('tempadjust') || !req.body.hasOwnProperty('humidityadjust')) {
+			return res.sendStatus(400);
+		}
 
-	const result = await insideConditions.changeSensorLabel(req.body.id, req.body.label);
+		const tempAdjust = parseFloat(req.body.tempadjust || 0);
+		const humidityAdjust = parseInt(req.body.humidityadjust || 0, 10);
 
-	if (!result) {
-		next();
-	} else {
-		res.json({
-			status: 'ok'
+		const result = await insideConditions.changeSensorSettings(req.body.id, {
+			label: req.body.label,
+			tempAdjust,
+			humidityAdjust
 		});
+
+		if (!result) {
+			next();
+		} else {
+			res.json({
+				status: 'ok'
+			});
+		}
+	} catch (err) {
+		next(err);
 	}
 };
 
@@ -316,7 +327,7 @@ exports.plantWateringInit = async (req, res) => {
 
 exports.plantWateringSensor = async (req, res) => {
 	if (!req.query.id || !req.query.status) {
-		return res.status(400).json({
+		return res.sendStatus(400).json({
 			status: 'error',
 			reason: 'id or status parameters missing'
 		});

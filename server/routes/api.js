@@ -12,7 +12,7 @@ router.get('/init', loginMiddleware, cors(), apiCtrl.init);
 router.post('/tempadjust', loginMiddleware, cors(), apiCtrl.tempAdjust);
 router.post('/restartsensor', loginMiddleware, cors(), apiCtrl.restartSensor);
 router.post('/togglesensorstatus', loginMiddleware, cors(), apiCtrl.toggleSensorStatus);
-router.post('/changesensorlabel', loginMiddleware, cors(), apiCtrl.changeSensorLabel);
+router.post('/changesensorsettings', loginMiddleware, cors(), apiCtrl.changeSensorSettings);
 router.post('/changedefaultplan', loginMiddleware, cors(), apiCtrl.changeDefaultPlan);
 router.get('/sensorpolling', apiKeyMiddleware, cors(), apiCtrl.sensorPolling);
 router.get('/statistics', loginMiddleware, cors(), apiCtrl.statistics);

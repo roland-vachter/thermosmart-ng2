@@ -12,7 +12,7 @@ import { ServerUpdateService } from '../shared/server-update.service';
 import { ServerApiService } from './services/server-api.service';
 import { SensorComponent } from './components/sensor/sensor.component';
 import { ChangeHeatingPlanModalComponent } from './components/change-heating-plan-modal/change-heating-plan-modal.component';
-import { ChangeSensorLabelModalComponent } from './components/change-sensor-label-modal/change-sensor-label-modal.component';
+import { ChangeSensorSettingsModalComponent } from './components/change-sensor-settings-modal/change-sensor-settings-modal.component';
 import { StatisticsModalComponent } from './components/statistics-modal/statistics-modal.component';
 import { FormsModule } from '@angular/forms';
 import { HeatingCurrentPlanComponent } from './components/heating-current-plan/heating-current-plan.component';
@@ -34,7 +34,7 @@ import { ThermoConfigModalComponent } from './components/thermo-config-modal/the
 		ThermoComponent,
 		SensorComponent,
 		ChangeHeatingPlanModalComponent,
-		ChangeSensorLabelModalComponent,
+		ChangeSensorSettingsModalComponent,
 		StatisticsModalComponent,
 		HeatingCurrentPlanComponent,
 		ThermoConfigModalComponent
@@ -48,7 +48,7 @@ import { ThermoConfigModalComponent } from './components/thermo-config-modal/the
 	],
 	entryComponents: [
 		ChangeHeatingPlanModalComponent,
-		ChangeSensorLabelModalComponent,
+		ChangeSensorSettingsModalComponent,
 		StatisticsModalComponent,
 		ThermoConfigModalComponent
 	]

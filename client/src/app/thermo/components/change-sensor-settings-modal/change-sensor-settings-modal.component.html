@@ -1,0 +1,58 @@
+<div class="modal-header">
+	<h4 class="modal-title">Change settings</h4>
+	<button type="button" class="close" aria-label="Close" (click)="bsModalRef.hide()">
+		<span aria-hidden="true">&times;</span>
+	</button>
+</div>
+<div class="modal-body">
+	<form (ngSubmit)="onSubmit()" #changeSensorLabelForm="ngForm">
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<h5>Label</h5>
+
+					<div class="form-group">
+						<input type="text" class="form-control" id="label" name="label" [(ngModel)]="label">
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col">
+					<h5>Temperature adjust</h5>
+
+					<div class="thermo-sensor-setting--container">
+						<div class="thermo-sensor-setting--button--container">
+							<button type="button" class="thermo-sensor-setting--button thermo-sensor-setting--increase" (click)="tempAdjust = tempAdjust + 0.1">&#8743;</button>
+						</div>
+						<span class="thermo-sensor-setting-value">{{tempAdjust | integer}}<span class="decimal">.{{tempAdjust | decimal}}</span> &deg;C</span>
+						<div class="thermo-sensor-setting--button--container">
+							<button type="button" class="thermo-sensor-setting--button thermo-sensor-setting--decrease" (click)="tempAdjust = tempAdjust - 0.1">&#8744;</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="col">
+					<h5>Humidity adjust</h5>
+
+					<div class="thermo-sensor-setting--container">
+						<div class="thermo-sensor-setting--button--container">
+							<button type="button" class="thermo-sensor-setting--button thermo-sensor-setting--increase" (click)="humidityAdjust = humidityAdjust + 1">&#8743;</button>
+						</div>
+						<span class="thermo-sensor-setting-value">{{humidityAdjust}} %</span>
+						<div class="thermo-sensor-setting--button--container">
+							<button type="button" class="thermo-sensor-setting--button thermo-sensor-setting--decrease" (click)="humidityAdjust = humidityAdjust - 1">&#8744;</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col">
+					<button type="submit" class="btn btn-info">Submit</button>
+					<button type="button" class="btn btn-outline-dark" (click)="bsModalRef.hide()">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
