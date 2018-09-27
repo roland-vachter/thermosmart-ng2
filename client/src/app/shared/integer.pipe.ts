@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class IntegerPipe implements PipeTransform {
 
-	transform(value: number):any {
+	transform(value: number):string {
 		if (isNaN(value)) {
 			return '-';
 		}
@@ -23,7 +23,7 @@ export class IntegerPipe implements PipeTransform {
 			}
 		}
 
-		return intValue < 0 && intValue > -1 ? '-' + intValue : intValue;
+		return value < 0 && value > -0.95 ? '-' + intValue : '' + intValue;
 	}
 
 }
