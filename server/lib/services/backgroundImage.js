@@ -195,6 +195,7 @@ const conditionMapping = {
 	snow: 'snow',
 	sunny: 'clear',
 	tstorms: 'rain',
+	wind: 'cloudy'
 };
 
 function getCondition (wunderCondition) {
