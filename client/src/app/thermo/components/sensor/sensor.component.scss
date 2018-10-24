@@ -55,12 +55,13 @@
 }
 
 .thermo-room--status {
-	font-size: 1rem;
+	font-size: 1.5rem;
 	float: right;
-}
 
-.thermo-room:hover .thermo-room--status {
-	display: none;
+	&:hover {
+		color: $dark-gray;
+		cursor: pointer;
+	}
 }
 
 .thermo-room--switch {

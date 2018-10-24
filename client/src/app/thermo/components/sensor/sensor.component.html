@@ -2,8 +2,7 @@
 	<div class="row no-gutters">
 		<div class="col-12">
 			<div class="thermo-room-label-container">
-				<span class="thermo-room--status icon-wifi color-{{restartSensorInProgress ? 'yellow' : (!enabled ? 'gray' : active ? 'mint' : 'red')}}"></span>
-				<i class="thermo-room--switch icon-power-button" (click)="toggleSensorStatus()"></i>
+				<span class="thermo-room--status icon-wifi color-{{restartSensorInProgress ? 'yellow' : (!enabled ? 'gray' : active ? 'mint' : 'red')}}" (click)="toggleSensorStatus()"></span>
 				<span class="thermo-room--label" (click)="changeLabel()">
 					<span>({{id}})</span> {{label || id}}
 				</span>
