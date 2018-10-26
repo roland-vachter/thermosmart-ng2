@@ -17,6 +17,7 @@ import { StatisticsModalComponent } from './components/statistics-modal/statisti
 import { FormsModule } from '@angular/forms';
 import { HeatingCurrentPlanComponent } from './components/heating-current-plan/heating-current-plan.component';
 import { ThermoConfigModalComponent } from './components/thermo-config-modal/thermo-config-modal.component';
+import { HeatingPowerComponent } from './components/heating-power/heating-power.component';
 
 @NgModule({
 	imports: [
@@ -37,7 +38,8 @@ import { ThermoConfigModalComponent } from './components/thermo-config-modal/the
 		ChangeSensorSettingsModalComponent,
 		StatisticsModalComponent,
 		HeatingCurrentPlanComponent,
-		ThermoConfigModalComponent
+		ThermoConfigModalComponent,
+		HeatingPowerComponent
 	],
 	exports: [
 		ThermoComponent

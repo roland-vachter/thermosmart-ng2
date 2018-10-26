@@ -48,6 +48,10 @@ exports.init = function (req, res, next) {
 				outside: outsideConditions.get(),
 				sensors: insideConditions.get(),
 				isHeatingOn: heatingService.isHeatingOn(),
+				heatingPower: {
+					status: heatingService.getPowerStatus().poweredOn,
+					until: heatingService.getPowerStatus().until
+				},
 				temperatures: temps,
 				heatingPlans: heatingPlans,
 				heatingDefaultPlans: heatingDefaultPlans,
@@ -133,6 +137,14 @@ exports.changeDefaultPlan = function (req, res, next) {
 		}
 	})
 	.catch(next);
+};
+
+exports.toggleHeatingPower = (req, res) => {
+	heatingService.togglePower();
+
+	res.json({
+		status: 'ok'
+	});
 };
 
 exports.securityToggleArm = (req, res) => {

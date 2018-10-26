@@ -44,12 +44,21 @@ exports.init = function () {
 		});
 	});
 
-	heatingService.evts.on('change', data => {
+	heatingService.evts.on('changeHeating', data => {
 		io.emit('update', {
 			isHeatingOn: data
 		});
 
 		recalculateHeatingDuration();
+	});
+
+	heatingService.evts.on('changeHeatingPower', data => {
+		io.emit('update', {
+			heatingPower: {
+				status: data.poweredOn,
+				until: data.until
+			}
+		});
 	});
 
 	restartSensorService.evts.on('change', data => {

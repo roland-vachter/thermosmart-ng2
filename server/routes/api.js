@@ -17,6 +17,7 @@ router.post('/changedefaultplan', loginMiddleware, cors(), apiCtrl.changeDefault
 router.get('/sensorpolling', apiKeyMiddleware, cors(), apiCtrl.sensorPolling);
 router.get('/statistics', loginMiddleware, cors(), apiCtrl.statistics);
 router.post('/changeconfig', loginMiddleware, cors(), apiCtrl.changeConfig);
+router.post('/toggleheatingpower', loginMiddleware, cors(), apiCtrl.toggleHeatingPower);
 
 router.post('/security/togglearm', loginMiddleware, cors(), apiCtrl.securityToggleArm);
 router.get('/security/init', loginMiddleware, cors(), apiCtrl.securityInit);

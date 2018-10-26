@@ -57,6 +57,10 @@ export class ThermoComponent implements OnInit {
 	currentTime: any = null;
 	currentDate: any = null;
 	config: any = {};
+	heatingPower = {
+		status: false,
+		until: new Date(new Date().getTime() + 15 * 60 * 1000)
+	};
 
 	constructor(
 			private serverUpdateService: ServerUpdateService,
@@ -170,6 +174,11 @@ export class ThermoComponent implements OnInit {
 
 		if (data.statisticsForToday) {
 			this.heatingDuration = data.statisticsForToday.heatingDuration;
+		}
+
+		if (data.heatingPower) {
+			this.heatingPower.status = data.heatingPower.status;
+			this.heatingPower.until = new Date(data.heatingPower.until);
 		}
 
 		this.todaysPlan = this.defaultHeatingPlans[new Date().getDay()];

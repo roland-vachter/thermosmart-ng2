@@ -12,6 +12,11 @@ const avgValues = {
 	humidity: 0
 };
 
+let poweredOn = true;
+let until = null;
+
+let suspendTimeout;
+
 let initialized = false;
 
 insideConditions.evts.on('change', () => {
@@ -43,13 +48,49 @@ exports.isHeatingOn = () => {
 	return isOn;
 };
 
+exports.getPowerStatus = () => {
+	return {
+		poweredOn,
+		until
+	};
+};
+
+exports.togglePower = () => {
+	clearTimeout(suspendTimeout);
+	if (poweredOn) {
+		console.log('heating power off');
+		poweredOn = false;
+		until = new Date(new Date().getTime() + 15 * 60 * 1000);
+
+		evts.emit('changeHeatingPower', {
+			poweredOn,
+			until
+		});
+
+		suspendTimeout = setTimeout(() => {
+			exports.togglePower();
+		}, 15 * 60 * 1000);
+	} else {
+		console.log('heating power on');
+		poweredOn = true;
+		until = null;
+
+		evts.emit('changeHeatingPower', {
+			poweredOn,
+			until
+		});
+	}
+
+	updateHeatingStatus();
+};
+
 exports.evts = evts;
 
 
 function turnHeatingOn () {
 	isOn = true;
 	if (lastChangeEventStatus !== isOn) {
-		evts.emit('change', isOn);
+		evts.emit('changeHeating', isOn);
 		console.log('heating turned on');
 	}
 	lastChangeEventStatus = isOn;
@@ -58,7 +99,7 @@ function turnHeatingOn () {
 function turnHeatingOff () {
 	isOn = false;
 	if (lastChangeEventStatus !== isOn) {
-		evts.emit('change', isOn);
+		evts.emit('changeHeating', isOn);
 		console.log('heating turned off');
 	}
 	lastChangeEventStatus = isOn;
@@ -70,7 +111,7 @@ async function updateHeatingStatus () {
 	}
 
 	try {
-		[switchThresholdBelow, switchThresholdAbove] = await Promise.all([
+		let [switchThresholdBelow, switchThresholdAbove] = await Promise.all([
 			configService.get('switchThresholdBelow'),
 			configService.get('switchThresholdAbove')
 		]);
@@ -85,6 +126,11 @@ async function updateHeatingStatus () {
 			switchThresholdAbove = {
 				value: 0.2
 			};
+		}
+
+		if (Number.isNaN(avgValues.temperature) || !poweredOn) {
+			turnHeatingOff();
+			return;
 		}
 
 		const target = await targetTempService();

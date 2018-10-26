@@ -18,6 +18,12 @@ export class ServerApiService {
 			});
 	}
 
+	toggleHeatingPower () {
+		const obs = this.http.post('/api/toggleheatingpower', {});
+		obs.subscribe();
+		return obs;
+	}
+
 	toggleSensorStatus (id) {
 		const obs = this.http.post('/api/togglesensorstatus', {
 			id

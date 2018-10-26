@@ -7,30 +7,25 @@ let sensorData = {};
 
 exports.set = async (data) => {
 	try {
+		const id = data.id;
+
 		if (
-				!(sensorData[data.id] && Math.abs(data.temperature - sensorData[data.id].temperature) < 10) &&
-				!(!sensorData[data.id] && data.temperature > 10)
+				!(sensorData[id] && Math.abs(data.temperature - sensorData[id].temperature) < 10) &&
+				!(!sensorData[id] && data.temperature > 10)
 			) {
-			console.log(`INVALID SENSOR VALUES - id: ${data.id}, temperature: ${data.temperature}, humidity: ${data.humidity}`);
+			console.log(`INVALID SENSOR VALUES - id: ${id}, temperature: ${data.temperature}, humidity: ${data.humidity}`);
 			return;
 		}
 
-		if (!sensorData[data.id]) {
-			sensorData[data.id] = {
-				id: data.id
-			};
-		}
-
-
 		let sensorSetting = await SensorSetting.findOne({
-			_id: data.id
+			_id: id
 		});
 
 		if (!sensorSetting) {
 			sensorSetting = new SensorSetting({
-				_id: data.id,
-				order: data.id,
-				label: data.id,
+				_id: id,
+				order: id,
+				label: id,
 				enabled: true,
 				tempAdjust: 0,
 				humidityAdjust: 0
@@ -39,30 +34,82 @@ exports.set = async (data) => {
 		}
 
 
+		if (!sensorData[id]) {
+			sensorData[id] = {
+				id: id,
+				enabled: sensorSetting.enabled,
+				tempHistory: [],
+				onHoldTempLowest: null,
+				onHoldTempHighest: null
+			};
+		}
+
+
 		let changesMade = false;
 
-		if (sensorData[data.id].temperature !== data.temperature + sensorSetting.tempAdjust ||
-				sensorData[data.id].humidity !== data.humidity + sensorSetting.humidityAdjust ||
-				sensorData[data.id].active !== true) {
+		if (sensorData[id].temperature !== data.temperature + sensorSetting.tempAdjust ||
+				sensorData[id].humidity !== data.humidity + sensorSetting.humidityAdjust ||
+				sensorData[id].active !== true) {
 			changesMade = true;
 		}
 
-		sensorData[data.id].temperature = data.temperature + sensorSetting.tempAdjust;
-		sensorData[data.id].humidity = data.humidity + sensorSetting.humidityAdjust;
+		sensorData[id].temperature = data.temperature + sensorSetting.tempAdjust;
+		sensorData[id].humidity = data.humidity + sensorSetting.humidityAdjust;
 
-		sensorData[data.id].reportedTemperature = data.temperature;
-		sensorData[data.id].reportedHumidity = data.humidity;
+		sensorData[id].reportedTemperature = data.temperature;
+		sensorData[id].reportedHumidity = data.humidity;
 
-		sensorData[data.id].lastUpdate = new Date();
-		sensorData[data.id].active = true;
+		sensorData[id].lastUpdate = new Date();
+		sensorData[id].active = true;
 
-		sensorData[data.id].enabled = sensorSetting.enabled;
-		sensorData[data.id].label = sensorSetting.label;
-		sensorData[data.id].tempAdjust = sensorSetting.tempAdjust;
-		sensorData[data.id].humidityAdjust = sensorSetting.humidityAdjust;
+		//sensorData[id].enabled = sensorSetting.enabled;
+		sensorData[id].label = sensorSetting.label;
+		sensorData[id].tempAdjust = sensorSetting.tempAdjust;
+		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
+
+		if (sensorSetting.enabled && sensorData[id].tempHistory.length) {
+			const lastTemp = sensorData[id].tempHistory[0];
+			const prevLastTemp = sensorData[id].tempHistory[1];
+
+			if (sensorData[id].enabled) {
+				if (lastTemp - data.temperature >= 0.15 || (prevLastTemp && prevLastTemp - data.temperature >= 0.25)) {
+					sensorData[id].onHoldTempLowest = data.temperature;
+					sensorData[id].onHoldTempHighest = null;
+					sensorData[id].enabled = false;
+					changesMade = true;
+				}
+			} else {
+				if (data.temperature < sensorData[id].onHoldTempLowest) {
+					sensorData[id].onHoldTempLowest = data.temperature;
+				} else {
+					if (!sensorData[id].onHoldTempHighest) {
+						sensorData[id].onHoldTempHighest = data.temperature;
+					} else {
+						if (data.temperature > sensorData[id].onHoldTempHighest) {
+							sensorData[id].onHoldTempHighest = data.temperature;
+						} else {
+							sensorData[id].enabled = true;
+							sensorData[id].onHoldTempHighest = null;
+							sensorData[id].onHoldTempLowest = null;
+							changesMade = true;
+						}
+					}
+				}
+			}
+
+			if (data.temperature <= 10) {
+				sensorData[id].onHoldStatus = null;
+				sensorData[id.enabled] = true;
+			}
+		}
+
+		sensorData[id].tempHistory.unshift(data.temperature);
+		if (sensorData[id].tempHistory.length > 5) {
+			sensorData[id].tempHistory.pop();
+		}
 
 		if (changesMade) {
-			evts.emit('change', sensorData[data.id]);
+			evts.emit('change', sensorData[id]);
 		}
 	} catch (e) {
 		console.error("Error saving sensor data", e);
@@ -79,11 +126,15 @@ exports.toggleSensorStatus = async (id) => {
 	});
 
 	if (sensorSetting) {
-		sensorSetting.enabled = !sensorSetting.enabled;
-		await sensorSetting.save();
+		if (sensorSetting === sensorData[id].enabled) {
+			sensorSetting.enabled = !sensorSetting.enabled;
+			await sensorSetting.save();
+		}
 
 		if (sensorData[id]) {
 			sensorData[id].enabled = sensorSetting.enabled;
+			sensorData[id].onHoldTempLowest = null;
+			sensorData[id].onHoldTempHighest = null;
 			evts.emit('change', sensorData[id]);
 		}
 
@@ -108,7 +159,7 @@ exports.changeSensorSettings = async (id, settings) => {
 			sensorData[id].tempAdjust = sensorSetting.tempAdjust;
 			sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
 			sensorData[id].temperature = sensorData[id].reportedTemperature + sensorSetting.tempAdjust;
-			sensorData[id].humidity = sensorData[id].reportedHumidity + sensorSetting.humidityAdjust
+			sensorData[id].humidity = sensorData[id].reportedHumidity + sensorSetting.humidityAdjust;
 		}
 
 		await sensorSetting.save();
@@ -122,11 +173,21 @@ exports.changeSensorSettings = async (id, settings) => {
 };
 
 setInterval(() => {
-	Object.keys(sensorData).forEach(id => {
-		if (new Date().getTime() - sensorData[id].lastUpdate.getTime() > 5 * 60 * 1000) {
-			sensorData[id].active = false;
+	Object.keys(sensorData).forEach(async id => {
+		const sensorSetting = await SensorSetting.findOne({
+			_id: id
+		});
 
-			evts.emit('change', sensorData[id]);
+		if (new Date().getTime() - sensorData[id].lastUpdate.getTime() > 5 * 60 * 1000) {
+			if (sensorData[id].active !== false) {
+				sensorData[id].active = false;
+
+				sensorData[id].enabled = sensorSetting.enabled;
+				sensorData[id].onHoldTempLowest = null;
+				sensorData[id].onHoldTempHighest = null;
+
+				evts.emit('change', sensorData[id]);
+			}
 		}
 
 		if (new Date().getTime() - sensorData[id].lastUpdate.getTime() > 10 * 60 * 1000) {
