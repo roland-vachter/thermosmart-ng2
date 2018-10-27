@@ -22,7 +22,7 @@ outsideConditions.evts.on('change', values => {
 	}
 });
 
-heatingService.evts.on('change', status => {
+heatingService.evts.on('changeHeating', status => {
 	HeatingHistory
 		.findOne()
 		.sort({
