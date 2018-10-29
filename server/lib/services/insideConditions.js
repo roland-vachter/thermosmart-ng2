@@ -159,7 +159,7 @@ exports.toggleSensorStatus = async (id) => {
 	});
 
 	if (sensorSetting) {
-		if (sensorSetting === sensorData[id].enabled) {
+		if (sensorSetting.enabled === sensorData[id].enabled) {
 			sensorSetting.enabled = !sensorSetting.enabled;
 			await sensorSetting.save();
 		}
