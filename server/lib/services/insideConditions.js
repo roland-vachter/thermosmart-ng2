@@ -72,63 +72,61 @@ exports.set = async (data) => {
 			const lastTemp = sensorData[id].tempHistory[0];
 			const prevLastTemp = sensorData[id].tempHistory[1];
 
-			if (!sensorData[id].onHoldStatus || sensorData[id].onHoldStatus === 'firstDecrease') {
+			if (!sensorData[id].onHoldStatus) {
 				if (lastTemp - data.temperature >= 0.15 || (prevLastTemp && prevLastTemp - data.temperature >= 0.25)) {
 					sensorData[id].onHoldTempLowest = data.temperature;
 					sensorData[id].onHoldTempHighest = null;
 					sensorData[id].enabled = false;
 					changesMade = true;
 
-					if (!sensorData[id].onHoldStatus) {
-						sensorData[id].onHoldStatus = 'firstDecrease';
-					} else {
-						sensorData[id].onHoldStatus = 'decrease';	
-					}
-				} else {
-					if (sensorData[id].onHoldStatus === 'firstDecrease') {
-						sensorData[id].onHoldStatus = null;
-						sensorData[id].onHoldTempLowest = null;
-						sensorData[id].onHoldTempHighest = null;
-						sensorData[id].enabled = true;
-						changesMade = true;
-					}
+					sensorData[id].onHoldStatus = 'firstDecrease';
 				}
-			} else {
-				if (sensorData[id].onHoldStatus === 'decrease') {
+			} else if (sensorData[id].onHoldStatus === 'firstDecrease') {
+				if (lastTemp - data.temperature >= 0.15) {
+					sensorData[id].onHoldTempLowest = data.temperature;
+
+					sensorData[id].onHoldStatus = 'decrease';
+				} else {
+					sensorData[id].onHoldStatus = null;
+					sensorData[id].onHoldTempLowest = null;
+					sensorData[id].onHoldTempHighest = null;
+					sensorData[id].enabled = true;
+					changesMade = true;
+				}
+			} else if (sensorData[id].onHoldStatus === 'decrease') {
 					if (data.temperature <= sensorData[id].onHoldTempLowest) {
 						sensorData[id].onHoldTempLowest = data.temperature;
 					} else {
 						sensorData[id].onHoldStatus = 'firstIncrease';
 					}
-				} else if (sensorData[id].onHoldStatus === 'firstIncrease') {
-					if (data.temperature <= sensorData[id].onHoldTempLowest) {
-						sensorData[id].onHoldStatus = 'decrease';
-						sensorData[id].onHoldTempLowest = data.temperature;
-					} else if (data.temperature < lastTemp) {
-						sensorData[id].onHoldStatus = 'decrease';
-					} else if (data.temperature > lastTemp) {
-						sensorData[id].onHoldStatus = 'increase';
-						sensorData[id].onHoldTempHighest = data.temperature;
-					}
-				} else if (sensorData[id].onHoldStatus === 'increase') {
-					if (data.temperature >= sensorData[id].onHoldTempHighest) {
-						sensorData[id].onHoldTempHighest = data.temperature;
-					} else {
-						sensorData[id].onHoldStatus = 'firstStabilized';
-					}
-				} else if (sensorData[id].onHoldStatus === 'firstStabilized') {
-					if (data.temperature >= sensorData[id].onHoldTempHighest) {
-						sensorData[id].onHoldTempHighest = data.temperature;
-						sensorData[id].onHoldStatus = 'increase';
-					} else if (data.temperature > lastTemp) {
-						sensorData[id].onHoldStatus = 'increase';
-					} else {
-						sensorData[id].enabled = true;
-						sensorData[id].onHoldStatus = null;
-						sensorData[id].onHoldTempHighest = null;
-						sensorData[id].onHoldTempLowest = null;
-						changesMade = true;		
-					}
+			} else if (sensorData[id].onHoldStatus === 'firstIncrease') {
+				if (data.temperature <= sensorData[id].onHoldTempLowest) {
+					sensorData[id].onHoldStatus = 'decrease';
+					sensorData[id].onHoldTempLowest = data.temperature;
+				} else if (data.temperature < lastTemp) {
+					sensorData[id].onHoldStatus = 'decrease';
+				} else if (data.temperature > lastTemp) {
+					sensorData[id].onHoldStatus = 'increase';
+					sensorData[id].onHoldTempHighest = data.temperature;
+				}
+			} else if (sensorData[id].onHoldStatus === 'increase') {
+				if (data.temperature > sensorData[id].onHoldTempHighest) {
+					sensorData[id].onHoldTempHighest = data.temperature;
+				} else {
+					sensorData[id].onHoldStatus = 'firstStabilized';
+				}
+			} else if (sensorData[id].onHoldStatus === 'firstStabilized') {
+				if (data.temperature > sensorData[id].onHoldTempHighest) {
+					sensorData[id].onHoldTempHighest = data.temperature;
+					sensorData[id].onHoldStatus = 'increase';
+				} else if (data.temperature > lastTemp) {
+					sensorData[id].onHoldStatus = 'increase';
+				} else {
+					sensorData[id].enabled = true;
+					sensorData[id].onHoldStatus = null;
+					sensorData[id].onHoldTempHighest = null;
+					sensorData[id].onHoldTempLowest = null;
+					changesMade = true;
 				}
 			}
 
@@ -136,6 +134,8 @@ exports.set = async (data) => {
 				sensorData[id].onHoldStatus = null;
 				sensorData[id.enabled] = true;
 			}
+
+			console.log(sensorData[id].onHoldStatus);
 		}
 
 		sensorData[id].tempHistory.unshift(data.temperature);
