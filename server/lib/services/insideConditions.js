@@ -134,8 +134,6 @@ exports.set = async (data) => {
 				sensorData[id].onHoldStatus = null;
 				sensorData[id.enabled] = true;
 			}
-
-			console.log(sensorData[id].onHoldStatus);
 		}
 
 		sensorData[id].tempHistory.unshift(data.temperature);
