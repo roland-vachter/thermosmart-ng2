@@ -8,6 +8,7 @@ const statisticsService = require('../services/statistics');
 const security = require('../services/security');
 const plantWatering = require('../services/plantWatering');
 const restartSensorService = require('../services/restartSensor');
+const targetTempService = require('../services/targetTemp');
 const config = require('../services/config');
 const Temperature = require('../models/Temperature');
 const HeatingDefaultPlan = require('../models/HeatingDefaultPlan');
@@ -71,6 +72,12 @@ exports.init = function () {
 		io.emit('update', {
 			config: data
 		});
+	});
+
+	targetTempService.evts.on('change', data => {
+		io.emit('update', {
+			targetTempId: data.id
+		})
 	});
 
 	Temperature.evts.on('change', ids => {

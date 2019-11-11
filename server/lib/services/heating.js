@@ -133,11 +133,13 @@ async function updateHeatingStatus () {
 			return;
 		}
 
-		const target = await targetTempService();
-		if (!isOn && avgValues.temperature <= target - switchThresholdBelow.value) {
-			turnHeatingOn();
-		} else if (avgValues.temperature >= target + switchThresholdAbove.value) {
-			turnHeatingOff();
+		const target = targetTempService.get();
+		if (target) {
+			if (!isOn && avgValues.temperature <= target.value - switchThresholdBelow.value) {
+				turnHeatingOn();
+			} else if (avgValues.temperature >= target.value + switchThresholdAbove.value) {
+				turnHeatingOff();
+			}
 		}
 	} catch(err) {
 		console.log("Error occured while fetching the heating plan for today", err);

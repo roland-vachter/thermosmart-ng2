@@ -12,7 +12,7 @@ const configService = require('../services/config');
 const SecurityMovementHistory = require('../models/SecurityMovementHistory');
 const SecurityArmingHistory = require('../models/SecurityArmingHistory');
 const plantWateringService = require('../services/plantWatering');
-
+const targetTempService = require('../services/targetTemp');
 
 const moment = require('moment-timezone');
 
@@ -32,16 +32,16 @@ exports.init = function (req, res, next) {
 			.exec(),
 		statisticsService
 			.getStatisticsForToday(),
+		targetTempService.get(),
 		configService.getAll()
-	]).then(results => {
-		const [
-			temps,
-			heatingDefaultPlans,
-			heatingPlans,
-			statisticsForToday,
-			config
-		] = results;
-
+	]).then(([
+				temps,
+				heatingDefaultPlans,
+				heatingPlans,
+				statisticsForToday,
+				targetTemp,
+				config
+			]) => {
 		res.json({
 			status: 'ok',
 			data: {
@@ -52,6 +52,7 @@ exports.init = function (req, res, next) {
 					status: heatingService.getPowerStatus().poweredOn,
 					until: heatingService.getPowerStatus().until
 				},
+				targetTempId: targetTemp ? targetTemp.id : null,
 				temperatures: temps,
 				heatingPlans: heatingPlans,
 				heatingDefaultPlans: heatingDefaultPlans,

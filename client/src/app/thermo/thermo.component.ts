@@ -142,6 +142,10 @@ export class ThermoComponent implements OnInit {
 			});
 		}
 
+		if (data.targetTempId) {
+			this.targetTemp = this.temperatures[data.targetTempId];
+		}
+
 		if (data.heatingPlans) {
 			data.heatingPlans.forEach(heatingPlan => {
 				if (!this.heatingPlans[heatingPlan._id]) {
@@ -235,19 +239,6 @@ export class ThermoComponent implements OnInit {
 		this.percentInDay = this.getPercentInDay();
 		this.currentTime = `${this.pad(d.getHours(), 2)}:${this.pad(d.getMinutes(), 2)}`;
 		this.currentDate = d;
-
-		let temp = null;
-		const today = new Date();
-
-		this.todaysPlan.plan.ref.intervals.forEach(interval => {
-			if (today.getHours() > interval.startHour ||
-					(today.getHours() === interval.startHour &&
-					today.getMinutes() >= interval.startMinute)) {
-				temp = interval.temp;
-			}
-		});
-
-		this.targetTemp = temp;
 	}
 
 	computeInsideConditions () {

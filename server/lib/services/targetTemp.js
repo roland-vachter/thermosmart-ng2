@@ -1,7 +1,18 @@
 const HeatingDefaultPlan = require('../models/HeatingDefaultPlan');
 const moment = require('moment-timezone');
 
-module.exports = function () {
+const EventEmitter = require('events');
+const evts = new EventEmitter();
+
+let lastTargetTemp = null;
+
+exports.evts = evts;
+
+exports.get = () => {
+	return lastTargetTemp;
+};
+
+function update () {
 	return HeatingDefaultPlan.findOne({
 			dayOfWeek: moment().tz("Europe/Bucharest").day()
 		})
@@ -27,6 +38,12 @@ module.exports = function () {
 				}
 			});
 
-			return targetTemp.value;
+			if (lastTargetTemp !== targetTemp) {
+				lastTargetTemp = targetTemp;
+				evts.emit('change', targetTemp);
+			}
 		});
 };
+
+update();
+setInterval(update, 10000);

@@ -22,12 +22,13 @@ PlantWateringStatusHistory
 	})
 	.exec()
 	.then((result) => {
-		status = result.status;
+		if (result) {
+			status = result.status;
+		}
 	});
 
 exports.changeStatus = (id, newStatus) => {
 	sensors[id] = newStatus;
-	console.log(sensors);
 
 	let intermStatus = true;
 
@@ -36,8 +37,6 @@ exports.changeStatus = (id, newStatus) => {
 	});
 
 	status = intermStatus;
-
-	console.log('new status', status);
 
 	evts.emit('change', status);
 	new PlantWateringStatusHistory({

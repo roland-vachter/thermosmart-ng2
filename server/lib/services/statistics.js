@@ -41,7 +41,8 @@ heatingService.evts.on('changeHeating', status => {
 
 
 function monitorTargetTemp () {
-	targetTempService().then(target => {
+	const target = targetTempService.get();
+	if (target) {
 		TargetTempHistory
 			.findOne()
 			.sort({
@@ -49,14 +50,14 @@ function monitorTargetTemp () {
 			})
 			.exec()
 			.then((result) => {
-				if (!result || result.t !== target) {
+				if (!result || result.t !== target.value) {
 					new TargetTempHistory({
 						datetime: new Date(),
-						t: target
+						t: target.value
 					}).save();
 				}
 			});
-		});
+	}
 }
 monitorTargetTemp();
 setInterval(monitorTargetTemp, 60000);
