@@ -9,7 +9,7 @@
 		<div class="col-12">
 			<h2>Temperature settings</h2>
 			<div class="thermo-temps row">
-				<div class="thermo-temps--temp col-xs-6 col-md-4 col-lg-3" *ngFor="let temp of temps">
+				<div class="thermo-temps--temp col-xs-6 col-lg-4" *ngFor="let temp of temps">
 					<div class="color-{{temp.ref.color}}">
 						<i class="{{temp.ref.iconClass}}"></i> <span class="thermo-temps--temp-name">{{temp.ref.name}}</span>
 						<div class="thermo-temps--temp-control" data-id="{{temp.ref._id}}">
