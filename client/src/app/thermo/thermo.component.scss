@@ -21,16 +21,25 @@
 	z-index: 11;
 }
 
-.thermo-house--outside {
-	display: inline-block;
-}
-
 .thermo-house--inside {
 	position: relative;
 	display: inline-block;
 	margin-left: -7px;
-	padding: 20px 0 20px 0;
+	padding: 0 0 20px 0;
 	text-align: left;
+	background-image: url(/assets/static/house-simple.svg);
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+	width: calc(100% - 70px);
+	vertical-align: middle;
+
+	.themo-house--inside-placeholder {
+		width: 0px;
+		position: relative;
+		padding-top: 100%;
+		float: left;
+	}
 }
 
 .thermo-heating--target {
@@ -41,22 +50,17 @@
 
 .thermo--inside {
 	position: absolute;
-	left: 40px;
-	top: 110px;
+	left: 20%;
+	top: 45%;
 }
 
 .thermo-heating--status {
-	position: absolute;
-	left: 0;
-	top: 40px;
-	width: 100%;
 	text-align: center;
+	margin-top: 10%;
 }
 
 .thermo-heating--duration {
 	position: absolute;
-	top: 210px;
-	left: 50px;
-	font-size: 1.2rem;
-	color: $dark-gray;
+	bottom: 15%;
+	left: 20%;
 }

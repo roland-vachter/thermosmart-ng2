@@ -1,0 +1,43 @@
+<div class="row">
+   <div class="col">
+      <div class="current-status-container">
+         <div class="current-temp">
+            <i class="temp-icon"></i>
+            {{currentTemperature | integer}}<span class="decimal">.{{currentTemperature | decimal}}</span>
+         </div>
+      </div>
+   </div>
+   <div class="col">
+      <div class="current-status-container">
+         <div class="current-humidity">
+            <i class="humi-icon"></i>
+            {{currentHumidity | integer}}
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="row">
+   <div class="col">
+      <div class="target-container">
+         <div class="target target--color-{{ targetTemperature?.color }} {{ heatingStatus ? 'target--color-' + targetTemperature?.color + '--active' : '' }}">
+            <div class="target-increase">+</div>
+            <div class="target-value">
+               {{targetTemperature?.value | integer}}<span class="decimal">.{{targetTemperature?.value | decimal}}</span>
+            </div>
+            <div class="target-decrease">-</div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="row">
+   <div class="col">
+      <div class="program-container">
+         <div class="program">
+            <i class="{{ todaysPlan?.iconClass }}"></i>
+            {{ todaysPlan?.name }}
+         </div>
+      </div>
+   </div>
+</div>

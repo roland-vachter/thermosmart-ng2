@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "newProjectRoot": "projects",
+	"newProjectRoot": "projects",
   "projects": {
     "thermosmart-ng2": {
       "root": "client",
@@ -19,7 +19,8 @@
             "polyfills": "client/src/polyfills.ts",
             "tsConfig": "client/src/tsconfig.app.json",
             "assets": [
-              "client/src/favicon.ico",
+              "client/src/favicon-32x32.png",
+							"client/src/favicon-194x194.png",
               "client/src/assets"
             ],
             "styles": [
@@ -34,7 +35,8 @@
                   "replace": "client/src/environments/environment.ts",
                   "with": "client/src/environments/environment.prod.ts"
                 }
-              ],
+							],
+							"baseHref": "/",
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,

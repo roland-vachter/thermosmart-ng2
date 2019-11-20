@@ -2,16 +2,16 @@
 	<div class="row">
 		<div class="col-12 col-md-6 col-lg-5 col-xl-4 thermo-house--component-wrapper">
 			<div class="component thermo-house--component">
-				<div class="thermo-heating--power">
+				<!-- <div class="thermo-heating--power">
 					<thermo-heating-power [status]="heatingPower.status" [until]="heatingPower.until"></thermo-heating-power>
-				</div>
+				</div> -->
 
 				<div class="thermo-house--outside">
 					<thermo-outside [temperature]="outsideConditions.temperature" [humidity]="outsideConditions.humidity" [weatherIconClass]="outsideConditions.weatherIconClass"></thermo-outside>
 				</div>
 
 				<div class="thermo-house--inside">
-					<i class="icon-house-simple thermo-house--icon color-gray"></i>
+					<div class="themo-house--inside-placeholder"></div>
 
 					<div class="thermo-heating--status">
 						<thermo-heating-status [isHeatingOn]="heatingStatus"></thermo-heating-status>

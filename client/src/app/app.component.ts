@@ -28,30 +28,30 @@ export class AppComponent {
 	}
 
 
-	thermoStatisticsAction () {
-		this.thermoComponent.showHeatingStatisticsModal();
-	}
+	// thermoStatisticsAction () {
+	// 	this.thermoComponent.showHeatingStatisticsModal();
+	// }
 
-	thermoConfigAction () {
-		this.thermoComponent.showHeatingConfigModal();
-	}
+	// thermoConfigAction () {
+	// 	this.thermoComponent.showHeatingConfigModal();
+	// }
 
-	thermoRestartSensors () {
-		this.thermoComponent.restartSensors();
-	}
+	// thermoRestartSensors () {
+	// 	this.thermoComponent.restartSensors();
+	// }
 
-	updateFreshnessStatus () {
-		this.currentDate = new Date().getTime();
+	// updateFreshnessStatus () {
+	// 	this.currentDate = new Date().getTime();
 
-		if (this.currentDate - this.thermoComponent.lastUpdate < 5 * 60 * 1000) {
-			this.updateStatus = 'fresh';
-		} else if (this.currentDate - this.thermoComponent.lastUpdate >= 5 * 60 * 1000 &&
-				this.currentDate - this.thermoComponent.lastUpdate < 10 * 60 * 1000) {
-			this.updateStatus = 'idle';
-		} else {
-			this.updateStatus = 'outdated';
-		}
-	}
+	// 	if (this.currentDate - this.thermoComponent.lastUpdate < 5 * 60 * 1000) {
+	// 		this.updateStatus = 'fresh';
+	// 	} else if (this.currentDate - this.thermoComponent.lastUpdate >= 5 * 60 * 1000 &&
+	// 			this.currentDate - this.thermoComponent.lastUpdate < 10 * 60 * 1000) {
+	// 		this.updateStatus = 'idle';
+	// 	} else {
+	// 		this.updateStatus = 'outdated';
+	// 	}
+	// }
 
 	checkLoginStatus (onDemand = false) {
 		if (onDemand || !this.lastLoginStatusCheck || new Date().getTime() - this.lastLoginStatusCheck.getTime() > 10 * 60 * 1000) {
@@ -70,33 +70,33 @@ export class AppComponent {
 		}
 	}
 
-	refresh (onDemand = false) {
-		this.checkLoginStatus(onDemand);
-		this.thermoComponent.refresh();
-		this.securityComponent.refresh();
+	// refresh (onDemand = false) {
+	// 	this.checkLoginStatus(onDemand);
+	// 	this.thermoComponent.refresh();
+	// 	this.securityComponent.refresh();
 
-		this.refreshInProgress = true;
-		setTimeout(() => {
-			this.updateFreshnessStatus();
-			this.refreshInProgress = false;
-		}, 2000);
-	}
+	// 	this.refreshInProgress = true;
+	// 	setTimeout(() => {
+	// 		this.updateFreshnessStatus();
+	// 		this.refreshInProgress = false;
+	// 	}, 2000);
+	// }
 
-	ngOnInit () {
-		setTimeout(this.updateFreshnessStatus.bind(this), 60000);
-		setTimeout(this.checkLoginStatus, 60 * 60 * 1000);
+	// ngOnInit () {
+	// 	setTimeout(this.updateFreshnessStatus.bind(this), 60000);
+	// 	setTimeout(this.checkLoginStatus, 60 * 60 * 1000);
 
-		document.addEventListener("visibilitychange", (() => {
-			if (document.visibilityState === 'visible') {
-				this.checkLoginStatus();
-				this.updateFreshnessStatus();
+	// 	document.addEventListener("visibilitychange", (() => {
+	// 		if (document.visibilityState === 'visible') {
+	// 			this.checkLoginStatus();
+	// 			this.updateFreshnessStatus();
 				
-				if ((this.updateStatus === 'outdated' || new Date().getTime() - this.lastVisible.getTime() > 60 * 60 * 1000)) {
-					this.refresh();
-				}
+	// 			if ((this.updateStatus === 'outdated' || new Date().getTime() - this.lastVisible.getTime() > 60 * 60 * 1000)) {
+	// 				this.refresh();
+	// 			}
 
-				this.lastVisible = new Date();
-			}
-		}).bind(this));
-	}
+	// 			this.lastVisible = new Date();
+	// 		}
+	// 	}).bind(this));
+	// }
 }

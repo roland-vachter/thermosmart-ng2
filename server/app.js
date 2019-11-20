@@ -12,6 +12,7 @@ const _ = require('lodash');
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const loginMiddleware = require('./lib/middlewares/login');
 
 var store = new MongoStore({
 	url: process.env.DATABASE_URL || process.env.MONGODB_URI || process.env.MONGO_URL,
@@ -163,13 +164,20 @@ app.get(`/assets/bower/*.(woff|svg|ttf|eot|gif|png|jpg|js|css)`, (req, res) => {
 app.use(`/assets/static/`, express.static(path.join(__dirname, 'public'), {
 	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
 }));
-app.use(`/assets/`, express.static(path.join(__dirname, '../client/dist'), {
-	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
-}));
+// app.use(`/assets/`, express.static(path.join(__dirname, '../client/dist'), {
+// 	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
+// }));
 
 
 
 app.use('/', require('./router'));
+
+app.get('/([^\.]+).([^\.]+)', (req, res) => {
+	res.sendFile(path.join(__dirname, '../client/dist', req.originalUrl));
+});
+app.get('*', loginMiddleware, (req, res) => {
+	res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

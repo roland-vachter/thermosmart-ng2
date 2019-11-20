@@ -1,1 +1,6 @@
+@import '../../../../styles/colors/variables';
 
+:host {
+   font-size: 1.2rem;
+	color: $dark-gray;
+}

@@ -7,20 +7,22 @@
 }
 
 .thermo-outside--temp {
+	display: inline-block;
 	color: $maroon;
 
 	@include icon('thermometer6');
 }
 
 .thermo-outside--humi {
+	display: inline-block;
 	color: $navy;
-	margin-bottom: 20px;
 
 	@include icon('humidity');
 }
 
 .thermo-outside--weather {
-	margin-bottom: 60px;
-	text-align: center;
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 40px;
 	font-size: 3.1rem;
 }

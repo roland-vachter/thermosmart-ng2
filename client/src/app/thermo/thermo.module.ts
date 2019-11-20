@@ -18,12 +18,32 @@ import { FormsModule } from '@angular/forms';
 import { HeatingCurrentPlanComponent } from './components/heating-current-plan/heating-current-plan.component';
 import { ThermoConfigModalComponent } from './components/thermo-config-modal/thermo-config-modal.component';
 import { HeatingPowerComponent } from './components/heating-power/heating-power.component';
+import { ThermostatComponent } from './components/thermostat/thermostat.component';
+import { RouterModule, Routes } from '@angular/router';
+
+const ROUTES: Routes = [
+	{
+		path: '',
+		children: [
+			{
+				path: '',
+				redirectTo: 'thermostat',
+				pathMatch: 'full'
+			},
+			{
+				path: 'thermostat',
+				component: ThermostatComponent
+			}
+		]
+	}
+];
 
 @NgModule({
 	imports: [
 		CommonModule,
 		SharedModule,
-		FormsModule
+		FormsModule,
+		RouterModule.forChild(ROUTES)
 	],
 	declarations: [
 		InsideComponent,
@@ -39,7 +59,8 @@ import { HeatingPowerComponent } from './components/heating-power/heating-power.
 		StatisticsModalComponent,
 		HeatingCurrentPlanComponent,
 		ThermoConfigModalComponent,
-		HeatingPowerComponent
+		HeatingPowerComponent,
+		ThermostatComponent
 	],
 	exports: [
 		ThermoComponent

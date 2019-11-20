@@ -7,7 +7,6 @@ const indexCtrl = require('../lib/controllers/indexCtrl');
 const loginMiddleware = require('../lib/middlewares/login');
 
 
-/* GET home page. */
 router.get('/', loginMiddleware, indexCtrl);
 
 module.exports = router;
