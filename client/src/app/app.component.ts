@@ -82,6 +82,10 @@ export class AppComponent {
 		}, 2000);
 	}
 
+	reload() {
+		document.location.reload();
+	}
+
 	ngOnInit () {
 		setTimeout(this.updateFreshnessStatus.bind(this), 60000);
 		setTimeout(this.checkLoginStatus, 60 * 60 * 1000);
@@ -91,8 +95,8 @@ export class AppComponent {
 				this.checkLoginStatus();
 				this.updateFreshnessStatus();
 				
-				if ((this.updateStatus === 'outdated' || new Date().getTime() - this.lastVisible.getTime() > 60 * 60 * 1000)) {
-					this.refresh();
+				if ((this.updateStatus === 'outdated' || new Date().getTime() - this.lastVisible.getTime() > 10 * 60 * 1000)) {
+					this.reload();
 				}
 
 				this.lastVisible = new Date();
