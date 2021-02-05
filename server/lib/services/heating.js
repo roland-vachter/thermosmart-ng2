@@ -6,6 +6,7 @@ const EventEmitter = require('events');
 const evts = new EventEmitter();
 
 let isOn = false;
+let lastStatusReadBySensor = false;
 let lastChangeEventStatus;
 const avgValues = {
 	temperature: 0,
@@ -44,8 +45,18 @@ insideConditions.evts.on('change', () => {
 	updateHeatingStatus();
 });
 
-exports.isHeatingOn = () => {
-	return isOn;
+exports.isHeatingOn = (readFromSensor) => {
+	if (readFromSensor) {
+		lastStatusReadBySensor = true;
+
+		if (lastChangeEventStatus !== isOn && isOn === true) {
+			evts.emit('changeHeating', isOn);
+			console.log('heating turned ' + (isOn ? 'on' : 'off'));
+		}
+		lastChangeEventStatus = isOn;
+	}
+
+	return isOn && lastStatusReadBySensor;
 };
 
 exports.getPowerStatus = () => {
@@ -89,15 +100,12 @@ exports.evts = evts;
 
 function turnHeatingOn () {
 	isOn = true;
-	if (lastChangeEventStatus !== isOn) {
-		evts.emit('changeHeating', isOn);
-		console.log('heating turned on');
-	}
-	lastChangeEventStatus = isOn;
+	lastStatusReadBySensor = false;
 }
 
 function turnHeatingOff () {
 	isOn = false;
+	lastStatusReadBySensor = false;
 	if (lastChangeEventStatus !== isOn) {
 		evts.emit('changeHeating', isOn);
 		console.log('heating turned off');
