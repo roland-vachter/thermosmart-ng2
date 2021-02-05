@@ -279,7 +279,7 @@ exports.sensorPolling = function (req, res) {
 	});
 
 	setTimeout(() => res.json({
-		isHeatingOn: heatingService.isHeatingOn(id === 1 ? true : false),
+		isHeatingOn: heatingService.isHeatingOn(parseInt(id, 10) === 1 ? true : false),
 		restart: restartSensorService.getStatus()
 	}), 200);
 };
