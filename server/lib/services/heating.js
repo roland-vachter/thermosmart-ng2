@@ -143,9 +143,14 @@ async function updateHeatingStatus () {
 
 		const target = targetTempService.get();
 		if (target) {
+			const sensors = insideConditions.get();
 			if (!isOn && avgValues.temperature <= target.value - switchThresholdBelow.value) {
+				console.log('sensor data', JSON.stringify(sensors));
 				turnHeatingOn();
 			} else if (avgValues.temperature >= target.value + switchThresholdAbove.value) {
+				if (isOn) {
+					console.log('sensor data', JSON.stringify(sensors));
+				}
 				turnHeatingOff();
 			}
 		}
