@@ -212,7 +212,7 @@ setInterval(() => {
 			_id: id
 		});
 
-		if (new Date().getTime() - sensorData[id].lastUpdate.getTime() > 5 * 60 * 1000) {
+		if (new Date().getTime() - sensorData[id].lastUpdate.getTime() > 10 * 60 * 1000) {
 			if (sensorData[id].active !== false) {
 				sensorData[id].active = false;
 
@@ -225,7 +225,7 @@ setInterval(() => {
 			}
 		}
 
-		if (new Date().getTime() - sensorData[id].lastUpdate.getTime() > 10 * 60 * 1000) {
+		if (new Date().getTime() - sensorData[id].lastUpdate.getTime() > 15 * 60 * 1000) {
 			evts.emit('change', Object.assign({}, sensorData[id], {
 				deleted: true
 			}));
