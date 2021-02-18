@@ -2,7 +2,7 @@ const OutsideConditionHistory = require('../models/OutsideConditionHistory');
 const outsideConditions = require('./outsideConditions');
 
 const HeatingHistory = require('../models/HeatingHistory');
-const heatingService = require('./heating.js');
+const heatingEvts = require('./heatingEvts.js');
 
 const TargetTempHistory = require('../models/TargetTempHistory');
 const targetTempService = require('./targetTemp');
@@ -22,7 +22,7 @@ outsideConditions.evts.on('change', values => {
 	}
 });
 
-heatingService.evts.on('changeHeating', status => {
+heatingEvts.on('changeHeating', status => {
 	HeatingHistory
 		.findOne()
 		.sort({
