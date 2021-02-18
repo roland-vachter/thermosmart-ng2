@@ -2,9 +2,7 @@ const insideConditionsEvts = require('./insideConditions').evts;
 const getSensors = require('./insideConditions').get;
 const targetTempService = require('./targetTemp');
 const configService = require('./config');
-
-const EventEmitter = require('events');
-const evts = new EventEmitter();
+const heatingEvts = require('./heatingEvts');
 
 let isOn = false;
 let lastStatusReadBySensor = false;
@@ -51,7 +49,7 @@ exports.isHeatingOn = (readFromSensor) => {
 		lastStatusReadBySensor = true;
 
 		if (lastChangeEventStatus !== isOn && isOn === true) {
-			evts.emit('changeHeating', isOn);
+			heatingEvts.emit('changeHeating', isOn);
 			console.log('heating turned ' + (isOn ? 'on' : 'off'));
 		}
 		lastChangeEventStatus = isOn;
@@ -74,7 +72,7 @@ exports.togglePower = () => {
 		poweredOn = false;
 		until = new Date(new Date().getTime() + 15 * 60 * 1000);
 
-		evts.emit('changeHeatingPower', {
+		heatingEvts.emit('changeHeatingPower', {
 			poweredOn,
 			until
 		});
@@ -87,7 +85,7 @@ exports.togglePower = () => {
 		poweredOn = true;
 		until = null;
 
-		evts.emit('changeHeatingPower', {
+		heatingEvts.emit('changeHeatingPower', {
 			poweredOn,
 			until
 		});
@@ -95,8 +93,6 @@ exports.togglePower = () => {
 
 	updateHeatingStatus();
 };
-
-exports.evts = evts;
 
 
 function turnHeatingOn () {
@@ -108,7 +104,7 @@ function turnHeatingOff () {
 	isOn = false;
 	lastStatusReadBySensor = false;
 	if (lastChangeEventStatus !== isOn) {
-		evts.emit('changeHeating', isOn);
+		heatingEvts.emit('changeHeating', isOn);
 		console.log('heating turned off');
 	}
 	lastChangeEventStatus = isOn;

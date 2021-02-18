@@ -4,6 +4,7 @@ const socket = require('../services/socketio');
 const outsideConditions = require('../services/outsideConditions');
 const insideConditions = require('../services/insideConditions');
 const heatingService = require('../services/heating');
+const heatingEvts = require('../services/heatingEvts');
 const statisticsService = require('../services/statistics');
 const security = require('../services/security');
 const plantWatering = require('../services/plantWatering');
@@ -45,7 +46,7 @@ exports.init = function () {
 		});
 	});
 
-	heatingService.evts.on('changeHeating', data => {
+	heatingEvts.on('changeHeating', data => {
 		io.emit('update', {
 			isHeatingOn: data
 		});
@@ -53,7 +54,7 @@ exports.init = function () {
 		recalculateHeatingDuration();
 	});
 
-	heatingService.evts.on('changeHeatingPower', data => {
+	heatingEvts.on('changeHeatingPower', data => {
 		io.emit('update', {
 			heatingPower: {
 				status: data.poweredOn,

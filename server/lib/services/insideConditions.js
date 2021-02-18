@@ -1,5 +1,5 @@
 const SensorSetting = require('../models/SensorSetting');
-const heatingEvts = require('./heating').evts;
+const heatingEvts = require('./heatingEvts');
 
 const EventEmitter = require('events');
 const evts = new EventEmitter();
@@ -7,7 +7,7 @@ const evts = new EventEmitter();
 let sensorData = {};
 
 let heatingOn = false;
-heatingEvts.on('change', (isOn) => {
+heatingEvts.on('changeHeating', (isOn) => {
 	if (isOn) {
 		enableAllSensors();
 		heatingOn = true;
