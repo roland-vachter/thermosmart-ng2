@@ -165,7 +165,8 @@ exports.get = () => {
 };
 
 const enableAllSensors = () => {
-	sensorData.forEach(async s => {
+	Object.keys(sensorData).forEach(async id => {
+		const s = s[id];
 		if (!s.enabled) {
 			s.enabled = true;
 			s.onHoldStatus = null;
@@ -173,7 +174,7 @@ const enableAllSensors = () => {
 			s.onHoldTempHighest = null;
 
 			const sensorSetting = await SensorSetting.findOne({
-				_id: s.id
+				_id: id
 			});
 
 			if (sensorSetting) {
