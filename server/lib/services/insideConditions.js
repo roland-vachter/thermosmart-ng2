@@ -1,9 +1,20 @@
 const SensorSetting = require('../models/SensorSetting');
+const heatingEvts = require('./heating').evts;
 
 const EventEmitter = require('events');
 const evts = new EventEmitter();
 
 let sensorData = {};
+
+let heatingOn = false;
+heatingEvts.on('change', (isOn) => {
+	if (isOn) {
+		this.enableAllSensors();
+		heatingOn = true;
+	} else {
+		heatingOn = false;
+	}
+});
 
 exports.set = async (data) => {
 	try {
@@ -68,7 +79,7 @@ exports.set = async (data) => {
 		sensorData[id].tempAdjust = sensorSetting.tempAdjust;
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
 
-		if (sensorSetting.enabled && sensorData[id].tempHistory.length) {
+		if (!heatingOn && sensorSetting.enabled && sensorData[id].tempHistory.length) {
 			const lastTemp = sensorData[id].tempHistory[0];
 			const prevLastTemp = sensorData[id].tempHistory[1];
 
@@ -152,6 +163,28 @@ exports.set = async (data) => {
 exports.get = () => {
 	return sensorData;
 };
+
+const enableAllSensors = () => {
+	sensorData.forEach(s => {
+		if (!s.enabled) {
+			s.enabled = true;
+			s.onHoldStatus = null;
+			s.onHoldTempLowest = null;
+			s.onHoldTempHighest = null;
+
+			const sensorSetting = await SensorSetting.findOne({
+				_id: s.id
+			});
+
+			if (sensorSetting) {
+				if (!sensorSetting.enabled) {
+					sensorSetting.enabled = true;
+					await sensorSetting.save();
+				}
+			}
+		}
+	});
+}
 
 exports.toggleSensorStatus = async (id) => {
 	const sensorSetting = await SensorSetting.findOne({

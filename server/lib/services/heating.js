@@ -1,4 +1,5 @@
-const insideConditions = require('./insideConditions');
+const insideConditionsEvts = require('./insideConditions').evts;
+const getSensors = require('./insideConditions').get;
 const targetTempService = require('./targetTemp');
 const configService = require('./config');
 
@@ -20,11 +21,11 @@ let suspendTimeout;
 
 let initialized = false;
 
-insideConditions.evts.on('change', () => {
+insideConditionsEvts.on('change', () => {
 	avgValues.temperature = 0;
 	avgValues.humidity = 0;
 
-	const sensors = insideConditions.get();
+	const sensors = getSensors();
 
 	const keys = Object.keys(sensors);
 	let activeCount = 0;
@@ -143,7 +144,7 @@ async function updateHeatingStatus () {
 
 		const target = targetTempService.get();
 		if (target) {
-			const sensors = insideConditions.get();
+			const sensors = getSensors();
 			if (!isOn && avgValues.temperature <= target.value - switchThresholdBelow.value) {
 				console.log('sensor data', JSON.stringify(sensors));
 				turnHeatingOn();
