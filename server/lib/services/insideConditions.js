@@ -164,7 +164,7 @@ exports.get = () => {
 	return sensorData;
 };
 
-const enableAllSensors = () => {
+const enableAllSensors = async () => {
 	sensorData.forEach(s => {
 		if (!s.enabled) {
 			s.enabled = true;
