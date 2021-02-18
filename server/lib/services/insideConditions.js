@@ -9,7 +9,7 @@ let sensorData = {};
 let heatingOn = false;
 heatingEvts.on('change', (isOn) => {
 	if (isOn) {
-		this.enableAllSensors();
+		enableAllSensors();
 		heatingOn = true;
 	} else {
 		heatingOn = false;
