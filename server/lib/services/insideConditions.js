@@ -166,7 +166,7 @@ exports.get = () => {
 
 const enableAllSensors = () => {
 	Object.keys(sensorData).forEach(async id => {
-		const s = s[id];
+		const s = sensorData[id];
 		if (!s.enabled) {
 			s.enabled = true;
 			s.onHoldStatus = null;
