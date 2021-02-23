@@ -87,7 +87,6 @@ exports.set = async (data) => {
 				if (lastTemp - data.temperature >= 0.15 || (prevLastTemp && prevLastTemp - data.temperature >= 0.25)) {
 					sensorData[id].onHoldTempLowest = data.temperature;
 					sensorData[id].onHoldTempHighest = null;
-					sensorData[id].enabled = false;
 					changesMade = true;
 
 					sensorData[id].onHoldStatus = 'firstDecrease';
@@ -95,6 +94,7 @@ exports.set = async (data) => {
 			} else if (sensorData[id].onHoldStatus === 'firstDecrease') {
 				if (lastTemp - data.temperature >= 0.15) {
 					sensorData[id].onHoldTempLowest = data.temperature;
+					sensorData[id].enabled = false;
 
 					sensorData[id].onHoldStatus = 'decrease';
 				} else {
