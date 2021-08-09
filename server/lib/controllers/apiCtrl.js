@@ -380,7 +380,7 @@ exports.log = async (req, res) => {
 			fn = console.warn;
 			break;
 		case 'ERROR':
-			fn = consoler.error;
+			fn = console.error;
 			break;
 	}
 
