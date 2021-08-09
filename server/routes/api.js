@@ -28,4 +28,6 @@ router.get('/security/sensor/movement', apiKeyMiddleware, cors(), apiCtrl.securi
 router.get('/plantwatering/init', loginMiddleware, cors(), apiCtrl.plantWateringInit);
 router.get('/plantwatering/sensor', apiKeyMiddleware, cors(), apiCtrl.plantWateringSensor);
 
+router.post('/log', apiKeyMiddleware, cors(), apiCtrl.log);
+
 module.exports = router;

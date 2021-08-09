@@ -356,3 +356,35 @@ exports.plantWateringSensor = async (req, res) => {
 		status: 'ok'
 	});
 };
+
+
+exports.log = async (req, res) => {
+	if (!req.body.id || req.body.log) {
+		return res.sendStatus(400).json({
+			status: 'error',
+			reason: 'id or log parameter is missing'
+		});
+	}
+
+	let level = 'LOG';
+	if (req.body.level && ['LOG', 'WARN', 'ERROR'].includes(req.body.level)) {
+		level = req.body.level;
+	}
+
+	let fn = console.log;
+	switch(level) {
+		case 'LOG':
+			fn = console.log;
+			break;
+		case 'WARN':
+			fn = console.warn;
+			break;
+		case 'ERROR':
+			fn = consoler.error;
+			break;
+	}
+
+	fn.apply(this, `=== ID ${req.body.id} || ${level} || ${req.body.log} |`);
+
+	res.sendStatus(200);
+}
