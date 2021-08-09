@@ -359,8 +359,8 @@ exports.plantWateringSensor = async (req, res) => {
 
 
 exports.log = async (req, res) => {
-	if (!req.body.id || req.body.log) {
-		return res.sendStatus(400).json({
+	if (!req.body.id || !req.body.log) {
+		return res.status(400).json({
 			status: 'error',
 			reason: 'id or log parameter is missing'
 		});
