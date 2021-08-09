@@ -384,7 +384,7 @@ exports.log = async (req, res) => {
 			break;
 	}
 
-	fn.apply(this, `=== ID ${req.body.id} || ${level} || ${req.body.log} |`);
+	fn.call(this, `=== ID ${req.body.id} || ${level} || ${req.body.log} |`);
 
 	res.sendStatus(200);
 }
