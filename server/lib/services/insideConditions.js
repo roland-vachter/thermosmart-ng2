@@ -1,5 +1,6 @@
 const SensorSetting = require('../models/SensorSetting');
 const heatingEvts = require('./heatingEvts');
+const pushNotifications = require('./pushNotifications');
 
 const EventEmitter = require('events');
 const evts = new EventEmitter();
@@ -266,8 +267,10 @@ setInterval(() => {
 
 			if (sensorData.length === 1) {
 				sensorData = [];
+				pushNotifications.send(['heating'], 'ThermoSmart - Heating', 'All sensors are removed');
 			} else {
 				delete sensorData[id];
+				pushNotifications.send(['heating'], 'ThermoSmart - Heating', 'Sensor removed');
 			}
 		}
 	});

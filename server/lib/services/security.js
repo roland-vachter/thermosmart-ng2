@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 const evts = new EventEmitter();
 
+const pushNotifications = require('./pushNotifications');
 const SecurityMovementHistory = require('../models/SecurityMovementHistory');
 const SecurityArmingHistory = require('../models/SecurityArmingHistory');
 
@@ -42,6 +43,10 @@ const changeStatus = (newStatus) => {
 	status = newStatus;
 	evts.emit('status', status);
 
+	if (status === STATUSES.ALARM) {
+		pushNotifications.send(['security'], 'ThermoSmart - Security', 'Alarm triggered!');
+	}
+
 	new SecurityArmingHistory({
 		datetime: new Date(),
 		status: newStatus
@@ -76,6 +81,8 @@ exports.movementDetected = () => {
 	new SecurityMovementHistory({
 		datetime: new Date()
 	}).save();
+
+	pushNotifications.send(['security'], 'ThermoSmart - Security', 'Movement');
 
 	if (status === STATUSES.ARMED && ARMED_STATUSES.includes(status)) {
 		changeStatus(STATUSES.PREALARM);
