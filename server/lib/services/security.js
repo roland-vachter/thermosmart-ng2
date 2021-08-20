@@ -82,8 +82,6 @@ exports.movementDetected = () => {
 		datetime: new Date()
 	}).save();
 
-	pushNotifications.send(['security'], 'ThermoSmart - Security', 'Movement');
-
 	if (status === STATUSES.ARMED && ARMED_STATUSES.includes(status)) {
 		changeStatus(STATUSES.PREALARM);
 
