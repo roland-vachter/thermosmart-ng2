@@ -1,0 +1,68 @@
+<div class="thermo">
+	<div class="row">
+		<div class="col-12 col-md-6 col-lg-5 col-xl-4 thermo-house--component-wrapper">
+			
+		</div>
+
+		<div class="col-12 col-md-6 col-lg-7 col-xl-8">
+			<div class="row">
+				<div *ngFor="let sensor of dataStore.sensorList" class="col-12 col-sm-6 col-xl-4">
+					<div class="component">
+						<thermo-sensor
+							[id]="sensor.id"
+							[temperature]="sensor.temperature"
+							[humidity]="sensor.humidity"
+							[active]="sensor.active"
+							[enabled]="sensor.enabled"
+							[label]="sensor.label"
+							[tempAdjust]="sensor.tempAdjust"
+							[humidityAdjust]="sensor.humidityAdjust"
+							[restartSensorInProgress]="restartSensorInProgress">
+						</thermo-sensor>
+					</div>
+				</div>
+
+				<div class="col-12">
+					<div class="component">
+						<thermo-heating-current-plan
+							[targetTemp]="dataStore.targetTemp"
+							[todaysPlan]="dataStore.todaysPlan"
+							[nextDaysPlan]="dataStore.nextDaysPlan"
+							[currentTime]="dataStore.currentTime"
+							[percentInDay]="dataStore.percentInDay"
+							(onChangePlan)="showChangePlanModal($event)">
+						</thermo-heating-current-plan>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+	<!--
+
+	<div class="thermo-status--inside">
+		<i class="icon-house-simple thermo-status--house-icon color-{{security === SECURITY_STATUSES.PREACTIVATED ? 'orange' : security === SECURITY_STATUSES.ACTIVATED ? 'red' : 'gray'}}"></i>
+
+		
+		<i class="icon-{{security === SECURITY_STATUSES.ARMED ? 'padlock-closed' : 'padlock-open'}} thermo-status--icon-lock color-{{SECURITY_ARMED_STATUSES.includes(security) ? 'red' : security === SECURITY_STATUSES.ARMING ? 'orange' : 'green'}}" ng-click="scope().securityToggleAlarm()"></i>
+		<div class="thermo-status--value thermo-status--temp">
+			<i class="icon-thermometer6"></i> <span ng-bind-html="inside.temp | float"></span>
+		</div>
+
+		<div class="thermo-status--value thermo-status--humi">
+			<i class="icon-humidity"></i> {{inside.humi}}
+		</div>
+
+		<div class="thermo-status--run-duration">
+			<i class="icon-fire"></i> {{statisticsForToday.heatingDuration | duration}}
+		</div>
+	</div>
+</div>
+
+<div class="thermo-component thermo-target">
+	<div class="thermo-target--control">
+		<button type="button" class="thermo-target--button thermo-target--decrease" ng-click="scope().tempAdjust(targetTemp.ref._id, -0.1)">-</button>
+		<span class="thermo-target--value color-{{targetTemp.ref.color}}"><span ng-bind-html="targetTemp.ref.value | float"></span> &deg;C</span>
+		<button type="button" class="thermo-target--button thermo-target--increase" ng-click="scope().tempAdjust(targetTemp.ref._id, 0.1)">+</button>
+	</div>-->

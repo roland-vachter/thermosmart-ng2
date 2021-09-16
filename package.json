@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"scripts": {
 		"ng": "ng",
-		"start": "node ./server/bin/www",
+		"start": "nodemon ./server/bin/www",
 		"build": "ng build",
 		"build-watch": "ng build -w",
 		"test": "ng test",
@@ -32,6 +32,7 @@
 		"angular2-moment": "^1.8.0",
 		"body-parser": "~1.13.2",
 		"bootstrap": "^4.0.0",
+		"bootstrap-toggle": "^2.2.2",
 		"chart.js": "^2.7.1",
 		"compression": "^1.7.1",
 		"connect-mongo": "^2.0.0",

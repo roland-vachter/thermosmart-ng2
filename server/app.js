@@ -163,7 +163,7 @@ app.get(`/assets/bower/*.(woff|svg|ttf|eot|gif|png|jpg|js|css)`, (req, res) => {
 app.use(`/assets/static/`, express.static(path.join(__dirname, 'public'), {
 	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
 }));
-app.use(`/assets/`, express.static(path.join(__dirname, '../client/dist'), {
+app.use(`/assets/`, express.static(path.join(__dirname, '../dist'), {
 	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
 }));
 

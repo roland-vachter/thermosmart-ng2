@@ -1,0 +1,47 @@
+<div class="modal-header">
+	<h4 class="modal-title">Security settings</h4>
+	<button type="button" class="close" aria-label="Close" (click)="bsModalRef.hide()">
+		<span aria-hidden="true">&times;</span>
+	</button>
+</div>
+<div class="modal-body security-settings--modal">
+	<h3>Camera internal IPs</h3>
+	<ul class="list-group">
+		<li class="list-group-item" *ngFor="let camera of cameras">
+			{{ camera.ip }}
+			<span (click)="removeCameraIp(camera.ip)">X</span>
+		</li>
+		<li class="list-group-item">
+			<div class="input-group">
+				<input type="text" class="form-control" name="ip" [(ngModel)]="newCameraIp" [ngClass]="{ 'invalid-input': !!cameraReason }">
+				<div class="input-group-append">
+					<button class="btn btn-outline-primary" type="button" (click)="addCameraIp()">Add</button>
+				</div>
+			</div>
+			<div *ngIf="cameraReason" class="invalid-text">
+				{{ cameraReason }}
+			</div>
+		</li>
+	</ul>
+
+	<hr />
+
+	<h3>Controller IDs</h3>
+	<ul class="list-group">
+		<li class="list-group-item" *ngFor="let controller of controllers">
+			{{ controller.id }}
+			<span (click)="removeControllerId(controller.id)">X</span>
+		</li>
+		<li class="list-group-item">
+			<div class="input-group">
+				<input type="text" class="form-control" name="ip" [(ngModel)]="newControllerId" [ngClass]="{ 'invalid-input': !!controllerReason }">
+				<div class="input-group-append">
+					<button class="btn btn-outline-primary" type="button" (click)="addControllerId()">Add</button>
+				</div>
+			</div>
+			<div *ngIf="controllerReason" class="invalid-text">
+				{{ controllerReason }}
+			</div>
+		</li>
+	</ul>
+</div>

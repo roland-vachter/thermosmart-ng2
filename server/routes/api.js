@@ -4,27 +4,48 @@ const express = require('express');
 const router = express.Router();
 
 const apiCtrl = require('../lib/controllers/apiCtrl');
+const heatingApiCtrl = require('../lib/controllers/heating/apiCtrl');
+const securityStatusAndMovementApiCtrl = require('../lib/controllers/security/statusAndMovementApiCtrl');
+const securityHealthApiCtrl = require('../lib/controllers/security/healthApiCtrl');
 const loginMiddleware = require('../lib/middlewares/login');
 const apiKeyMiddleware = require('../lib/middlewares/apiKey');
 const cors = require('cors');
 
-router.get('/init', loginMiddleware, cors(), apiCtrl.init);
-router.post('/tempadjust', loginMiddleware, cors(), apiCtrl.tempAdjust);
-router.post('/restartsensor', loginMiddleware, cors(), apiCtrl.restartSensor);
-router.post('/togglesensorstatus', loginMiddleware, cors(), apiCtrl.toggleSensorStatus);
-router.post('/changesensorsettings', loginMiddleware, cors(), apiCtrl.changeSensorSettings);
-router.post('/changedefaultplan', loginMiddleware, cors(), apiCtrl.changeDefaultPlan);
-router.get('/sensorpolling', apiKeyMiddleware, cors(), apiCtrl.sensorPolling);
-router.get('/statistics', loginMiddleware, cors(), apiCtrl.statistics);
-router.post('/changeconfig', loginMiddleware, cors(), apiCtrl.changeConfig);
-router.post('/toggleheatingpower', loginMiddleware, cors(), apiCtrl.toggleHeatingPower);
+// heating
+router.get('/init', loginMiddleware, cors(), heatingApiCtrl.init);
+router.post('/tempadjust', loginMiddleware, cors(), heatingApiCtrl.tempAdjust);
+router.post('/restartsensor', loginMiddleware, cors(), heatingApiCtrl.restartSensor);
+router.post('/togglesensorstatus', loginMiddleware, cors(), heatingApiCtrl.toggleSensorStatus);
+router.post('/changesensorsettings', loginMiddleware, cors(), heatingApiCtrl.changeSensorSettings);
+router.post('/changedefaultplan', loginMiddleware, cors(), heatingApiCtrl.changeDefaultPlan);
+router.get('/sensorpolling', apiKeyMiddleware, cors(), heatingApiCtrl.sensorPolling);
+router.get('/statistics', loginMiddleware, cors(), heatingApiCtrl.statistics);
+router.post('/changeconfig', loginMiddleware, cors(), heatingApiCtrl.changeConfig);
+router.post('/toggleheatingpower', loginMiddleware, cors(), heatingApiCtrl.toggleHeatingPower);
 
-router.post('/security/togglearm', loginMiddleware, cors(), apiCtrl.securityToggleArm);
-router.get('/security/init', loginMiddleware, cors(), apiCtrl.securityInit);
-router.get('/security/sensor/status', apiKeyMiddleware, cors(), apiCtrl.securityStatus);
-router.post('/security/sensor/togglearm', apiKeyMiddleware, cors(), apiCtrl.securityToggleArm);
-router.get('/security/sensor/movement', apiKeyMiddleware, cors(), apiCtrl.securityMovement);
 
+// security UI
+router.post('/security/togglearm', loginMiddleware, cors(), securityStatusAndMovementApiCtrl.toggleArm);
+router.get('/security/init', loginMiddleware, cors(), securityStatusAndMovementApiCtrl.init);
+router.get('/security/camera/list', loginMiddleware, cors(), securityHealthApiCtrl.camera.list);
+router.post('/security/camera/add', loginMiddleware, cors(), securityHealthApiCtrl.camera.add);
+router.post('/security/camera/remove', loginMiddleware, cors(), securityHealthApiCtrl.camera.remove);
+router.get('/security/controller/list', loginMiddleware, cors(), securityHealthApiCtrl.controller.list);
+router.post('/security/controller/add', loginMiddleware, cors(), securityHealthApiCtrl.controller.add);
+router.post('/security/controller/remove', loginMiddleware, cors(), securityHealthApiCtrl.controller.remove);
+
+// security sensor
+router.get('/security/sensor/status', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.status);
+router.post('/security/sensor/togglearm', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.toggleArm);
+router.get('/security/sensor/movement', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.movement);
+router.get('/security/sensor/camera/ips', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.listApis);
+router.post('/security/sensor/camera/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.reportHealth);
+router.post('/security/sensor/camera/movement', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.reportMovement);
+router.post('/security/sensor/controller/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.controller.reportHealth);
+router.post('/security/sensor/keypad/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.keypad.reportHealth);
+router.post('/security/sensor/motionsensor/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.motionSensor.reportHealth);
+
+// plant watering
 router.get('/plantwatering/init', loginMiddleware, cors(), apiCtrl.plantWateringInit);
 router.get('/plantwatering/sensor', apiKeyMiddleware, cors(), apiCtrl.plantWateringSensor);
 

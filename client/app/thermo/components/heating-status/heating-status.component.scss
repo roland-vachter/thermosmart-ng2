@@ -1,0 +1,175 @@
+@import '../../../../styles/icons/mixins';
+@import '../../../../styles/colors/variables';
+
+
+.thermo-status--icon {
+	font-size: 3.1rem;
+
+	@include icon('air-conditioner-3');
+}
+
+.thermo-heating--power {
+	text-align: center;
+	min-width: 100px;
+}
+
+.thermo-heating--power-button {
+	font-size: 1.5rem;
+	cursor: pointer;
+}
+
+.thermo-heating--power-status {
+	font-size: 1.5rem;
+}
+
+.thermo-heating--power-counter {
+	font-size: 1.2rem;
+	line-height: 1.7rem;
+	vertical-align: text-bottom;
+}
+
+.thermo-house--component {
+	height: calc(100% - 10px);
+	text-align: center;
+}
+
+.thermo-house--icon {
+	font-size: 15rem;
+	font-weight: 100;
+	margin: 0 -1rem;
+}
+
+.thermo-heating--power {
+	position: absolute;
+	right: 20px;
+	z-index: 11;
+}
+
+.thermo-house--outside {
+	display: inline-block;
+}
+
+.thermo-house--inside {
+	position: relative;
+	display: inline-block;
+	margin-left: -7px;
+	padding: 20px 0 20px 0;
+	text-align: left;
+}
+
+.thermo-heating--target {
+	display: inline-block;
+	width: 100%;
+	text-align: center;
+}
+
+.thermo--inside {
+	position: absolute;
+	left: 40px;
+	top: 110px;
+
+	.thermo-inside {
+		font-size: 2.5rem;
+		line-height: 1.5rem;
+		font-weight: bold;
+	}
+	
+	.thermo-inside--temp {
+		color: $red;
+	}
+	
+	.thermo-inside--temp-icon {
+		@include icon('thermometer6');
+		font-size: 1.8rem;
+		vertical-align: super;
+	}
+	
+	.thermo-inside--humi {
+		color: $teal;
+	}
+	
+	.thermo-inside--humi-icon {
+		@include icon('humidity');
+		font-size: 1.8rem;
+		vertical-align: super;
+	}
+}
+
+.thermo-heating--status {
+	position: absolute;
+	left: 0;
+	top: 40px;
+	width: 100%;
+	text-align: center;
+}
+
+.thermo-heating--duration {
+	position: absolute;
+	top: 210px;
+	left: 50px;
+	font-size: 1.2rem;
+	color: $dark-gray;
+}
+
+
+.thermo-target--control {
+	vertical-align: middle;
+}
+
+.thermo-target--button {
+	border: 0;
+	background: none;
+	font-size: 3.1rem;
+	vertical-align: middle;
+	color: $gray;
+	margin: 0 30px;
+	outline: 0;
+	cursor: pointer;
+
+	&:first-child {
+		margin-left: 0;
+	}
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+.thermo-target--decrease {
+	margin-left: 0;
+}
+
+.thermo-target--increase {
+	margin-right: 0;
+}
+
+.thermo-target--value {
+	font-size: 3.1rem;
+	font-weight: bold;
+	vertical-align: middle;
+}
+
+
+.thermo-outside {
+	font-size: 1.7rem;
+	font-weight: bold;
+}
+
+.thermo-outside--temp {
+	color: $maroon;
+
+	@include icon('thermometer6');
+}
+
+.thermo-outside--humi {
+	color: $navy;
+	margin-bottom: 20px;
+
+	@include icon('humidity');
+}
+
+.thermo-outside--weather {
+	margin-bottom: 60px;
+	text-align: center;
+	font-size: 3.1rem;
+}

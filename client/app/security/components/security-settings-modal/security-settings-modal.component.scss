@@ -1,0 +1,60 @@
+@import '../../../../styles/colors/variables';
+@import '../../../../styles/icons/mixins';
+
+.thermo-select-plan--modal {
+	font-size: 1.6rem;
+
+	.thermo-select-plan--icon {
+		height: 125px;
+		font-size: 3rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.component {
+		box-sizing: border-box;
+		border: 2px solid transparent;
+
+		&:hover {
+			border: 2px solid $dark-gray;
+			color: $dark-gray;
+			cursor: pointer;
+			background: $magnolia;
+		}
+	}
+
+	.thermo-select-plan--selected {
+		border: 2px solid $crimson;
+		color: $crimson;
+		background: $light-gray;
+	}
+}
+
+.list-group {
+	font-size: 1rem;
+
+	.list-group-item {
+		border: 0;
+
+		span {
+			float: right;
+			display: none;
+			font-weight: bold;
+			color: $crimson;
+			cursor: pointer;
+		}
+
+		&:hover span {
+			display: inline-block;
+		}
+	}
+}
+
+.invalid-text {
+	color: $crimson;
+}
+
+.invalid-input {
+	border-color: $crimson;
+}

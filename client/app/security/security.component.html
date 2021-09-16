@@ -1,0 +1,48 @@
+<div class="component security">
+	<div class="security-status">
+		<!-- <span class="security-toggle security-{{status}} security-toggle--{{status === 'disarmed' ? 'open' : status === 'arming' ? 'transit' : 'closed'}}" (click)="toggleArming()">
+			<i class="security-status-icon security-status-icon-open icon-padlock-open"></i>
+			<i class="security-status-icon security-status-icon-closed icon-padlock-closed"></i>
+		</span>
+		
+		<span class="security-status--text">
+			{{status | titlecase}}
+		</span>
+
+		<i class="security-alarm-icon icon-alarm {{alarmTriggered > 0 ? 'security-alarm-icon--triggered' : ''}}"></i> -->
+
+		<i class="icon-settings-1 security-settings" (click)="showSettingsModal()"></i>
+		<div class="security-toggle security-status-{{status}}" [ngClass]="{ 'security-toggle--animation': ['prealarm', 'arming', 'alarm'].includes(status), 'security-toggle--alarm-triggered': alarmTriggered > 0 }" (click)="toggleArming()">
+			<i [ngClass]="{ 'icon-padlock-open': ['disarmed', 'arming'].includes(status), 'icon-padlock-closed': ['armed', 'prealarm'].includes(status), 'icon-alarm': status === 'alarm' }"></i>
+			<span>{{status | titlecase}}</span>
+		</div>
+
+		<div class="sensor-statuses">
+			<i class="icon-processor" [ngClass]="{
+				'health-ok': controllerHealth === HEALTH.OK,
+				'health-partial': controllerHealth === HEALTH.PARTIAL,
+				'health-fail': controllerHealth === HEALTH.FAIL
+			}"></i>
+			<div class="separator"></div>
+			<i [ngClass]="{
+				'icon-surveillance_ok': cameraHealth === HEALTH.OK,
+				'icon-surveillance_issue': cameraHealth !== HEALTH.OK,
+				'health-ok': cameraHealth === HEALTH.OK,
+				'health-partial': cameraHealth === HEALTH.PARTIAL,
+				'health-fail': cameraHealth === HEALTH.FAIL
+			}"></i>
+			<div class="separator"></div>
+			<i class="icon-motion" [ngClass]="{
+				'health-ok': motionSensorHealth === HEALTH.OK,
+				'health-partial': motionSensorHealth === HEALTH.PARTIAL,
+				'health-fail': motionSensorHealth === HEALTH.FAIL
+			}"></i>
+			<div class="separator"></div>
+			<i class="icon-dial" [ngClass]="{
+				'health-ok': keypadHealth === HEALTH.OK,
+				'health-partial': keypadHealth === HEALTH.PARTIAL,
+				'health-fail': keypadHealth === HEALTH.FAIL
+			}"></i>
+		</div>
+	</div>
+</div>

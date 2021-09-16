@@ -8,29 +8,23 @@ function isSocketAuthorized (socket) {
 }
 
 exports.init = function () {
-	const frontendIo = socket.io;
+	const sensorIo = socket.io;
 
-	frontendIo.on('connection', (socket) => {
-		console.log('connected');
-
+	sensorIo.on('connection', (socket) => {
 		security.evts.on('status', data => {
-			//socket.forEach(io => {
-				socket.emit('update', {
-					security: {
-						status: data
-					}
-				});
-			//});
+			socket.emit('update', {
+				security: {
+					status: data
+				}
+			});
 		});
 
 		security.evts.on('alarm', data => {
-			//socket.forEach(io => {
-				socket.emit('update', {
-					security: {
-						alarm: data
-					}
-				});
-			//});
+			socket.emit('update', {
+				security: {
+					alarm: data
+				}
+			});
 		});
 	});
 };

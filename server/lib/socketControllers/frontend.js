@@ -137,6 +137,38 @@ exports.init = function () {
 		});
 	});
 
+	security.evts.on('camera-health', data => {
+		io.emit('update', {
+			security: {
+				cameraHealth: data
+			}
+		})
+	});
+
+	security.evts.on('controller-health', data => {
+		io.emit('update', {
+			security: {
+				controllerHealth: data
+			}
+		})
+	});
+
+	security.evts.on('keypad-health', data => {
+		io.emit('update', {
+			security: {
+				keypadHealth: data
+			}
+		})
+	});
+
+	security.evts.on('motion-sensor-health', data => {
+		io.emit('update', {
+			security: {
+				motionSensorHealth: data
+			}
+		})
+	});
+
 
 	plantWatering.evts.on('change', data => {
 		io.emit('update', {
