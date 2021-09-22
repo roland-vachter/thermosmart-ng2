@@ -1,28 +1,9 @@
 <div class="thermo">
 	<div class="row">
-		<div class="col-12 col-md-6 col-lg-5 col-xl-4 thermo-house--component-wrapper">
-			
-		</div>
-
 		<div class="col-12 col-md-6 col-lg-7 col-xl-8">
 			<div class="row">
-				<div *ngFor="let sensor of dataStore.sensorList" class="col-12 col-sm-6 col-xl-4">
-					<div class="component">
-						<thermo-sensor
-							[id]="sensor.id"
-							[temperature]="sensor.temperature"
-							[humidity]="sensor.humidity"
-							[active]="sensor.active"
-							[enabled]="sensor.enabled"
-							[label]="sensor.label"
-							[tempAdjust]="sensor.tempAdjust"
-							[humidityAdjust]="sensor.humidityAdjust"
-							[restartSensorInProgress]="restartSensorInProgress">
-						</thermo-sensor>
-					</div>
-				</div>
 
-				<div class="col-12">
+				<!-- <div class="col-12">
 					<div class="component">
 						<thermo-heating-current-plan
 							[targetTemp]="dataStore.targetTemp"
@@ -33,7 +14,7 @@
 							(onChangePlan)="showChangePlanModal($event)">
 						</thermo-heating-current-plan>
 					</div>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</div>

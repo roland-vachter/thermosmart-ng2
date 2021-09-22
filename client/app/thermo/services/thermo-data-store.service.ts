@@ -1,5 +1,6 @@
 import { ApplicationRef, EventEmitter, Injectable } from '@angular/core';
 import { ServerUpdateService } from '../../shared/server-update.service';
+import { Sensor } from '../types';
 import { ThermoServerApiService } from './thermo-server-api.service';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class ThermoDataStoreService {
 		humidity: null
 	};
 	sensorsById = {};
-	sensorList = [];
+	sensorList: Sensor[] = [];
 	outsideConditions: any = {
 		temperature: null,
 		humidity: null,
@@ -52,6 +53,7 @@ export class ThermoDataStoreService {
 		status: false,
 		until: new Date(new Date().getTime() + 15 * 60 * 1000)
 	};
+	sensorRestartInProgress = false;
 
     evt: EventEmitter<string> = new EventEmitter();
 
@@ -73,7 +75,15 @@ export class ThermoDataStoreService {
 			.subscribe(this.handleServerData.bind(this));
     }
 
-    handleServerData (data: any) {
+	initiateSensorRestart() {
+		this.sensorRestartInProgress = true;
+	}
+
+	stopSensorRestart() {
+		this.sensorRestartInProgress = false;
+	}
+
+    private handleServerData (data: any) {
 		this.lastUpdate = new Date();
 
 		if (data.config) {

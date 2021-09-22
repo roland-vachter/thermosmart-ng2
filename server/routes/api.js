@@ -36,14 +36,14 @@ router.post('/security/controller/remove', loginMiddleware, cors(), securityHeal
 
 // security sensor
 router.get('/security/sensor/status', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.status);
-router.post('/security/sensor/togglearm', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.toggleArm);
+router.get('/security/sensor/togglearm', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.toggleArm);
 router.get('/security/sensor/movement', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.movement);
 router.get('/security/sensor/camera/ips', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.listApis);
-router.post('/security/sensor/camera/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.reportHealth);
-router.post('/security/sensor/camera/movement', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.reportMovement);
-router.post('/security/sensor/controller/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.controller.reportHealth);
-router.post('/security/sensor/keypad/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.keypad.reportHealth);
-router.post('/security/sensor/motionsensor/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.motionSensor.reportHealth);
+router.get('/security/sensor/camera/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.reportHealth);
+router.get('/security/sensor/camera/movement', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.reportMovement);
+router.get('/security/sensor/controller/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.controller.reportHealth);
+router.get('/security/sensor/keypad/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.keypad.reportHealth);
+router.get('/security/sensor/motionsensor/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.motionSensor.reportHealth);
 
 // plant watering
 router.get('/plantwatering/init', loginMiddleware, cors(), apiCtrl.plantWateringInit);

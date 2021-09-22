@@ -10,6 +10,7 @@ import { PercentStringPipe } from './percent-string.pipe';
 import { DayOfWeekNamePipe } from './day-of-week-name.pipe';
 import { LoginStatusService } from './login-status.service';
 import { ServerUpdateService } from './server-update.service';
+import { ResponsivityService } from './reponsivity.service';
 
 const config: SocketIoConfig = {
 	url: '/frontend',
@@ -40,7 +41,8 @@ const config: SocketIoConfig = {
 	],
 	providers: [
 		LoginStatusService,
-		ServerUpdateService
+		ServerUpdateService,
+		ResponsivityService
 	]
 })
 export class SharedModule { }

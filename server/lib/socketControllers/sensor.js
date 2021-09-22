@@ -1,5 +1,6 @@
 const socket = require('../services/socketio');
-const security = require('../services/security');
+const securityStatus = require('../services/securityStatus');
+const securityHealth = require('../services/securityHealth');
 
 const authorizedSockets = [];
 
@@ -11,7 +12,7 @@ exports.init = function () {
 	const sensorIo = socket.io;
 
 	sensorIo.on('connection', (socket) => {
-		security.evts.on('status', data => {
+		securityStatus.evts.on('status', data => {
 			socket.emit('update', {
 				security: {
 					status: data
@@ -19,12 +20,20 @@ exports.init = function () {
 			});
 		});
 
-		security.evts.on('alarm', data => {
+		securityStatus.evts.on('alarm', data => {
 			socket.emit('update', {
 				security: {
 					alarm: data
 				}
 			});
 		});
+
+		securityHealth.evts.on('camera-movement', () => {
+			socket.emit('update', {
+				security: {
+					cameraMovement: true
+				}
+			})
+		})
 	});
 };

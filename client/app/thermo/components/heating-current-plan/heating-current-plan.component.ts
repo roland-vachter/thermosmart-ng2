@@ -1,5 +1,6 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ChangeHeatingPlanModalComponent } from '../change-heating-plan-modal/change-heating-plan-modal.component';
+import { Component, OnInit } from '@angular/core';
+import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
+import { ThermoModalsService } from '../../services/thermo-modals.service';
 
 @Component({
 	selector: 'thermo-heating-current-plan',
@@ -8,20 +9,16 @@ import { ChangeHeatingPlanModalComponent } from '../change-heating-plan-modal/ch
 })
 export class HeatingCurrentPlanComponent implements OnInit {
 
-	@Input() todaysPlan;
-	@Input() nextDaysPlan;
-	@Input() targetTemp;
-	@Input() currentTime;
-	@Input() percentInDay;
-	@Output() onChangePlan: EventEmitter<any> = new EventEmitter();
-
-	constructor() { }
+	constructor(
+		protected dataStore: ThermoDataStoreService,
+		private modalService: ThermoModalsService
+	) { }
 
 	ngOnInit() {
 	}
 
 	changePlan () {
-		this.onChangePlan.emit(new Date().getDay());
+		this.modalService.showChangePlanModal(new Date().getDay());
 	}
 
 }

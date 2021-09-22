@@ -1,26 +1,28 @@
-<div class="thermo-current-plan">
-	<div class="row">
-		<div class="col-12 col-md-4 col-lg-3 col-xl-2">
-			<div class="thermo-current-plan--label">
-				<h5>{{todaysPlan.plan.ref.name}}</h5>
+<div class="component">
+	<div class="thermo-current-plan">
+		<div class="row">
+			<div class="col-12 col-md-4 col-lg-3 col-xl-2">
+				<div class="thermo-current-plan--label">
+					<h5>{{ dataStore.todaysPlan.plan.ref.name }}</h5>
+				</div>
+			</div>
+		
+			<div class="col-12 col-md-8 col-lg-9 col-xl-10">
+				<div class="thermo-current-plan--current-time" [ngClass]="{'thermo-current-plan--last-part': dataStore.percentInDay > 80}" [style.left]="dataStore.percentInDay | percentString">
+					<div class="thermo-current-plan--pointer color-bg-{{ dataStore.targetTemp.ref.color }}" [style.left]="dataStore.percentInDay | percentString"></div>
+					{{ dataStore.currentTime }}
+				</div>
+
+				<thermo-heating-plan [plan]="dataStore.todaysPlan.plan.ref"></thermo-heating-plan>
 			</div>
 		</div>
-	
-		<div class="col-12 col-md-8 col-lg-9 col-xl-10">
-			<div class="thermo-current-plan--current-time" [ngClass]="{'thermo-current-plan--last-part': percentInDay > 80}" [style.left]="percentInDay | percentString">
-				<div class="thermo-current-plan--pointer color-bg-{{targetTemp.ref.color}}" [style.left]="percentInDay | percentString"></div>
-				{{currentTime}}
+
+		<div class="row">
+			<div class="col-12 col-sm-11 offset-sm-1 thermo-current-plan--next-plan">
+				<i class="icon-diagonal-arrows"></i> Tomorrow: <strong>{{ dataStore.nextDaysPlan.plan.ref.name }}</strong>
 			</div>
-
-			<thermo-heating-plan [plan]="todaysPlan.plan.ref"></thermo-heating-plan>
 		</div>
-	</div>
 
-	<div class="row">
-		<div class="col-12 col-sm-11 offset-sm-1 thermo-current-plan--next-plan">
-			<i class="icon-diagonal-arrows"></i> Tomorrow: <strong>{{nextDaysPlan.plan.ref.name}}</strong>
-		</div>
+		<i class="icon-settings-1 color-maroon thermo-current-plan--change" (click)="changePlan()"></i>
 	</div>
-
-	<i class="icon-settings-1 color-maroon thermo-current-plan--change" (click)="changePlan()"></i>
 </div>

@@ -6,7 +6,8 @@ const insideConditions = require('../services/insideConditions');
 const heatingService = require('../services/heating');
 const heatingEvts = require('../services/heatingEvts');
 const statisticsService = require('../services/statistics');
-const security = require('../services/security');
+const securityStatus = require('../services/securityStatus');
+const securityHealth = require('../services/securityHealth');
 const plantWatering = require('../services/plantWatering');
 const restartSensorService = require('../services/restartSensor');
 const targetTempService = require('../services/targetTemp');
@@ -113,7 +114,7 @@ exports.init = function () {
 
 
 	// security
-	security.evts.on('status', data => {
+	securityStatus.evts.on('status', data => {
 		io.emit('update', {
 			security: {
 				status: data
@@ -121,7 +122,7 @@ exports.init = function () {
 		});
 	});
 
-	security.evts.on('alarm', data => {
+	securityStatus.evts.on('alarm', data => {
 		io.emit('update', {
 			security: {
 				alarm: data
@@ -129,7 +130,7 @@ exports.init = function () {
 		});
 	});
 
-	security.evts.on('movement', data => {
+	securityStatus.evts.on('movement', data => {
 		io.emit('update', {
 			security: {
 				movement: data
@@ -137,7 +138,7 @@ exports.init = function () {
 		});
 	});
 
-	security.evts.on('camera-health', data => {
+	securityHealth.evts.on('camera-health', data => {
 		io.emit('update', {
 			security: {
 				cameraHealth: data
@@ -145,7 +146,7 @@ exports.init = function () {
 		})
 	});
 
-	security.evts.on('controller-health', data => {
+	securityHealth.evts.on('controller-health', data => {
 		io.emit('update', {
 			security: {
 				controllerHealth: data
@@ -153,7 +154,7 @@ exports.init = function () {
 		})
 	});
 
-	security.evts.on('keypad-health', data => {
+	securityHealth.evts.on('keypad-health', data => {
 		io.emit('update', {
 			security: {
 				keypadHealth: data
@@ -161,7 +162,7 @@ exports.init = function () {
 		})
 	});
 
-	security.evts.on('motion-sensor-health', data => {
+	securityHealth.evts.on('motion-sensor-health', data => {
 		io.emit('update', {
 			security: {
 				motionSensorHealth: data

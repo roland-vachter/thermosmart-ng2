@@ -25,9 +25,7 @@
             "styles": [
               "client/styles.scss"
             ],
-            "scripts": [
-							"node_modules/bootstrap-toggle/js/bootstrap-toggle.min.js"
-						]
+            "scripts": []
           },
           "configurations": {
             "production": {

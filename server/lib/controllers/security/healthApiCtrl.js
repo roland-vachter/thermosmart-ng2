@@ -1,4 +1,4 @@
-const security = require('../../services/security');
+const securityHealth = require('../../services/securityHealth');
 const types = require('../../utils/types');
 
 exports.camera = {
@@ -10,7 +10,7 @@ exports.camera = {
 			});
 		}
 
-		const exists = await security.securityCameraIpExists(req.body.ip);
+		const exists = await securityHealth.camera.ipExists(req.body.ip);
 		if (exists) {
 			res.json({
 				status: types.RESPONSE_STATUS.ERROR,
@@ -18,7 +18,7 @@ exports.camera = {
 			})
 		} else {
 			try {
-				await security.addSecurityCamera(req.body.ip);
+				await securityHealth.camera.add(req.body.ip);
 				res.json({
 					status: types.RESPONSE_STATUS.OK
 				});
@@ -39,7 +39,7 @@ exports.camera = {
 		}
 
 		try {
-			await security.removeSecurityCamera(req.body.ip);
+			await securityHealth.camera.remove(req.body.ip);
 			res.json({
 				status: types.RESPONSE_STATUS.OK
 			});
@@ -50,28 +50,30 @@ exports.camera = {
 			});
 		}
 	},
-	list: (req, res) => {
-		res.json(security.getSecurityCameras());
+	list: async (req, res) => {
+		res.json(await securityHealth.camera.list());
 	},
-	listApis: (req, res) => {
-		res.json(security.getSecurityCameraIps());
+	listApis: async (req, res) => {
+		res.json({
+			ips: await securityHealth.camera.listIPs()
+		});
 	},
 	reportHealth: (req, res) => {
-		if (!req.body.ip || !req.body.health) {
+		if (!req.query.ip || !req.query.health) {
 			return res.status(400).json({
 				status: types.RESPONSE_STATUS.ERROR,
 				reason: 'IP or health parameter is missing'
 			});
 		}
 
-		security.reportCameraHealth(req.body.ip, req.body.health === 'true' || req.body.health === true);
+		securityHealth.camera.reportHealth(req.query.ip, req.query.health === 'true' || req.query.health === true);
 
 		res.json({
 			status: types.RESPONSE_STATUS.OK
 		});
 	},
 	reportMovement: () => {
-
+		securityHealth.camera.reportMovement();
 	}
 };
 
@@ -86,7 +88,7 @@ exports.controller = {
 			});
 		}
 
-		const exists = await security.securityControllerIdExists(req.body.id);
+		const exists = await securityHealth.controller.idExists(req.body.id);
 		if (exists) {
 			res.json({
 				status: types.RESPONSE_STATUS.ERROR,
@@ -94,7 +96,7 @@ exports.controller = {
 			})
 		} else {
 			try {
-				await security.addSecurityController(req.body.id);
+				await securityHealth.controller.add(req.body.id);
 				res.json({
 					status: types.RESPONSE_STATUS.OK
 				});
@@ -115,7 +117,7 @@ exports.controller = {
 		}
 
 		try {
-			await security.removeSecurityController(req.body.id);
+			await securityHealth.controller.remove(req.body.id);
 			res.json({
 				status: types.RESPONSE_STATUS.OK
 			});
@@ -126,18 +128,18 @@ exports.controller = {
 			});
 		}
 	},
-	list: (req, res) => {
-		res.json(security.getSecurityControllers());
+	list: async (req, res) => {
+		res.json(await securityHealth.controller.list());
 	},
 	reportHealth: (req, res) => {
-		if (!req.body.id) {
+		if (!req.query.id) {
 			return res.status(400).json({
 				status: types.RESPONSE_STATUS.ERROR,
 				reason: 'ID parameter is missing'
 			});
 		}
 
-		security.reportControllerHealth(req.body.id);
+		securityHealth.controller.reportHealth(req.query.id);
 
 		res.json({
 			status: types.RESPONSE_STATUS.OK
@@ -147,14 +149,14 @@ exports.controller = {
 
 exports.keypad = {
 	reportHealth: (req, res) => {
-		if (!req.body.health) {
+		if (!req.query.health) {
 			return res.status(400).json({
 				status: types.RESPONSE_STATUS.ERROR,
 				reason: 'health parameter is missing'
 			});
 		}
 
-		security.reportKeypadHealth(req.body.health === 'true' || req.body.health === true);
+		securityHealth.keypad.reportHealth(req.query.health === 'true' || req.query.health === true);
 
 		res.json({
 			status: types.RESPONSE_STATUS.OK
@@ -164,14 +166,14 @@ exports.keypad = {
 
 exports.motionSensor = {
 	reportHealth: (req, res) => {
-		if (!req.body.health) {
+		if (!req.query.health) {
 			return res.status(400).json({
 				status: types.RESPONSE_STATUS.ERROR,
 				reason: 'health parameter is missing'
 			});
 		}
 
-		security.reportMotionSensorHealth(req.body.health === 'true' || req.body.health === true);
+		securityHealth.motionSensor.reportHealth(req.query.health === 'true' || req.query.health === true);
 
 		res.json({
 			status: types.RESPONSE_STATUS.OK

@@ -2,8 +2,6 @@
 	<div class="container">
 		<div class="smart-header">
 			<div class="smart-header--content">
-				SmartHome
-
 				<div class="smart-navbar--dropdown-container btn-group float-left" dropdown>
 					<button dropdownToggle class="smart-navbar--dropdown-button color-gray" data-toggle="dropdown" role="button" id="smart-navbar-dropdown" aria-haspopup="true" aria-expanded="false">
 					</button>
@@ -16,10 +14,12 @@
 						<!-- <h4 class="dropdown-header">Security</h4> -->
 					</div>
 				</div>
-
-				<div class="float-right">
-					<div class="smart-refresh in-progress" [ngClass]="{'color-gray': updateStatus === 'fresh', 'color-orange': updateStatus === 'idle', 'color-red': updateStatus === 'outdated', 'smart-spin': refreshInProgress}" (click)="refresh(true)"></div>
+				
+				<div class="logo">
+					SmartHome
 				</div>
+
+				<div class="smart-refresh in-progress" [ngClass]="{'color-gray': updateStatus === 'fresh', 'color-orange': updateStatus === 'idle', 'color-red': updateStatus === 'outdated', 'smart-spin': refreshInProgress}" (click)="refresh(true)"></div>
 			</div>
 		</div>
 	</div>
@@ -33,6 +33,18 @@
 
 		<div class="col-md-6 col-12">
 			<thermo-heating-status class="align"></thermo-heating-status>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+			<thermo-sensor-list></thermo-sensor-list>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+			<thermo-heating-current-plan></thermo-heating-current-plan>
 		</div>
 	</div>
 </div>

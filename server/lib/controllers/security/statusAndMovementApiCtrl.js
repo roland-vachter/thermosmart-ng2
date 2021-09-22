@@ -1,9 +1,10 @@
 const SecurityMovementHistory = require('../../models/SecurityMovementHistory');
 const SecurityArmingHistory = require('../../models/SecurityArmingHistory');
-const security = require('../../services/security');
+const securityStatus = require('../../services/securityStatus');
+const securityHealth = require('../../services/securityHealth');
 
 exports.toggleArm = (req, res) => {
-	security.toggleArm();
+	securityStatus.toggleArm();
 
 	res.json({
 		status: 'ok'
@@ -15,7 +16,7 @@ exports.status = (req, res) => {
 		status: 'ok',
 		data: {
 			security: {
-				status: security.getStatus()
+				status: securityStatus.getStatus()
 			}
 		}
 	});
@@ -53,14 +54,14 @@ exports.init = (req, res) => {
 					status: 'ok',
 					data: {
 						security: {
-							status: security.getStatus(),
+							status: securityStatus.getStatus(),
 							lastActivity: movementHistory.datetime,
 							lastArmedAt: lastArmed.datetime,
-							alarmTriggered: security.getStatus() === 'disarmed' ? 0 : triggeredTimes,
-							cameraHealth: security.getCameraHealth(),
-							controllerHealth: security.getControllerHealth(),
-							keypadHealth: security.getKeypadHealth(),
-							motionSensorHealth: security.getMotionSensorHealth()
+							alarmTriggered: securityStatus.getStatus() === 'disarmed' ? 0 : triggeredTimes,
+							cameraHealth: securityHealth.camera.getHealth(),
+							controllerHealth: securityHealth.controller.getHealth(),
+							keypadHealth: securityHealth.keypad.getHealth(),
+							motionSensorHealth: securityHealth.motionSensor.getHealth()
 						}
 					}
 				});
@@ -71,9 +72,9 @@ exports.init = (req, res) => {
 
 
 exports.movement = function (req, res) {
-	security.movementDetected();
+	securityStatus.movementDetected();
 
 	res.json({
-		status: security.getStatus()
+		status: securityStatus.getStatus()
 	});
 };

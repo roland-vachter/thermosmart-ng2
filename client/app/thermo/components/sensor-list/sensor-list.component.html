@@ -1,0 +1,23 @@
+<div class="component">
+	<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3">
+		<div *ngFor="let sensor of dataStore.sensorList; index as i" class="col sensor-element">
+			<thermo-sensor
+				[sensor]="sensor"
+				[restartSensorInProgress]="dataStore.sensorRestartInProgress">
+			</thermo-sensor>
+
+			<div class="vertical-separator"
+				*ngIf="i < dataStore.sensorList.length - 1 && (
+					((responsivityService.isLtXl | async) && i % 2 === 0) ||
+					((responsivityService.isXl | async) && i % 3 !== 2)
+				)"
+			></div>
+
+			<div class="horizontal-separator"
+				*ngIf="((responsivityService.isLtSm | async) && i < dataStore.sensorList.length - 1) || 
+					((responsivityService.isLtXl | async) && dataStore.sensorList.length - i > 2) ||
+					((responsivityService.isXl | async) && dataStore.sensorList.length - i > 3)"
+			></div>
+		</div>
+	</div>
+</div>

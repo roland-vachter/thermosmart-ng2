@@ -1,8 +1,6 @@
 <div class="modal-header">
 	<h4 class="modal-title">Select plan for {{dayOfWeek | dayOfWeekName}}</h4>
-	<button type="button" class="close" aria-label="Close" (click)="bsModalRef.hide()">
-		<span aria-hidden="true">&times;</span>
-	</button>
+	<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="bsModalRef.hide()"></button>
 </div>
 <div class="modal-body thermo-select-plan--modal">
 	<div *ngFor="let planToChoose of heatingPlans" class="component" [ngClass]="{'thermo-select-plan--selected': planSelected._id === planToChoose.ref._id}" (click)="selectPlan(planToChoose.ref._id)">

@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
+import { ThermoDataStoreService } from './thermo-data-store.service';
 import { ThermoServerApiService } from './thermo-server-api.service';
 
 @Injectable()
 export class ThermoActionsService {
-    private restartSensorInProgress: boolean = false;
-
     constructor(
-        private serverApiService: ThermoServerApiService
+        private serverApiService: ThermoServerApiService,
+		private dataStore: ThermoDataStoreService
     ) {}
 
     restartSensors () {
 		this.serverApiService.restartSensor();
+		this.dataStore.initiateSensorRestart();
 
-		this.restartSensorInProgress = true;
 		setTimeout(() => {
-			this.restartSensorInProgress = false;
+			this.dataStore.stopSensorRestart();
 		}, 60000);
 	}
 }
