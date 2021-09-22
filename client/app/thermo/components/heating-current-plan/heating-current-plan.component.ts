@@ -10,7 +10,7 @@ import { ThermoModalsService } from '../../services/thermo-modals.service';
 export class HeatingCurrentPlanComponent implements OnInit {
 
 	constructor(
-		protected dataStore: ThermoDataStoreService,
+		public dataStore: ThermoDataStoreService,
 		private modalService: ThermoModalsService
 	) { }
 

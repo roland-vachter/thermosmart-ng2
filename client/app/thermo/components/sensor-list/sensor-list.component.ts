@@ -10,7 +10,7 @@ import { ThermoDataStoreService } from '../../services/thermo-data-store.service
 export class SensorListComponent implements OnInit {
 
 	constructor(
-		protected dataStore: ThermoDataStoreService,
+		public dataStore: ThermoDataStoreService,
 		protected responsivityService: ResponsivityService
 	) {	}
 

@@ -13,7 +13,7 @@ export class HeatingStatusComponent implements OnInit {
 	private lastHeatingPowerStatus = false;
 	
 	constructor(
-		protected dataStore: ThermoDataStoreService,
+		public dataStore: ThermoDataStoreService,
 		private serverApiService: ThermoServerApiService
 	) { }
 
