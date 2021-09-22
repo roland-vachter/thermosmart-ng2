@@ -4,8 +4,6 @@
 //const generateRandomString = require('../utils/generateRandomString');
 
 function login (req, res, next) {
-	return next();
-
 	if (req.isAuthenticated()) {
 		return next();
 	}
