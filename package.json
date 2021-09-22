@@ -10,7 +10,7 @@
 		"test": "ng test",
 		"lint": "ng lint",
 		"e2e": "ng e2e",
-		"postinstall": "ln -s \"$(readlink -f node_modules)\" client/node_modules && ng build"
+		"postinstall": "ng build"
 	},
 	"private": true,
 	"dependencies": {
@@ -81,6 +81,6 @@
 		"typescript": ">=2.4.2 <2.7"
 	},
 	"engines": {
-		"node": "^8.0.0"
+		"node": "^12.0.0"
 	}
 }
