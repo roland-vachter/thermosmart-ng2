@@ -22,7 +22,7 @@ export class SecurityComponent implements OnInit {
 	status;
 	lastActivity;
 	lastArmedAt;
-	alarmTriggered = 0;
+	alarmTriggeredCount = 0;
 
 	cameraHealth: HEALTH = HEALTH.FAIL;
 	controllerHealth: HEALTH = HEALTH.FAIL;
@@ -51,7 +51,7 @@ export class SecurityComponent implements OnInit {
 				}
 
 				if (this.status === 'disarmed') {
-					this.alarmTriggered = 0;
+					this.alarmTriggeredCount = 0;
 				}
 			}
 
@@ -63,16 +63,12 @@ export class SecurityComponent implements OnInit {
 				this.lastActivity = new Date(data.security.lastActivity);
 			}
 
-			if (data.security.alarm) {
-				this.alarmTriggered++;
-			}
-
 			if (data.security.lastArmedAt) {
 				this.lastArmedAt = data.security.lastArmedAt;
 			}
 
-			if (data.security.alarmTriggered) {
-				this.alarmTriggered = data.security.alarmTriggered;
+			if (data.security.alarmTriggeredCount) {
+				this.alarmTriggeredCount = data.security.alarmTriggeredCount;
 			}
 
 			if (data.security.cameraHealth) {

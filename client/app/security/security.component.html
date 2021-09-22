@@ -4,7 +4,7 @@
 		<div class="security-toggle security-status-{{status}}" [ngClass]="{ 'security-toggle--animation': ['prealarm', 'arming', 'alarm'].includes(status) }" (click)="toggleArming()">
 			<i [ngClass]="{ 'icon-padlock-open': ['disarmed', 'arming'].includes(status), 'icon-padlock-closed': ['armed', 'prealarm'].includes(status), 'icon-alarm': status === 'alarm' }"></i>
 			<span>{{status | titlecase}}</span>
-			<div class="alarm-triggered" *ngIf="alarmTriggered > 0">{{ alarmTriggered }}</div>
+			<div class="alarm-triggered" *ngIf="alarmTriggeredCount > 0">{{ alarmTriggeredCount }}</div>
 		</div>
 
 		<div class="sensor-statuses">

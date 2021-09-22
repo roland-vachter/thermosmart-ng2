@@ -15,6 +15,9 @@ const STATUSES = {
 const ARMED_STATUSES = [STATUSES.ARMED, STATUSES.PREALARM, STATUSES.ALARM];
 let status = STATUSES.DISARMED;
 let timeout;
+let alarmTriggeredCount = 0;
+let lastArmedAt = null;
+let lastMovement = null;
 
 exports.evts = evts;
 exports.getStatus = () => status;
@@ -35,13 +38,41 @@ SecurityArmingHistory
 		}
 	});
 
+Promise.resolve([
+	SecurityMovementHistory
+		.findOne()
+		.sort({
+			datetime: -1
+		})
+		.exec(),
+	SecurityArmingHistory
+		.findOne({
+			status: 'arming'
+		})
+		.sort({
+			datetime: -1
+		})
+		.exec()
+]).then(([movementHistory, lastArmed]) => {
+	lastArmedAt = new Date(lastArmed.datetime);
+	lastMovement = new Date(movementHistory.datetime);
+
+	SecurityArmingHistory
+		.count({
+			status: 'alarm',
+			datetime: {
+				$gt: lastArmed.datetime
+			}
+		})
+		.exec()
+		.then(triggeredTimes => {
+			alarmTriggeredCount = triggeredTimes;
+		});
+});
+
 const changeStatus = (newStatus) => {
 	status = newStatus;
 	evts.emit('status', status);
-
-	if (status === STATUSES.ALARM) {
-		pushNotifications.send(['security'], 'ThermoSmart - Security', 'Alarm triggered!');
-	}
 
 	new SecurityArmingHistory({
 		datetime: new Date(),
@@ -55,11 +86,14 @@ const arm = () => {
 
 	timeout = setTimeout(() => {
 		changeStatus(STATUSES.ARMED);
+		lastArmedAt = new Date();
 	}, 30 * 1000);
 };
 
 const disarm = () => {
 	clearTimeout(timeout);
+	alarmTriggeredCount = 0;
+	evts.emit('alarmTriggeredCount', alarmTriggeredCount);
 
 	changeStatus(STATUSES.DISARMED);
 };
@@ -74,6 +108,7 @@ exports.toggleArm = () => {
 
 exports.movementDetected = () => {
 	evts.emit('movement', true);
+	lastMovement = new Date();
 	new SecurityMovementHistory({
 		datetime: new Date()
 	}).save();
@@ -84,7 +119,10 @@ exports.movementDetected = () => {
 		clearTimeout(timeout);
 		timeout = setTimeout(() => {
 			evts.emit('alarm', true);
+			pushNotifications.send(['security'], 'ThermoSmart - Security', 'Alarm triggered!');
 			changeStatus(STATUSES.ALARM);
+			alarmTriggeredCount++;
+			evts.emit('alarmTriggeredCount', alarmTriggeredCount);
 
 			clearTimeout(timeout);
 			timeout = setTimeout(() => {
@@ -94,3 +132,7 @@ exports.movementDetected = () => {
 		}, 15 * 1000);
 	}
 };
+
+exports.getLastMovementDate = () => lastMovement;
+exports.getLastArmedDate = () => lastArmedAt;
+exports.getAlarmTriggeredCount = () => alarmTriggeredCount;

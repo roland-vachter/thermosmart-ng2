@@ -138,6 +138,14 @@ exports.init = function () {
 		});
 	});
 
+	securityStatus.evts.on('alarmTriggeredCount', data => {
+		io.emit('update', {
+			security: {
+				alarmTriggeredCount: data
+			}
+		})
+	});
+
 	securityHealth.evts.on('camera-health', data => {
 		io.emit('update', {
 			security: {
