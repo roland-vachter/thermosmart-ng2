@@ -1,9 +1,10 @@
 <div class="component security">
 	<div class="security-status">
 		<i class="icon-settings-1 security-settings" (click)="showSettingsModal()"></i>
-		<div class="security-toggle security-status-{{status}}" [ngClass]="{ 'security-toggle--animation': ['prealarm', 'arming', 'alarm'].includes(status), 'security-toggle--alarm-triggered': alarmTriggered > 0 }" (click)="toggleArming()">
+		<div class="security-toggle security-status-{{status}}" [ngClass]="{ 'security-toggle--animation': ['prealarm', 'arming', 'alarm'].includes(status) }" (click)="toggleArming()">
 			<i [ngClass]="{ 'icon-padlock-open': ['disarmed', 'arming'].includes(status), 'icon-padlock-closed': ['armed', 'prealarm'].includes(status), 'icon-alarm': status === 'alarm' }"></i>
 			<span>{{status | titlecase}}</span>
+			<div class="alarm-triggered" *ngIf="alarmTriggered > 0">{{ alarmTriggered }}</div>
 		</div>
 
 		<div class="sensor-statuses">

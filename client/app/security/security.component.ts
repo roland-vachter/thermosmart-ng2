@@ -34,9 +34,7 @@ export class SecurityComponent implements OnInit {
 			private serverUpdateService: ServerUpdateService,
 			private serverApiService: ServerApiService,
 			private modalService: BsModalService
-		) {
-
-	}
+		) {	}
 
 	toggleArming () {
 		this.serverApiService.toggleArm().subscribe();
