@@ -10,14 +10,12 @@
 		</div>
 		<div class="col-6">
 			<div class="thermo-room--temperature">
-				<i class="icon-thermometer6"></i>
-				{{ sensor.temperature | integer }}<span class="decimal">.{{ sensor.temperature | decimal }}</span>
+				<temperature [value]="sensor.temperature" [withIcon]="true"></temperature>
 			</div>
 		</div>
 		<div class="col-6">
 			<div class="thermo-room--humidity">
-				<i class="icon-humidity"></i>
-				{{ sensor.humidity }}
+				<humidity [value]="sensor.humidity" [withIcon]="true"></humidity>
 			</div>
 		</div>
 	</div>

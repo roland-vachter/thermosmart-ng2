@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
+import { ThermoModalsService } from '../../services/thermo-modals.service';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
 
 @Component({
@@ -14,7 +15,8 @@ export class HeatingStatusComponent implements OnInit {
 	
 	constructor(
 		public dataStore: ThermoDataStoreService,
-		private serverApiService: ThermoServerApiService
+		private serverApiService: ThermoServerApiService,
+		private modalService: ThermoModalsService
 	) { }
 
 	ngOnInit() {
@@ -27,6 +29,10 @@ export class HeatingStatusComponent implements OnInit {
 
 	toggleStatus() {
 		this.serverApiService.toggleHeatingPower();
+	}
+
+	showSettingsModal() {
+		this.modalService.showHeatingConfigModal();
 	}
 
 	updateHeatingPower() {

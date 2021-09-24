@@ -1,4 +1,63 @@
-<div class="component thermo-house--component">
+<div class="component thermo">
+    <i class="icon-settings-1 thermo-settings" (click)="showSettingsModal()"></i>
+
+    <div class="content-wrapper">
+        <div class="thermo--inside">
+            <div class="thermo-inside--icon">
+                <i class="icon-house-4"></i>
+            </div>
+
+            <div class="thermo-inside--temp">
+                <temperature [value]="dataStore.insideConditions.temperature" [withIcon]="true"></temperature>
+            </div>
+        
+            <div class="thermo-inside--humi">
+                <humidity [value]="dataStore.insideConditions.humidity" [withIcon]="true"></humidity>
+            </div>
+        </div>
+        <div class="thermo-status--wrapper">
+            <button type="button" class="thermo-target--button thermo-target--decrease" (click)="tempAdjust(-0.1)"></button>
+            <button type="button" class="thermo-target--button thermo-target--increase" (click)="tempAdjust(0.1)"></button>
+            <div class="thermo-status" [ngClass]="{ 'thermo-status--idle': !dataStore.heatingStatus, 'thermo-status--heating': dataStore.heatingStatus }">
+                <div class="thermo-heating--power">
+                    <label class="switch">
+                        <input type="checkbox" class="switch-input" [checked]="dataStore.heatingPower.status" (change)="toggleStatus()">
+                        <span class="switch-label" data-on="On" data-off=" "></span>
+                        <span class="switch-handle"></span>
+                        <span class="thermo-heating--power-counter">{{timerString}}</span>
+                    </label>
+                </div>
+
+                <div class="thermo-target--value color-{{ dataStore.targetTemp.ref.color }}">
+                    <i class="{{ dataStore.targetTemp.ref.iconClass }}"></i>
+                    <temperature [value]="dataStore.targetTemp.ref.value" color="inherit"></temperature>
+                    &deg;C
+                </div>
+
+                <div class="thermo-heating--duration">
+                    <i class="icon-fire color-gold"></i> {{ dataStore.heatingDuration | duration }}
+                </div>
+            </div>
+        </div>
+        <div class="thermo--outside">
+            <div class="thermo-outside--weather">
+                <i class="{{ dataStore.outsideConditions.weatherIconClass }}"></i>
+            </div>
+        
+            <div class="thermo-outside--temp">
+                <temperature [value]="dataStore.outsideConditions.temperature" [withIcon]="true" [outside]="true"></temperature>
+            </div>
+        
+            <div class="thermo-outside--humi">
+                <humidity [value]="dataStore.outsideConditions.humidity" [withIcon]="true"></humidity>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- <div class="component thermo-house--component">
     <div class="thermo-heating--power">
         <label class="switch">
             <input type="checkbox" class="switch-input" [checked]="dataStore.heatingPower.status" (change)="toggleStatus()">
@@ -63,4 +122,4 @@
         </div>
         
     </div>
-</div>
+</div> -->

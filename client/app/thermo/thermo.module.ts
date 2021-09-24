@@ -18,6 +18,8 @@ import { HeatingStatusComponent } from './components/heating-status/heating-stat
 import { ThermoActionsService } from './services/thermo-actions.service';
 import { ThermoModalsService } from './services/thermo-modals.service';
 import { SensorListComponent } from './components/sensor-list/sensor-list.component';
+import { TemperatureComponent } from './components/temperature/temperature.component';
+import { HumidityComponent } from './components/humidity/humidity.component';
 
 @NgModule({
 	imports: [
@@ -37,7 +39,9 @@ import { SensorListComponent } from './components/sensor-list/sensor-list.compon
 		StatisticsModalComponent,
 		HeatingCurrentPlanComponent,
 		ThermoConfigModalComponent,
-		SensorListComponent
+		SensorListComponent,
+		TemperatureComponent,
+		HumidityComponent
 	],
 	exports: [
 		HeatingStatusComponent,
