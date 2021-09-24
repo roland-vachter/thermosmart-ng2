@@ -124,7 +124,7 @@
 .thermo-target--increase {
 	bottom: 30px;
     right: 30px;
-	border: 1px solid $orange;
+	border: 2px solid $orange;
 	color: $orange;
 	@include icon('plus');
 }
@@ -132,7 +132,7 @@
 .thermo-target--decrease {
 	bottom: 30px;
     left: 30px;
-	border: 1px solid $teal;
+	border: 2px solid $teal;
 	color: $teal;
 	@include icon('minus');
 }
