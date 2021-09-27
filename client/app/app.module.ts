@@ -1,14 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ThermoModule } from './thermo/thermo.module';
 import { SecurityModule } from './security/security.module';
 import { PlantwateringModule } from './plantwatering/plantwatering.module';
 import { SharedModule } from './shared/shared.module';
-import { MomentModule } from 'angular2-moment';
 import { FormsModule } from '@angular/forms';
-import { ChartsModule } from 'ng2-charts';
-import { ModalModule, BsDropdownModule  } from 'ngx-bootstrap';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { AppComponent } from './app.component';
 import { LoginStatusService } from './shared/login-status.service';
 
@@ -20,10 +17,7 @@ import { LoginStatusService } from './shared/login-status.service';
 	imports: [
 		BrowserModule,
 		ModalModule.forRoot(),
-		BsDropdownModule.forRoot(),
 		FormsModule,
-		MomentModule,
-		ChartsModule,
 		SharedModule,
 		ThermoModule,
 		SecurityModule,

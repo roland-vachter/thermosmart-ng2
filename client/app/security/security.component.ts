@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ServerApiService } from './services/server-api.service';
 import { ServerUpdateService } from '../shared/server-update.service';
-import { BsModalService } from 'ngx-bootstrap';
 import { SecuritySettingsModalComponent } from './components/security-settings-modal/security-settings-modal.component';
+import { BsModalService } from 'ngx-bootstrap/modal';
 
 enum HEALTH {
 	OK = 'OK',

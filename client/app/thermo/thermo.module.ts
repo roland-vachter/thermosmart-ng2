@@ -20,12 +20,14 @@ import { ThermoModalsService } from './services/thermo-modals.service';
 import { SensorListComponent } from './components/sensor-list/sensor-list.component';
 import { TemperatureComponent } from './components/temperature/temperature.component';
 import { HumidityComponent } from './components/humidity/humidity.component';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 @NgModule({
 	imports: [
 		CommonModule,
 		SharedModule,
-		FormsModule
+		FormsModule,
+		BsDropdownModule.forRoot(),
 	],
 	declarations: [
 		InsideComponent,

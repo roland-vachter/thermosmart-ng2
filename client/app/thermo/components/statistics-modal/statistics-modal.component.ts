@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
 import { Chart } from 'chart.js';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import * as moment from 'moment';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
 	selector: 'app-statistics-modal',

@@ -28,23 +28,8 @@ export class AppComponent {
 
 	constructor(
 		private loginStatusService: LoginStatusService,
-		private thermoDataStore: ThermoDataStoreService,
-		private thermoActionsService: ThermoActionsService,
-		private thermoModalsService: ThermoModalsService
+		private thermoDataStore: ThermoDataStoreService
 	) {
-	}
-
-
-	thermoStatisticsAction () {
-		this.thermoModalsService.showHeatingStatisticsModal();
-	}
-
-	thermoConfigAction () {
-		this.thermoModalsService.showHeatingConfigModal();
-	}
-
-	thermoRestartSensors () {
-		this.thermoActionsService.restartSensors();
 	}
 
 	updateFreshnessStatus () {

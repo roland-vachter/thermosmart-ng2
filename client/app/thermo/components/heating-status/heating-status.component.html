@@ -1,10 +1,23 @@
 <div class="component thermo">
-    <i class="icon-settings-1 thermo-settings" (click)="showSettingsModal()"></i>
+    <div class="thermo-settings" dropdown>
+        <button dropdownToggle id="optionsDropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></button>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="optionsDropdown">
+            <a class="dropdown-item" (click)="thermoStatisticsAction()">
+                <i class="icon-stats"></i> Statistics
+            </a>
+            <a class="dropdown-item" (click)="thermoRestartSensors()">
+                <i class="icon-power-button"></i> Restart sensors
+            </a>
+            <a class="dropdown-item" (click)="showSettingsModal()">
+                <i class="icon-settings-1"></i> Config
+            </a>
+        </div>
+    </div>
 
     <div class="content-wrapper">
         <div class="thermo--inside">
             <div class="thermo-inside--icon">
-                <i class="icon-house-4"></i>
+                <i class="icon-house-7"></i>
             </div>
 
             <div class="thermo-inside--temp">
@@ -54,72 +67,3 @@
         </div>
     </div>
 </div>
-
-
-
-<!-- <div class="component thermo-house--component">
-    <div class="thermo-heating--power">
-        <label class="switch">
-            <input type="checkbox" class="switch-input" [checked]="dataStore.heatingPower.status" (change)="toggleStatus()">
-            <span class="switch-label" data-on="On" data-off="Off"></span>
-            <span class="switch-handle"></span>
-        </label>
-        <div class="thermo-heating--power-counter">{{timerString}}</div>
-    </div>
-
-    <div class="thermo-house--outside">
-        <div class="thermo-outside">
-            <div class="thermo-outside--weather">
-                <i class="{{ dataStore.outsideConditions.weatherIconClass }}"></i>
-            </div>
-        
-            <div class="thermo-outside--value thermo-outside--temp">
-                {{ dataStore.outsideConditions.temperature | integer }}<span class="decimal">.{{ dataStore.outsideConditions.temperature | decimal }}</span>
-            </div>
-        
-            <div class="thermo-outside--value thermo-outside--humi">
-                {{ dataStore.outsideConditions.humidity | integer }}
-            </div>
-        </div>        
-    </div>
-
-    <div class="thermo-house--inside">
-        <i class="icon-house-simple thermo-house--icon color-gray"></i>
-
-        <div class="thermo-heating--status">
-            <i class="thermo-status--icon" [ngClass]="{'color-olive': dataStore.heatingStatus, 'color-gray': !dataStore.heatingStatus}"></i>
-        </div>
-
-        <div class="thermo--inside">
-            <div class="thermo-inside">
-                <div class="thermo-inside--value thermo-inside--temp">
-                    <i class="thermo-inside--temp-icon"></i>
-                    <span>
-                        {{ dataStore.insideConditions.temperature | integer }}<span class="decimal">.{{ dataStore.insideConditions.temperature | decimal }}</span>
-                    </span>
-                </div>
-            
-                <div class="thermo-inside--value thermo-inside--humi">
-                    <i class="thermo-inside--humi-icon"></i> {{ dataStore.insideConditions.humidity | integer }}
-                </div>
-            </div>
-            
-        </div>
-
-        <div class="thermo-heating--duration">
-            <i class="icon-fire color-gold"></i> {{ dataStore.heatingDuration | duration }}
-        </div>
-    </div>
-
-    <div class="thermo-heating--target">
-        <div class="thermo-target--control">	
-            <button type="button" class="thermo-target--button thermo-target--decrease" (click)="tempAdjust(-0.1)">-</button>
-            <span class="thermo-target--value color-{{ dataStore.targetTemp.ref.color }}">
-                {{ dataStore.targetTemp.ref.value | integer }}<span class="decimal">.{{ dataStore.targetTemp.ref.value | decimal }}</span>
-                &deg;C
-            </span>
-            <button type="button" class="thermo-target--button thermo-target--increase" (click)="tempAdjust(0.1)">+</button>
-        </div>
-        
-    </div>
-</div> -->

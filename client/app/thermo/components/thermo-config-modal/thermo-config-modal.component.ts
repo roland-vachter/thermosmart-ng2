@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
 
 @Component({
@@ -20,6 +20,7 @@ export class ThermoConfigModalComponent implements OnInit {
 		value: NaN
 	};
 	@Output() onChangePlan: EventEmitter<any> = new EventEmitter();
+	currentDate = new Date().getDay();
 
 	constructor(
 			public bsModalRef: BsModalRef,
