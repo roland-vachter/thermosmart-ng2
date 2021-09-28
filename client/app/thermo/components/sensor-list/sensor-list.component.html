@@ -7,10 +7,12 @@
 			</thermo-sensor>
 
 			<div class="vertical-separator"
-				*ngIf="i < dataStore.sensorList.length - 1 && (
-					((responsivityService.isLtXl | async) && i % 2 === 0) ||
-					((responsivityService.isXl | async) && i % 3 !== 2)
-				)"
+				*ngIf="i < dataStore.sensorList.length - 1 &&
+					!(responsivityService.isLtSm | async) &&
+					(
+						((responsivityService.isLtXl | async) && i % 2 === 0) ||
+						((responsivityService.isXl | async) && i % 3 !== 2)
+					)"
 			></div>
 
 			<div class="horizontal-separator"
