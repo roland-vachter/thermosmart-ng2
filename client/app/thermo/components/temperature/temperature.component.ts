@@ -51,13 +51,13 @@ export class TemperatureComponent implements OnInit, OnChanges {
                         this.color = 'mint';
                     } else if (changes.value.currentValue < 21.5) {
                         this.color = 'green';
-                    } else if (changes.value.currentValue < 22) {
-                        this.color = 'olive';
                     } else if (changes.value.currentValue < 23) {
+                        this.color = 'olive';
+                    } else if (changes.value.currentValue < 25) {
                         this.color = 'dark-olive';
-                    } else if (changes.value.currentValue < 26) {
+                    } else if (changes.value.currentValue < 27) {
                         this.color = 'gold';
-                    } else if (changes.value.currentValue < 28) {
+                    } else if (changes.value.currentValue < 29) {
                         this.color = 'orange';
                     } else {
                         this.color = 'red';

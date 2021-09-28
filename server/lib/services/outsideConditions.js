@@ -5,6 +5,7 @@ const evts = new EventEmitter();
 
 const backgroundImage = require('./backgroundImage');
 const fetch = require('node-fetch');
+const pad = require('../utils/pad');
 
 const lastValues = {
 	temperature: NaN,
@@ -79,13 +80,16 @@ async function update () {
 			resSunset.json()
 		]);
 
+		const sunrise = new Date(jsonSunset.results.sunrise);
+		const sunset = new Date(jsonSunset.results.sunset);
+
 		if (jsonWeather && jsonWeather.currently) {
 			const temperature = jsonWeather.currently.temperature;
 			const humidity = jsonWeather.currently.humidity * 100;
 			let weatherDescription = iconTextMapping[jsonWeather.currently.icon];
 
-			if (new Date() < jsonSunset.results.sunrise ||
-				new Date() > jsonSunset.results.sunset) {
+			if (Date.now() < sunrise.getTime() ||
+				Date.now() > sunset.getTime()) {
 				weatherDescription = 'nt_' + weatherDescription;
 			}
 
