@@ -14,82 +14,72 @@ const lastValues = {
 };
 
 
-const iconClassMapping = {
-	clear: 'icon-sun2',
-	cloudy: 'icon-cloudy2',
-	fog: 'icon-haze',
-	partlycloudy: 'icon-cloud-12',
-	sleet: 'icon-rain-73',
-	rain: 'icon-rain2',
-	wind: 'icon-wind',
-	snow: 'icon-snowing',
-	tstorms: 'icon-storm2',
-
-	nt_clear: 'icon-night-12',
-	nt_cloudy: 'icon-cloudy2',
-	nt_fog: 'icon-haze',
-	nt_partlycloudy: 'icon-night3',
-	nt_sleet: 'icon-rain-73',
-	nt_rain: 'icon-rainy',
-	nt_wind: 'icon-wind',
-	nt_snow: 'icon-snowing',
-	nt_tstorms: 'icon-storm2'
+const weatherIconClassMapping = {
+	day: {
+		clear: 'icon-sun2',
+		partlycloudy: 'icon-cloud-12',
+		cloudy: 'icon-cloud2',
+		verycloudy: 'icon-cloudy2',
+		rain: 'icon-rain-4',
+		heavyrain: 'icon-rain2',
+		tstorms: 'icon-storm2',
+		snow: 'icon-snowing',
+		fog: 'icon-haze'
+	},
+	night: {
+		clear: 'icon-night-12',
+		partycloudy: 'icon-night3',
+		cloudy: 'icon-cloud2',
+		verycloudy: 'icon-cloudy2',
+		rain: 'icon-rainy',
+		heavyrain: 'icon-rain2',
+		tstorms: 'icon-storm2',
+		snow: 'icon-snowing',
+		fog: 'icon-haze'
+	}
 };
 
 
-const iconTextMapping = {
-	'clear-day': 'clear',
-	'clear-night': 'clear',
-	'rain': 'rain',
-	'snow': 'snow',
-	'sleet': 'sleet',
-	'wind': 'wind',
-	'fog': 'fog',
-	'cloudy': 'cloudy',
-	'partly-cloudy-day': 'partlycloudy',
-	'partly-cloudy-night': 'partlycloudy',
-	'hail': 'tstorms',
-	'thunderstorm': 'tstorms',
-	'tornado': 'tstorms'
+const weatherTypeMapping = {
+	1: 'clear',
+	2: 'partlycloudy',
+	3: 'cloudy',
+	4: 'verycloudy',
+	9: 'rain',
+	10: 'heavyrain',
+	11: 'tstorms',
+	13: 'snow',
+	50: 'fog'
 };
 
 
 async function update () {
 	try {
-		const [resWeather, resSunset] = await Promise.all([
-			fetch(`${process.env.WEATHER_API_URL}/forecast/${process.env.WEATHER_API_KEY}/${process.env.LOCATION_LAT},${process.env.LOCATION_LNG}?exclude=hourly,daily,flags&units=si`),
-			fetch(`${process.env.SUNSET_API_URL}/json?lat=${process.env.LOCATION_LAT}&lng=${process.env.LOCATION_LNG}&formatted=0`)
-		]);
+		const resWeather = await fetch(`${process.env.WEATHER_API_URL}?appid=${process.env.WEATHER_API_KEY}&lat=${process.env.LOCATION_LAT}&lon=${process.env.LOCATION_LNG}&units=metric`);
 
-		if (!resWeather.ok || !resSunset.ok) {
-			let res;
-			if (!resWeather.ok) {
-				res = resWeather;
-			} else {
-				res = resSunset;
-			}
-
-			const err = new Error(res.status);
-			err.response = res;
+		if (!resWeather.ok) {
+			const err = new Error(resWeather.status);
+			err.response = resWeather;
 			throw err;
 		}
 
-		const [jsonWeather, jsonSunset] = await Promise.all([
-			resWeather.json(),
-			resSunset.json()
-		]);
+		const jsonWeather = await resWeather.json();
 
-		const sunrise = new Date(jsonSunset.results.sunrise);
-		const sunset = new Date(jsonSunset.results.sunset);
+		if (jsonWeather && jsonWeather.current) {
+			const temperature = jsonWeather.current.temp;
+			const humidity = jsonWeather.current.humidity;
+			const sunrise = jsonWeather.current.sunrise * 1000;
+			const sunset = jsonWeather.current.sunset * 1000;
+			let weatherType = weatherTypeMapping[parseInt(jsonWeather.current.weather[0].icon.substr(0, 2), 10)];
 
-		if (jsonWeather && jsonWeather.currently) {
-			const temperature = jsonWeather.currently.temperature;
-			const humidity = jsonWeather.currently.humidity * 100;
-			let weatherDescription = iconTextMapping[jsonWeather.currently.icon];
-
-			if (Date.now() < sunrise.getTime() ||
-				Date.now() > sunset.getTime()) {
-				weatherDescription = 'nt_' + weatherDescription;
+			let iconClassMapping;
+			let daytime;
+			if (Date.now() > sunrise && Date.now() < sunset) {
+				iconClassMapping = weatherIconClassMapping.day;
+				daytime = 'day';
+			} else {
+				iconClassMapping = weatherIconClassMapping.night;
+				daytime = 'night';
 			}
 
 			if (lastValues.temperature !== temperature
@@ -97,9 +87,9 @@ async function update () {
 					|| lastValues.weatherDescription !== weatherDescription) {
 				lastValues.temperature = temperature;
 				lastValues.humidity = humidity;
-				lastValues.weatherDescription = weatherDescription;
-				lastValues.weatherIconClass = iconClassMapping[weatherDescription];
-				lastValues.backgroundImage = backgroundImage.get(weatherDescription);
+				lastValues.weatherDescription = jsonWeather.current.weather[0].main;
+				lastValues.weatherIconClass = iconClassMapping[weatherType];
+				lastValues.backgroundImage = backgroundImage.get(weatherType, daytime);
 
 				evts.emit('change', lastValues);
 			}

@@ -73,17 +73,17 @@ const images = {
 	},
 	'not_winter_sunset1.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
-		conditions: ['clear', 'cloudy', 'fog'],
+		conditions: ['clear'],
 		daytime: ['night']
 	},
 	'not_winter_sunset2.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
-		conditions: ['clear', 'cloudy', 'fog'],
+		conditions: ['clear'],
 		daytime: ['night']
 	},
 	'not_winter_sunset3.jpg': {
 		seasons: ['spring', 'summer', 'autumn'],
-		conditions: ['clear', 'cloudy', 'fog'],
+		conditions: ['clear'],
 		daytime: ['night']
 	},
 	'spring_clear1.jpg': {
@@ -181,41 +181,21 @@ function getSeason () {
 }
 
 const conditionMapping = {
-	clear: 'clear',
-	cloudy: 'cloudy',
-	flurries: 'rain',
-	fog: 'fog',
-	hazy: 'fog',
-	mostlycloudy: 'cloudy',
-	mostlysunny: 'clear',
+	clear: 'icon-sun2',
 	partlycloudy: 'cloudy',
-	partlysunny: 'sunny',
-	sleet: 'rain',
+	cloudy: 'cloudy',
+	verycloudy: 'cloudy',
 	rain: 'rain',
-	snow: 'snow',
-	sunny: 'clear',
+	heavyrain: 'rain',
 	tstorms: 'rain',
-	wind: 'cloudy'
+	snow: 'snow',
+	fog: 'fog'
 };
 
-function getCondition (wunderCondition) {
-	const condition = wunderCondition.replace('nt_', '');
-	return conditionMapping[condition];
-}
 
-function getDaytime (wunderCondition) {
-	if (wunderCondition.startsWith('nt_')) {
-		return 'night';
-	} else {
-		return 'day';
-	}
-}
-
-
-exports.get = wunderCondition => {
+exports.get = (sourceCondition, daytime) => {
 	const season = getSeason();
-	const condition = getCondition(wunderCondition);
-	const daytime = getDaytime(wunderCondition);
+	const condition = conditionMapping[sourceCondition];
 
 	let foundImages = [];
 	Object.keys(images).forEach(imageName => {
