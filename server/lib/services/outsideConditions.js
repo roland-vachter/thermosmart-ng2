@@ -5,7 +5,6 @@ const evts = new EventEmitter();
 
 const backgroundImage = require('./backgroundImage');
 const fetch = require('node-fetch');
-const pad = require('../utils/pad');
 
 const lastValues = {
 	temperature: NaN,
