@@ -72,8 +72,10 @@ exports.camera = {
 			status: types.RESPONSE_STATUS.OK
 		});
 	},
-	reportMovement: () => {
+	reportMovement: (req, res) => {
 		securityHealth.camera.reportMovement();
+
+		res.sendStatus(200);
 	}
 };
 

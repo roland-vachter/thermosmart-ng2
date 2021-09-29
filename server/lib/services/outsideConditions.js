@@ -84,9 +84,11 @@ async function update () {
 
 			if (lastValues.temperature !== temperature
 					|| lastValues.humidity !== humidity
-					|| lastValues.weatherDescription !== weatherDescription) {
+					|| lastValues.weatherIconClass !== iconClassMapping[weatherType]
+					|| lastValues.daytime !== daytime) {
 				lastValues.temperature = temperature;
 				lastValues.humidity = humidity;
+				lastValues.daytime = daytime;
 				lastValues.weatherDescription = jsonWeather.current.weather[0].main;
 				lastValues.weatherIconClass = iconClassMapping[weatherType];
 				lastValues.backgroundImage = backgroundImage.get(weatherType, daytime);
