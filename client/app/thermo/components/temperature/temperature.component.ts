@@ -26,11 +26,11 @@ export class TemperatureComponent implements OnInit, OnChanges {
             if (!this.predefinedColor) {
                 if (this.outside) {
                     if (changes.value.currentValue < 5) {
-                        this.color = 'blue';
+                        this.color = 'steel-blue';
                     } else if (changes.value.currentValue < 10) {
-                        this.color = 'teal';
+                        this.color = 'cadet-blue';
                     } else if (changes.value.currentValue < 15) {
-                        this.color = 'aqua';
+                        this.color = 'teal';
                     } else if (changes.value.currentValue < 20) {
                         this.color = 'mint';
                     } else if (changes.value.currentValue < 25) {
@@ -42,11 +42,11 @@ export class TemperatureComponent implements OnInit, OnChanges {
                     }
                 } else {
                     if (changes.value.currentValue < 18) {
-                        this.color = 'blue';
+                        this.color = 'steel-blue';
                     } else if (changes.value.currentValue < 19) {
-                        this.color = 'teal';
+                        this.color = 'cadet-blue';
                     } else if (changes.value.currentValue < 20) {
-                        this.color = 'aqua';
+                        this.color = 'teal';
                     } else if (changes.value.currentValue < 21) {
                         this.color = 'mint';
                     } else if (changes.value.currentValue < 21.5) {
