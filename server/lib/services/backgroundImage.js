@@ -227,5 +227,7 @@ exports.get = (sourceCondition, daytime) => {
 		return foundImages[0];
 	}
 
+	console.log('###', 'No background image found for:', 'condition -', sourceCondition + '/' + condition, 'season -', season, 'daytime -', daytime);
+
 	return '';
 };
