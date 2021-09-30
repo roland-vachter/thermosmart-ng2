@@ -181,7 +181,7 @@ function getSeason () {
 }
 
 const conditionMapping = {
-	clear: 'icon-sun2',
+	clear: 'clear',
 	partlycloudy: 'cloudy',
 	cloudy: 'cloudy',
 	verycloudy: 'cloudy',
