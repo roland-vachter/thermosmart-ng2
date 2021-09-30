@@ -57,7 +57,7 @@ const weatherTypeMapping = {
 const weatherColorMapping = {
 	day: {
 		clear: 'orange',
-		partlycloudy: 'silver',
+		partlycloudy: 'gray',
 		cloudy: 'gray',
 		verycloudy: 'dark-gray',
 		rain: 'blue',
