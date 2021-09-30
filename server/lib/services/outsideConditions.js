@@ -9,8 +9,11 @@ const fetch = require('node-fetch');
 const lastValues = {
 	temperature: NaN,
 	humidity: NaN,
+	color: '',
+	daytime: '',
 	weatherIconClass: '',
-	weatherDescription: ''
+	weatherDescription: '',
+	backgroundImage: ''
 };
 
 
@@ -39,7 +42,6 @@ const weatherIconClassMapping = {
 	}
 };
 
-
 const weatherTypeMapping = {
 	1: 'clear',
 	2: 'partlycloudy',
@@ -52,6 +54,30 @@ const weatherTypeMapping = {
 	50: 'fog'
 };
 
+const weatherColorMapping = {
+	day: {
+		clear: 'orange',
+		partlycloudy: 'silver',
+		cloudy: 'gray',
+		verycloudy: 'dark-gray',
+		rain: 'blue',
+		heavyrain: 'dark-blue',
+		tstorms: 'navy',
+		snow: 'aqua',
+		fog: 'silver'
+	},
+	night: {
+		clear: 'dark-blue',
+		partlycloudy: 'gray',
+		cloudy: 'gray',
+		verycloudy: 'dark-gray',
+		rain: 'gray',
+		heavyrain: 'gray',
+		tstorms: 'dark-gray',
+		snow: 'gray',
+		fog: 'gray'
+	}
+};
 
 async function update () {
 	try {
@@ -72,25 +98,23 @@ async function update () {
 			const sunset = jsonWeather.current.sunset * 1000;
 			let weatherType = weatherTypeMapping[parseInt(jsonWeather.current.weather[0].icon.substr(0, 2), 10)];
 
-			let iconClassMapping;
 			let daytime;
 			if (Date.now() > sunrise && Date.now() < sunset) {
-				iconClassMapping = weatherIconClassMapping.day;
 				daytime = 'day';
 			} else {
-				iconClassMapping = weatherIconClassMapping.night;
 				daytime = 'night';
 			}
 
 			if (lastValues.temperature !== temperature
 					|| lastValues.humidity !== humidity
-					|| lastValues.weatherIconClass !== iconClassMapping[weatherType]
+					|| lastValues.weatherIconClass !== weatherIconClassMapping[daytime][weatherType]
 					|| lastValues.daytime !== daytime) {
 				lastValues.temperature = temperature;
 				lastValues.humidity = humidity;
 				lastValues.daytime = daytime;
+				lastValues.color = weatherColorMapping[daytime][weatherType];
 				lastValues.weatherDescription = jsonWeather.current.weather[0].main;
-				lastValues.weatherIconClass = iconClassMapping[weatherType];
+				lastValues.weatherIconClass = weatherIconClassMapping[daytime][weatherType];
 				lastValues.backgroundImage = backgroundImage.get(weatherType, daytime);
 
 				evts.emit('change', lastValues);

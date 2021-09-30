@@ -18,6 +18,7 @@ export class ThermoDataStoreService {
 	outsideConditions: any = {
 		temperature: null,
 		humidity: null,
+		color: null,
 		weatherIconClass: null
 	};
 	heatingStatus: any = false;
@@ -136,6 +137,7 @@ export class ThermoDataStoreService {
 			this.outsideConditions.temperature = data.outside.temperature;
 			this.outsideConditions.humidity = data.outside.humidity;
 			this.outsideConditions.weatherIconClass = data.outside.weatherIconClass;
+			this.outsideConditions.color = data.outside.color;
 
 			if (data.outside.backgroundImage) {
 				document.body.style.backgroundImage = document.body.style.backgroundImage.substring(0, document.body.style.backgroundImage.lastIndexOf('/') + 1) + data.outside.backgroundImage;
