@@ -27,6 +27,7 @@ export class HeatingStatusComponent implements OnInit {
 				this.updateHeatingPower();
 			}
 		});
+		this.updateHeatingPower();
 	}
 
 	toggleStatus() {
