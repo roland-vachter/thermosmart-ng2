@@ -1,6 +1,11 @@
 const arrayShuffle = require('../utils/arrayShuffle');
 
 const images = {
+	'night': {
+		seasons: ['all'],
+		conditions: ['clear', 'cloudy'],
+		daytime: ['night']
+	},
 	'autumn_clear1.jpg': {
 		seasons: ['autumn'],
 		conditions: ['clear'],

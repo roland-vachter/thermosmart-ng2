@@ -30,8 +30,8 @@ const weatherIconClassMapping = {
 		fog: 'icon-haze'
 	},
 	night: {
-		clear: 'icon-night-12',
-		partycloudy: 'icon-night3',
+		clear: 'icon-night2',
+		partlycloudy: 'icon-night3',
 		cloudy: 'icon-cloud2',
 		verycloudy: 'icon-cloudy2',
 		rain: 'icon-rainy',
