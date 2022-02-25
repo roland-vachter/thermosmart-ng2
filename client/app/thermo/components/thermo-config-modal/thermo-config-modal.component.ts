@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
+import { SharedServerApiService } from '../../../shared/shared-server-api.service';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
 
 @Component({
@@ -23,8 +24,10 @@ export class ThermoConfigModalComponent implements OnInit {
 	currentDate = new Date().getDay();
 
 	constructor(
-			public bsModalRef: BsModalRef,
-			private serverApiService: ThermoServerApiService) { }
+		public bsModalRef: BsModalRef,
+		private serverApiService: ThermoServerApiService,
+		private sharedApiService: SharedServerApiService
+	) { }
 
 	ngOnInit() {
 	}
@@ -41,7 +44,7 @@ export class ThermoConfigModalComponent implements OnInit {
 
 	switchAdjust (switchConfig, diff) {
 		const expected = switchConfig.value + diff;
-		this.serverApiService.changeConfig(switchConfig.name, switchConfig.value + diff);
+		this.sharedApiService.changeConfig(switchConfig.name, switchConfig.value + diff).subscribe();
 		switchConfig.value = expected;
 	}
 

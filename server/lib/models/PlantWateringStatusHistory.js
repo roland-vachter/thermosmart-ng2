@@ -8,10 +8,12 @@ const plantWateringStatusHistorySchema = new Schema({
 		type: Date,
 		index: true
 	},
-	status: Boolean
+	status: Boolean,
+	zone: Number
 });
 
 plantWateringStatusHistorySchema.index({datetime: 1});
+plantWateringStatusHistorySchema.index({zone: 1});
 plantWateringStatusHistorySchema.set('versionKey', false);
 
 module.exports = mongoose.model('PlantWateringStatusHistory', plantWateringStatusHistorySchema);

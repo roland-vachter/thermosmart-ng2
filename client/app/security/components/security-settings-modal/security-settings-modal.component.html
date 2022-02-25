@@ -42,4 +42,12 @@
 			</div>
 		</li>
 	</ul>
+
+	<hr />
+
+	<h3>Motion sensor count</h3>
+	<div class="input-group">
+		<input type="number" class="form-control" name="motionsensors" [(ngModel)]="motionSensorCount" [ngClass]="{ 'invalid-input': !!motionSensorReason }"
+			(change)="changeMotionSensorCount()">
+	</div>
 </div>

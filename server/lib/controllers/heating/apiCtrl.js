@@ -11,6 +11,7 @@ const configService = require('../../services/config');
 const targetTempService = require('../../services/targetTemp');
 
 const moment = require('moment-timezone');
+const HeatingPlanOverrides = require('../../models/HeatingPlanOverrides');
 
 exports.init = function (req, res, next) {
 	Promise.all([
@@ -26,6 +27,12 @@ exports.init = function (req, res, next) {
 				displayOrder: 1
 			})
 			.exec(),
+		HeatingPlanOverrides
+			.find()
+			.sort({
+				date: 1
+			})
+			.exec(),
 		statisticsService
 			.getStatisticsForToday(),
 		targetTempService.get(),
@@ -34,6 +41,7 @@ exports.init = function (req, res, next) {
 				temps,
 				heatingDefaultPlans,
 				heatingPlans,
+				heatingPlanOverrides,
 				statisticsForToday,
 				targetTemp,
 				config
@@ -52,6 +60,10 @@ exports.init = function (req, res, next) {
 				temperatures: temps,
 				heatingPlans: heatingPlans,
 				heatingDefaultPlans: heatingDefaultPlans,
+				heatingPlanOverrides: heatingPlanOverrides.map(hp => {
+					hp.date = moment(hp.date).tz('Europe/Bucharest').startOf('day').valueOf();
+					return hp
+				}),
 				statisticsForToday: statisticsForToday,
 				restartInProgress: restartSensorService.getStatus(),
 				config: config
@@ -132,6 +144,77 @@ exports.changeDefaultPlan = function (req, res, next) {
 	})
 	.catch(next);
 };
+
+exports.listHeatingPlanOverride = async (req, res) => {
+	try {
+		const heatingPlanOverrides = await HeatingPlanOverrides.find().exec();
+
+		console.log(heatingPlanOverrides);
+
+		res.json({
+			status: 'ok',
+			data: heatingPlanOverrides
+		});
+	} catch(e) {
+		res.status(500).json({
+			status: 'error',
+			message: e.message
+		})
+	}
+};
+
+exports.addOrUpdateHeatingPlanOverride = (req, res) => {
+	if (!req.body.date || !req.body.planId) {
+		res.status(400).json({
+			status: 'error',
+			message: 'Date of plan parameters are missing'
+		});
+		return;
+	}
+
+	const date = moment(parseInt(req.body.date, 10)).tz('Europe/Bucharest').startOf('day');
+
+	HeatingPlanOverrides.findOneAndUpdate({ date: date.valueOf() }, { plan: req.body.planId }, { upsert: true, new: true }, function(err, doc) {
+		if (err) {
+			return res.status(500).json({
+				status: 'error',
+				message: err
+			});
+		}
+
+		return res.json({
+			status: 'ok',
+		});
+	});
+};
+
+exports.removeHeatingPlanOverride = (req, res) => {
+	if (!req.body.date) {
+		res.status(400).json({
+			status: 'Date parameter is missing'
+		});
+		return;
+	}
+
+	const date = moment(parseInt(req.body.date, 10)).tz('Europe/Bucharest').startOf('day');
+
+	HeatingPlanOverrides
+		.deleteOne({
+			date: date.valueOf()
+		})
+		.exec(err => {
+			if (err) {
+				return res.status(500).json({
+					status: 'error',
+					message: err
+				});
+			}
+
+			res.json({
+				status: 'ok'
+			});
+		});
+}
 
 exports.toggleHeatingPower = (req, res) => {
 	heatingService.togglePower();
@@ -240,12 +323,5 @@ exports.statistics = async (req, res) => {
 			statisticsForLastMonth,
 			statisticsByMonth
 		}
-	});
-};
-
-exports.changeConfig = async (req, res) => {
-	await configService.set(req.body.name, req.body.value);
-	res.json({
-		status: 'ok'
 	});
 };

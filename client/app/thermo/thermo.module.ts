@@ -27,7 +27,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		BsDropdownModule.forRoot(),
+		BsDropdownModule.forRoot()
 	],
 	declarations: [
 		InsideComponent,

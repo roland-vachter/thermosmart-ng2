@@ -76,14 +76,4 @@ export class ThermoServerApiService {
 		return this.http.get('/api/statistics');
 	}
 
-	changeConfig (name, value) {
-		const obs = this.http.post('/api/changeconfig', {
-			name,
-			value
-		});
-
-		obs.subscribe();
-		return obs;
-	}
-
 }

@@ -1,5 +1,5 @@
 const plantWateringService = require('../services/plantWatering');
-
+const configService = require('../services/config');
 
 exports.plantWateringInit = async (req, res) => {
 	res.json({
@@ -61,4 +61,44 @@ exports.log = async (req, res) => {
 	fn.call(this, `>>> ID=${req.body.id} || ${level} || ${req.body.log} |`);
 
 	res.sendStatus(200);
+}
+
+exports.changeConfig = async (req, res) => {
+	if (!req.body.name || !req.body.value) {
+		return res.status(400).json({
+			status: types.RESPONSE_STATUS.ERROR,
+			reason: 'name or value parameter is missing'
+		});
+	}
+
+	try {
+		await configService.set(req.body.name, req.body.value);
+		res.json({
+			status: 'ok'
+		});
+	} catch(e) {
+		res.json({
+			status: 'error',
+			error: e.message
+		});
+	}
+};
+
+exports.getConfig = async (req, res) => {
+	if (!req.query.name) {
+		return res.status(400).json({
+			status: types.RESPONSE_STATUS.ERROR,
+			reason: 'name parameter is missing'
+		});
+	}
+
+	try {
+		const configItem = await configService.get(req.query.name);
+		res.json(configItem.value);
+	} catch(e) {
+		res.json({
+			status: 'error',
+			error: e.message
+		});
+	}
 }

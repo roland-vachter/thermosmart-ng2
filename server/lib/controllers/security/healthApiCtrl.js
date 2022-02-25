@@ -168,14 +168,14 @@ exports.keypad = {
 
 exports.motionSensor = {
 	reportHealth: (req, res) => {
-		if (!req.query.health) {
+		if (!req.query.health || !req.query.id) {
 			return res.status(400).json({
 				status: types.RESPONSE_STATUS.ERROR,
-				reason: 'health parameter is missing'
+				reason: 'ID or health parameter is missing'
 			});
 		}
 
-		securityHealth.motionSensor.reportHealth(req.query.health === 'true' || req.query.health === true);
+		securityHealth.motionSensor.reportHealth(req.query.id, req.query.health === 'true' || req.query.health === true);
 
 		res.json({
 			status: types.RESPONSE_STATUS.OK

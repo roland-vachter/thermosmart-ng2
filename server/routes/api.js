@@ -11,6 +11,10 @@ const loginMiddleware = require('../lib/middlewares/login');
 const apiKeyMiddleware = require('../lib/middlewares/apiKey');
 const cors = require('cors');
 
+// generic
+router.post('/changeconfig', loginMiddleware, cors(), apiCtrl.changeConfig);
+router.get('/getconfig', loginMiddleware, cors(), apiCtrl.getConfig);
+
 // heating
 router.get('/init', loginMiddleware, cors(), heatingApiCtrl.init);
 router.post('/tempadjust', loginMiddleware, cors(), heatingApiCtrl.tempAdjust);
@@ -18,9 +22,11 @@ router.post('/restartsensor', loginMiddleware, cors(), heatingApiCtrl.restartSen
 router.post('/togglesensorstatus', loginMiddleware, cors(), heatingApiCtrl.toggleSensorStatus);
 router.post('/changesensorsettings', loginMiddleware, cors(), heatingApiCtrl.changeSensorSettings);
 router.post('/changedefaultplan', loginMiddleware, cors(), heatingApiCtrl.changeDefaultPlan);
+router.post('/heating/planoverride/add', loginMiddleware, cors(), heatingApiCtrl.addOrUpdateHeatingPlanOverride);
+router.post('/heating/planoverride/remove', loginMiddleware, cors(), heatingApiCtrl.removeHeatingPlanOverride);
+router.get('/heating/planoverride/list', loginMiddleware, cors(), heatingApiCtrl.listHeatingPlanOverride);
 router.get('/sensorpolling', apiKeyMiddleware, cors(), heatingApiCtrl.sensorPolling);
 router.get('/statistics', loginMiddleware, cors(), heatingApiCtrl.statistics);
-router.post('/changeconfig', loginMiddleware, cors(), heatingApiCtrl.changeConfig);
 router.post('/toggleheatingpower', loginMiddleware, cors(), heatingApiCtrl.toggleHeatingPower);
 
 

@@ -2,9 +2,11 @@ const EventEmitter = require('events');
 const evts = new EventEmitter();
 const SecurityCameras = require('../models/SecurityCameras');
 const SecurityControllers = require('../models/SecurityControllers');
+const configService = require('../services/config');
 
 let securityCameras = null;
 let securityControllers = null;
+let motionSensors = {};
 
 const HEALTH = {
 	OK: 'OK',
@@ -16,7 +18,6 @@ let controllerHealth = HEALTH.FAIL;
 let keypadHealth = HEALTH.FAIL;
 let lastKeypadHealthUpdate = null;
 let motionSensorHealth = HEALTH.FAIL;
-let lastMotionSensorHealthUpdate = null;
 
 SecurityCameras
 	.find()
@@ -89,7 +90,28 @@ const updateControllerHealth = () => {
 	evts.emit('controller-health', controllerHealth);
 };
 
-const updateMotionSensorHealth = () => {
+const updateMotionSensorHealth = async () => {
+	const motionSensorCountObj = await configService.get('motionSensorCount');
+	const motionSensorCount = motionSensorCountObj ? motionSensorCountObj.value : 0;
+	let allHealthy = true;
+	let noneHealthy = true;
+
+	Object.keys(motionSensors).forEach(id => {
+		if (motionSensors[id].health) {
+			noneHealthy = false;
+		} else {
+			allHealthy = false;
+		}
+	});
+
+	if (allHealthy && Object.keys(motionSensors).length === motionSensorCount) {
+		motionSensorHealth = HEALTH.OK;
+	} else if (noneHealthy) {
+		motionSensorHealth = HEALTH.FAIL;
+	} else {
+		motionSensorHealth = HEALTH.PARTIAL;
+	}
+
 	evts.emit('motion-sensor-health', motionSensorHealth);
 };
 
@@ -129,9 +151,17 @@ setInterval(() => {
 		updateKeypadHealth();
 	}
 
-	if (lastMotionSensorHealthUpdate !== null && Date.now() - lastMotionSensorHealthUpdate > 180000) {
-		motionSensorHealth = HEALTH.FAIL;
-		updateMotionSensorHealth();
+	if (motionSensors) {
+		let motionSensorMadeUpdate = false;
+		Object.keys(motionSensors).forEach(id => {
+			if (motionSensors[id].lastHealthUpdate !== null && Date.now() - motionSensors[id].lastHealthUpdate > 180000) {
+				motionSensors[id].health = false;
+				motionSensorMadeUpdate = true;
+			}
+		});
+		if (motionSensorMadeUpdate) {
+			updateMotionSensorHealth();
+		}
 	}
 }, 60000);
 
@@ -316,9 +346,11 @@ exports.keypad = {
 };
 
 exports.motionSensor = {
-	reportHealth: (health) => {
-		motionSensorHealth = health ? HEALTH.OK : HEALTH.FAIL;
-		lastMotionSensorHealthUpdate = Date.now();
+	reportHealth: (id, health) => {
+		motionSensors[id] = {
+			health,
+			lastHealthUpdate: Date.now()
+		};
 		updateMotionSensorHealth();
 	},
 	getHealth: () => motionSensorHealth
