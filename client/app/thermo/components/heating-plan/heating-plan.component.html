@@ -1,11 +1,11 @@
 <div class="thermo-plan--horizontal">
 	<div class="thermo-plan--chart clearfix">
-		<div class="thermo-plan--period color-{{interval.temp.ref.color}} color-bg-{{interval.temp.ref.color}}" [ngClass]="{'last-child': plan.intervals.indexOf(interval) === plan.intervals.length - 1}" [style.width]="interval.blockPosition | percentString" *ngFor="let interval of plan.intervals">
-			<i class="{{interval.temp.ref.iconClass}}"></i>
+		<div class="thermo-plan--period color-{{interval?.temp?.color}} color-bg-{{interval.temp?.color}}" [ngClass]="{'last-child': plan?.intervals?.indexOf(interval) === plan?.intervals?.length - 1}" [style.width]="interval?.blockPosition | percentString" *ngFor="let interval of plan?.intervals">
+			<i class="{{interval?.temp?.iconClass}}"></i>
 		</div>
 	</div>
 
 	<div class="thermo-plan--labels">
-		<div class="thermo-plan--label" *ngFor="let interval of plan.intervals" [ngClass]="{'thermo-plan--label--first': plan.intervals.indexOf(interval) === 0}" [style.left]="interval.labelPosition | percentString">{{interval.label}}</div>
+		<div class="thermo-plan--label" *ngFor="let interval of plan?.intervals" [ngClass]="{'thermo-plan--label--first': plan?.intervals?.indexOf(interval) === 0}" [style.left]="interval?.labelPosition | percentString">{{interval?.label}}</div>
 	</div>
 </div>

@@ -18,3 +18,9 @@ heatingPlanOverridesSchema.index({date: 1});
 heatingPlanOverridesSchema.set('versionKey', false);
 
 module.exports = mongoose.model('HeatingPlanOverrides', heatingPlanOverridesSchema);
+
+module.exports.evts = evts;
+module.exports.triggerChange = function () {
+	console.log('heating plan override change triggered');
+	evts.emit('change');
+};

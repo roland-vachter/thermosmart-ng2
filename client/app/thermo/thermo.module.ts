@@ -21,13 +21,15 @@ import { SensorListComponent } from './components/sensor-list/sensor-list.compon
 import { TemperatureComponent } from './components/temperature/temperature.component';
 import { HumidityComponent } from './components/humidity/humidity.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { BsDatepickerModule } from 'ngx-bootstrap';
 
 @NgModule({
 	imports: [
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		BsDropdownModule.forRoot()
+		BsDropdownModule.forRoot(),
+		BsDatepickerModule.forRoot()
 	],
 	declarations: [
 		InsideComponent,

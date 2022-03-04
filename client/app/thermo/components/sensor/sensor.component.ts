@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { ChangeSensorSettingsModalComponent } from '../change-sensor-settings-modal/change-sensor-settings-modal.component';
-import { Sensor } from '../../types';
+import { Sensor } from '../../../types/types';
 
 @Component({
 	selector: 'thermo-sensor',

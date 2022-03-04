@@ -41,9 +41,9 @@
                     </label>
                 </div>
 
-                <div class="thermo-target--value color-{{ dataStore.targetTemp.ref.color }}">
-                    <i class="{{ dataStore.targetTemp.ref.iconClass }}"></i>
-                    <temperature [value]="dataStore.targetTemp.ref.value" color="inherit"></temperature>
+                <div class="thermo-target--value color-{{ dataStore.targetTemp.color }}">
+                    <i class="{{ dataStore.targetTemp.iconClass }}"></i>
+                    <temperature [value]="dataStore.targetTemp.value" color="inherit"></temperature>
                     &deg;C
                 </div>
 

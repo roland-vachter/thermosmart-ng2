@@ -1,8 +1,11 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { BsModalService } from 'ngx-bootstrap';
+import { SharedModalsService } from '../../../shared/shared-modals.service';
 import { ThermoActionsService } from '../../services/thermo-actions.service';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 import { ThermoModalsService } from '../../services/thermo-modals.service';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
+import { ThermoConfigModalComponent } from '../thermo-config-modal/thermo-config-modal.component';
 
 @Component({
   selector: 'thermo-heating-status',
@@ -18,7 +21,9 @@ export class HeatingStatusComponent implements OnInit {
 		public dataStore: ThermoDataStoreService,
 		private serverApiService: ThermoServerApiService,
 		private modalService: ThermoModalsService,
-		private actionsService: ThermoActionsService
+		private actionsService: ThermoActionsService,
+		private bsModalService: BsModalService,
+		private cdRef: ChangeDetectorRef
 	) { }
 
 	ngOnInit() {
@@ -26,6 +31,7 @@ export class HeatingStatusComponent implements OnInit {
 			if (this.lastHeatingPowerStatus !== this.dataStore.heatingPower.status) {
 				this.updateHeatingPower();
 			}
+			this.cdRef.detectChanges();
 		});
 		this.updateHeatingPower();
 	}
@@ -35,7 +41,26 @@ export class HeatingStatusComponent implements OnInit {
 	}
 
 	showSettingsModal() {
-		this.modalService.showHeatingConfigModal();
+		this.dataStore.config['switchThresholdBelow'] = this.dataStore.config['switchThresholdBelow'] || {
+			name: 'switchThresholdBelow',
+			value: 0.2
+		};
+
+		this.dataStore.config['switchThresholdAbove'] = this.dataStore.config['switchThresholdAbove'] || {
+			name: 'switchThresholdAbove',
+			value: 0.2
+		};
+
+		this.bsModalService.show(ThermoConfigModalComponent, {
+			initialState: {
+				temps: Object.values(this.dataStore.temperatures),
+				heatingDefaultPlans: this.dataStore.defaultHeatingPlans,
+				switchThresholdBelow: this.dataStore.config['switchThresholdBelow'],
+				switchThresholdAbove: this.dataStore.config['switchThresholdAbove'],
+				heatingPlanOverrides: this.dataStore.heatingPlanOverrides
+			},
+			class: 'modal-lg'
+		});
 	}
 
 	thermoStatisticsAction() {
@@ -52,7 +77,7 @@ export class HeatingStatusComponent implements OnInit {
 		if (!this.dataStore.heatingPower.status) {			
 			this.heatingPowerOffInterval = setInterval(() => {
 				const nowTime = new Date().getTime();
-				const untilTime = this.dataStore.heatingPower.until.getTime();
+				const untilTime = this.dataStore.heatingPower.until.valueOf();
 
 				if (untilTime < nowTime) {
 					this.timerString = '';
@@ -77,8 +102,8 @@ export class HeatingStatusComponent implements OnInit {
 	}
 
 	tempAdjust(diff) {
-		const expected = this.dataStore.targetTemp.ref.value + diff;
-		this.serverApiService.tempAdjust(this.dataStore.targetTemp.ref._id, this.dataStore.targetTemp.ref.value + diff);
-		this.dataStore.targetTemp.ref.value = expected;
+		const expected = this.dataStore.targetTemp.value + diff;
+		this.serverApiService.tempAdjust(this.dataStore.targetTemp._id, this.dataStore.targetTemp.value + diff);
+		this.dataStore.targetTemp.value = expected;
 	}
 }

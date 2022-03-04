@@ -1,19 +1,19 @@
 <div class="modal-header">
-	<h4 class="modal-title">Select plan for {{dayOfWeek | dayOfWeekName}}</h4>
+	<h4 class="modal-title">Select plan</h4>
 	<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="bsModalRef.hide()"></button>
 </div>
 <div class="modal-body thermo-select-plan--modal">
-	<div *ngFor="let planToChoose of heatingPlans" class="component" [ngClass]="{'thermo-select-plan--selected': planSelected._id === planToChoose.ref._id}" (click)="selectPlan(planToChoose.ref._id)">
+	<div *ngFor="let planToChoose of heatingPlanList" class="component" [ngClass]="{'thermo-select-plan--selected': planSelected?._id === planToChoose._id}" (click)="selectPlan(planToChoose._id)">
 		<div class="row">
 			<div class="col-3">
 				<div class="thermo-select-plan--icon">
-					<i class="{{planToChoose.ref.iconClass}}"></i>
+					<i class="{{planToChoose.iconClass}}"></i>
 				</div>
 			</div>
 			<div class="col-9">
-				{{planToChoose.ref.name}}
+				{{planToChoose.name}}
 
-				<thermo-heating-plan [plan]="planToChoose.ref"></thermo-heating-plan>
+				<thermo-heating-plan [plan]="planToChoose"></thermo-heating-plan>
 			</div>
 		</div>
 	</div>

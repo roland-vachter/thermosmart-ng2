@@ -8,12 +8,12 @@
 			<h2>Temperature settings</h2>
 			<div class="thermo-temps row">
 				<div class="thermo-temps--temp col-xs-6 col-lg-4" *ngFor="let temp of temps">
-					<div class="color-{{temp.ref.color}}">
-						<i class="{{temp.ref.iconClass}}"></i> <span class="thermo-temps--temp-name">{{temp.ref.name}}</span>
-						<div class="thermo-temps--temp-control" data-id="{{temp.ref._id}}">
-							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="tempAdjust(temp.ref, -0.1)">-</button>
-							<span class="thermo-temps--temp-value">{{temp.ref.value | integer}}<span class="decimal">.{{temp.ref.value | decimal}}</span> &deg;C</span>
-							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase" (click)="tempAdjust(temp.ref, 0.1)">+</button>
+					<div class="color-{{temp.color}}">
+						<i class="{{temp.iconClass}}"></i> <span class="thermo-temps--temp-name">{{temp.name}}</span>
+						<div class="thermo-temps--temp-control" data-id="{{temp._id}}">
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="tempAdjust(temp, -0.1)">-</button>
+							<span class="thermo-temps--temp-value">{{temp.value | integer}}<span class="decimal">.{{temp.value | decimal}}</span> &deg;C</span>
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase" (click)="tempAdjust(temp, 0.1)">+</button>
 						</div>
 					</div>
 				</div>
@@ -51,13 +51,13 @@
 				<div class="thermo-default-plans--plan" [ngClass]="{ 'thermo-default-plans--current-date': currentDate === i + 1 }" *ngFor="let defaultPlan of heatingDefaultPlans | slice:1; let i = index" (click)="changePlan(defaultPlan.dayOfWeek)">
 					<div class="thermo-default-plans--day-name">{{ defaultPlan.nameOfDay }}</div>
 
-					<i class="{{defaultPlan.plan.ref.iconClass}}"></i>
+					<i class="{{defaultPlan.plan.iconClass}}"></i>
 				</div>
 
 				<div class="thermo-default-plans--plan" [ngClass]="{ 'thermo-default-plans--current-date': currentDate === 0 }" (click)="changePlan(0)">
 					<div class="thermo-default-plans--day-name">{{heatingDefaultPlans[0].nameOfDay}}</div>
 
-					<i class="{{heatingDefaultPlans[0].plan.ref.iconClass}}"></i>
+					<i class="{{heatingDefaultPlans[0].plan.iconClass}}"></i>
 				</div>
 			</div>
 		</div>
@@ -65,28 +65,27 @@
 		<div class="col-12">
 			<h2>Plan overrides</h2>
 			<ul class="list-group">
-				<li class="list-group-item">
-					<strong>24-02-2022:</strong>
-					<i class="icon-house"></i>
-					At home - start late
+				<li class="list-group-item" *ngFor="let planOverride of heatingPlanOverrides">
+					<strong>{{ planOverride.date | date:'yyyy/MM/dd' }}:</strong>
+					<i class="icon-{{ planOverride.plan?.iconClass }}"></i>
+					{{ planOverride.plan?.name }}
 
-					<i class="icon-garbage"></i>
-				</li>
-				<li class="list-group-item">
-					<strong>24-02-2022:</strong>
-					<i class="icon-house"></i>
-					At home - start late
-
-					<i class="icon-garbage"></i>
-				</li>
-				<li class="list-group-item">
-					<strong>24-02-2022:</strong>
-					<i class="icon-house"></i>
-					At home - start late
-
-					<i class="icon-garbage"></i>
+					<i class="icon-garbage" (click)="removeOverride(planOverride)"></i>
 				</li>
 			</ul>
+
+			<div class="input-group">
+				<input type="text"
+					placeholder="Date"
+					class="form-control"
+					bsDatepicker
+					placement="top" [(ngModel)]="overrideToAdd.date">
+				<input type="text" value="{{ overrideToAdd.plan?.name }}" class="form-control" placeholder="Select plan" (click)="selectPlan()">
+				<div class="input-group-append">
+					<button class="btn btn-outline-primary" type="button" (click)="addOverride()">Add</button>
+					<button class="btn btn-outline-secondary" type="button" (click)="clearOverrideToAdd()">Clear</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

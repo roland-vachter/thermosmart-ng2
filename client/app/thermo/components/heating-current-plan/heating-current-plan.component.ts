@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 import { ThermoModalsService } from '../../services/thermo-modals.service';
 
@@ -11,14 +11,13 @@ export class HeatingCurrentPlanComponent implements OnInit {
 
 	constructor(
 		public dataStore: ThermoDataStoreService,
-		private modalService: ThermoModalsService
+		private cdRef: ChangeDetectorRef
 	) { }
 
 	ngOnInit() {
-	}
-
-	changePlan () {
-		this.modalService.showChangePlanModal(new Date().getDay());
+		this.dataStore.evt.subscribe(() => {
+			this.cdRef.detectChanges();
+		})
 	}
 
 }

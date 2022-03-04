@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import 'rxjs/add/operator/map';
-
-interface ApiResult {
-	status: 'ok' | 'error';
-	reason?: string
-}
+import { ApiResult } from '../../types/types';
 
 @Injectable()
 export class ServerApiService {

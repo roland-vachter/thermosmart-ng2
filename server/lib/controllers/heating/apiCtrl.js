@@ -62,7 +62,7 @@ exports.init = function (req, res, next) {
 				heatingDefaultPlans: heatingDefaultPlans,
 				heatingPlanOverrides: heatingPlanOverrides.map(hp => {
 					hp.date = moment(hp.date).tz('Europe/Bucharest').startOf('day').valueOf();
-					return hp
+					return hp;
 				}),
 				statisticsForToday: statisticsForToday,
 				restartInProgress: restartSensorService.getStatus(),
@@ -79,7 +79,7 @@ exports.tempAdjust = function (req, res, next) {
 	if (isNaN(req.body.id) || isNaN(req.body.value)) {
 		res.status(400).json({
 			status: 'error',
-			message: 'Missing or incorrect parameters'
+			reason: 'Missing or incorrect parameters'
 		});
 		return;
 	}
@@ -103,7 +103,7 @@ exports.tempAdjust = function (req, res, next) {
 		} else {
 			res.json({
 				status: 'error',
-				message: 'Temperature was not found'
+				reason: 'Temperature was not found'
 			});
 		}
 	})
@@ -114,7 +114,7 @@ exports.changeDefaultPlan = function (req, res, next) {
 	if (isNaN(req.body.dayOfWeek) || isNaN(req.body.planId)) {
 		res.status(400).json({
 			status: 'error',
-			message: 'Missing or incorrect parameters'
+			reason: 'Missing or incorrect parameters'
 		});
 		return;
 	}
@@ -130,6 +130,7 @@ exports.changeDefaultPlan = function (req, res, next) {
 	.then(heatingDefaultPlan => {
 		if (heatingDefaultPlan) {
 			HeatingDefaultPlan.triggerChange(heatingDefaultPlan);
+			targetTempService.update();
 
 			res.json({
 				status: 'ok',
@@ -138,7 +139,7 @@ exports.changeDefaultPlan = function (req, res, next) {
 		} else {
 			res.json({
 				status: 'error',
-				message: 'Heating plan was not found.'
+				reason: 'Heating plan was not found.'
 			});
 		}
 	})
@@ -149,8 +150,6 @@ exports.listHeatingPlanOverride = async (req, res) => {
 	try {
 		const heatingPlanOverrides = await HeatingPlanOverrides.find().exec();
 
-		console.log(heatingPlanOverrides);
-
 		res.json({
 			status: 'ok',
 			data: heatingPlanOverrides
@@ -158,7 +157,7 @@ exports.listHeatingPlanOverride = async (req, res) => {
 	} catch(e) {
 		res.status(500).json({
 			status: 'error',
-			message: e.message
+			reason: e.message
 		})
 	}
 };
@@ -167,7 +166,7 @@ exports.addOrUpdateHeatingPlanOverride = (req, res) => {
 	if (!req.body.date || !req.body.planId) {
 		res.status(400).json({
 			status: 'error',
-			message: 'Date of plan parameters are missing'
+			reason: 'Date of plan parameters are missing'
 		});
 		return;
 	}
@@ -178,9 +177,12 @@ exports.addOrUpdateHeatingPlanOverride = (req, res) => {
 		if (err) {
 			return res.status(500).json({
 				status: 'error',
-				message: err
+				reason: err
 			});
 		}
+
+		HeatingPlanOverrides.triggerChange();
+		targetTempService.update();
 
 		return res.json({
 			status: 'ok',
@@ -206,9 +208,12 @@ exports.removeHeatingPlanOverride = (req, res) => {
 			if (err) {
 				return res.status(500).json({
 					status: 'error',
-					message: err
+					reason: err
 				});
 			}
+
+			HeatingPlanOverrides.triggerChange();
+			targetTempService.update();
 
 			res.json({
 				status: 'ok'

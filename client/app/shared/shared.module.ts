@@ -12,6 +12,10 @@ import { LoginStatusService } from './login-status.service';
 import { ServerUpdateService } from './server-update.service';
 import { ResponsivityService } from './reponsivity.service';
 import { SharedServerApiService } from './shared-server-api.service';
+import { AlertModule } from 'ngx-bootstrap';
+import { SharedModalsService } from './shared-modals.service';
+import { AlertWrapperComponent } from './components/alert.component';
+import { MomentModule } from 'angular2-moment';
 
 const config: SocketIoConfig = {
 	url: '/frontend',
@@ -22,7 +26,9 @@ const config: SocketIoConfig = {
 	imports: [
 		CommonModule,
 		HttpClientModule,
-		SocketIoModule.forRoot(config)
+		SocketIoModule.forRoot(config),
+		AlertModule.forRoot(),
+		MomentModule
 	],
 	declarations: [
 		DurationPipe,
@@ -30,7 +36,8 @@ const config: SocketIoConfig = {
 		IntegerPipe,
 		ObjectKeysPipe,
 		PercentStringPipe,
-		DayOfWeekNamePipe
+		DayOfWeekNamePipe,
+		AlertWrapperComponent
 	],
 	exports: [
 		DurationPipe,
@@ -44,7 +51,11 @@ const config: SocketIoConfig = {
 		LoginStatusService,
 		ServerUpdateService,
 		ResponsivityService,
-		SharedServerApiService
+		SharedServerApiService,
+		SharedModalsService
+	],
+	entryComponents: [
+		AlertWrapperComponent
 	]
 })
 export class SharedModule { }

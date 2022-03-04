@@ -3,8 +3,8 @@ import { ThermoComponent }  from './thermo/thermo.component';
 import { SecurityComponent } from './security/security.component';
 import { LoginStatusService } from './shared/login-status.service';
 import { ThermoDataStoreService } from './thermo/services/thermo-data-store.service';
-import { ThermoActionsService } from './thermo/services/thermo-actions.service';
-import { ThermoModalsService } from './thermo/services/thermo-modals.service';
+import * as moment from 'moment';
+import { Moment } from 'moment';
 
 @Component({
 	selector: 'app-root',
@@ -14,7 +14,7 @@ import { ThermoModalsService } from './thermo/services/thermo-modals.service';
 export class AppComponent {
 	title = 'app';
 	refreshInProgress = false;
-	currentDate: any = new Date().getTime();
+	currentTimestamp: number = moment().valueOf();
 	updateStatus = 'fresh';
 	lastVisible = new Date();
 	lastLoginStatusCheck = new Date();
@@ -33,12 +33,12 @@ export class AppComponent {
 	}
 
 	updateFreshnessStatus () {
-		this.currentDate = new Date().getTime();
+		this.currentTimestamp = moment().valueOf();
 
-		if (this.currentDate - this.thermoDataStore.lastUpdate < 5 * 60 * 1000) {
+		if (this.currentTimestamp - this.thermoDataStore.lastUpdate.valueOf() < 5 * 60 * 1000) {
 			this.updateStatus = 'fresh';
-		} else if (this.currentDate - this.thermoDataStore.lastUpdate >= 5 * 60 * 1000 &&
-				this.currentDate - this.thermoDataStore.lastUpdate < 10 * 60 * 1000) {
+		} else if (this.currentTimestamp - this.thermoDataStore.lastUpdate.valueOf() >= 5 * 60 * 1000 &&
+				this.currentTimestamp - this.thermoDataStore.lastUpdate.valueOf() < 10 * 60 * 1000) {
 			this.updateStatus = 'idle';
 		} else {
 			this.updateStatus = 'outdated';

@@ -14,6 +14,7 @@ const targetTempService = require('../services/targetTemp');
 const config = require('../services/config');
 const Temperature = require('../models/Temperature');
 const HeatingDefaultPlan = require('../models/HeatingDefaultPlan');
+const HeatingPlanOverrides = require('../models/HeatingPlanOverrides');
 
 exports.init = function () {
 	const io = socket.io.of('/frontend');
@@ -103,6 +104,20 @@ exports.init = function () {
 			heatingDefaultPlans: [defaultPlan]
 		});
 	});
+
+	HeatingPlanOverrides.evts.on('change', () => {
+		HeatingPlanOverrides
+			.find()
+			.sort({
+				date: 1
+			})
+			.exec()
+			.then(planOverrides => {
+				io.emit('update', {
+					HeatingPlanOverrides: planOverrides
+				})
+			});
+	})
 
 
 	setInterval(() => {

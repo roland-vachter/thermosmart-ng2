@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import 'rxjs/add/operator/map';
+import { Moment } from 'moment';
+import { ApiResult } from '../../types/types';
 
 @Injectable()
 export class ThermoServerApiService {
@@ -62,7 +64,7 @@ export class ThermoServerApiService {
 		return obs;
 	}
 
-	changeDefaultPlan (dayOfWeek, planId) {
+	changeDefaultPlan (dayOfWeek: number, planId: number) {
 		const obs = this.http.post('/api/changedefaultplan', {
 			dayOfWeek,
 			planId
@@ -76,4 +78,20 @@ export class ThermoServerApiService {
 		return this.http.get('/api/statistics');
 	}
 
+	listPlanOverrides() {
+		return this.http.get<ApiResult>('/api/heating/planoverride/list');
+	}
+
+	addPlanOverride(date: Date, planId: number) {
+		return this.http.post<ApiResult>('/api/heating/planoverride/add', {
+			date: date.valueOf(),
+			planId
+		});
+	}
+
+	removePlanOverride(date: Date) {
+		return this.http.post<ApiResult>('/api/heating/planoverride/remove', {
+			date: date.valueOf()
+		})
+	}
 }
