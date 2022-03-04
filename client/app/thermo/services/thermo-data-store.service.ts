@@ -184,10 +184,7 @@ export class ThermoDataStoreService {
 		}
 
 		const todayStartOfDay = moment().tz('Europe/Bucharest').startOf('day');
-		const heatingPlanOverrideToday = this.heatingPlanOverrides.find(po => {
-			console.log(po.date.valueOf(), todayStartOfDay.valueOf());
-			return po.date.valueOf() === todayStartOfDay.valueOf();
-		});
+		const heatingPlanOverrideToday = this.heatingPlanOverrides.find(po => po.date.valueOf() === todayStartOfDay.valueOf());
 		this.todaysPlan = heatingPlanOverrideToday ? heatingPlanOverrideToday.plan : this.defaultHeatingPlans[moment().day()].plan;
 
 		const tomorrowStartOfDay = moment().tz('Europe/Bucharest').startOf('day').add(1, 'day');
@@ -197,6 +194,10 @@ export class ThermoDataStoreService {
 		this.update();
 
         this.evt.next();
+	}
+
+	get sensorList() {
+		return Object.values(this.sensorsById);
 	}
 
     private update () {
