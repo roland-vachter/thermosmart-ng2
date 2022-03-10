@@ -10,7 +10,7 @@ let sensorData = {};
 let heatingOn = false;
 heatingEvts.on('changeHeating', (isOn) => {
 	if (isOn) {
-		enableAllSensors();
+		activateAllSensors();
 		heatingOn = true;
 	} else {
 		heatingOn = false;
@@ -50,6 +50,7 @@ exports.set = async (data) => {
 			sensorData[id] = {
 				id: id,
 				enabled: sensorSetting.enabled,
+				windowOpen: false,
 				tempHistory: [],
 				onHoldTempLowest: null,
 				onHoldTempHighest: null,
@@ -75,7 +76,6 @@ exports.set = async (data) => {
 		sensorData[id].lastUpdate = new Date();
 		sensorData[id].active = true;
 
-		//sensorData[id].enabled = sensorSetting.enabled;
 		sensorData[id].label = sensorSetting.label;
 		sensorData[id].tempAdjust = sensorSetting.tempAdjust;
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
@@ -95,14 +95,14 @@ exports.set = async (data) => {
 			} else if (sensorData[id].onHoldStatus === 'firstDecrease') {
 				if (lastTemp - data.temperature >= 0.15) {
 					sensorData[id].onHoldTempLowest = data.temperature;
-					sensorData[id].enabled = false;
+					sensorData[id].windowOpen = true;
 
 					sensorData[id].onHoldStatus = 'decrease';
 				} else {
 					sensorData[id].onHoldStatus = null;
 					sensorData[id].onHoldTempLowest = null;
 					sensorData[id].onHoldTempHighest = null;
-					sensorData[id].enabled = true;
+					sensorData[id].windowOpen = false;
 					changesMade = true;
 				}
 			} else if (sensorData[id].onHoldStatus === 'decrease') {
@@ -134,7 +134,7 @@ exports.set = async (data) => {
 				} else if (data.temperature > lastTemp) {
 					sensorData[id].onHoldStatus = 'increase';
 				} else {
-					sensorData[id].enabled = true;
+					sensorData[id].windowOpen = false;
 					sensorData[id].onHoldStatus = null;
 					sensorData[id].onHoldTempHighest = null;
 					sensorData[id].onHoldTempLowest = null;
@@ -144,7 +144,7 @@ exports.set = async (data) => {
 
 			if (data.temperature <= 10) {
 				sensorData[id].onHoldStatus = null;
-				sensorData[id.enabled] = true;
+				sensorData[id].windowOpen = false;
 			}
 		}
 
@@ -165,25 +165,14 @@ exports.get = () => {
 	return sensorData;
 };
 
-const enableAllSensors = () => {
+const activateAllSensors = () => {
 	Object.keys(sensorData).forEach(async id => {
 		const s = sensorData[id];
-		if (!s.enabled) {
-			s.enabled = true;
+		if (s.windowOpen) {
+			s.windowOpen = false;
 			s.onHoldStatus = null;
 			s.onHoldTempLowest = null;
 			s.onHoldTempHighest = null;
-
-			const sensorSetting = await SensorSetting.findOne({
-				_id: id
-			});
-
-			if (sensorSetting) {
-				if (!sensorSetting.enabled) {
-					sensorSetting.enabled = true;
-					await sensorSetting.save();
-				}
-			}
 		}
 	});
 }
@@ -204,6 +193,7 @@ exports.toggleSensorStatus = async (id) => {
 			sensorData[id].onHoldTempLowest = null;
 			sensorData[id].onHoldTempHighest = null;
 			sensorData[id].onHoldStatus = null;
+			sensorData[id].windowOpen = false;
 			evts.emit('change', sensorData[id]);
 		}
 
@@ -252,6 +242,7 @@ setInterval(() => {
 				sensorData[id].active = false;
 
 				sensorData[id].enabled = sensorSetting.enabled;
+				sensorData[id].windowOpen = false;
 				sensorData[id].onHoldTempLowest = null;
 				sensorData[id].onHoldTempHighest = null;
 				sensorData[id].onHoldStatus = null;

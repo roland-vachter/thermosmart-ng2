@@ -28,7 +28,7 @@ insideConditionsEvts.on('change', () => {
 	const keys = Object.keys(sensors);
 	let activeCount = 0;
 	keys.forEach(key => {
-		if (sensors[key].active && sensors[key].enabled) {
+		if (sensors[key].active && sensors[key].enabled && !sensors[key].windowOpen) {
 			avgValues.temperature += sensors[key].temperature;
 			avgValues.humidity += sensors[key].humidity;
 			activeCount++;
