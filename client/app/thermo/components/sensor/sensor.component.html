@@ -1,8 +1,8 @@
-<div class="thermo-room" [ngClass]="{'thermo-room--disabled': !sensor.enabled}">
+<div class="thermo-room" [ngClass]="{'thermo-room--disabled': !sensor.enabled || sensor.windowOpen}">
 	<div class="row no-gutters">
 		<div class="col-12">
 			<div class="thermo-room-label-container">
-				<span class="thermo-room--status icon-wifi color-{{restartSensorInProgress ? 'yellow' : (!sensor.enabled ? 'gray' : sensor.active ? 'mint' : 'red')}}" (click)="toggleSensorStatus()"></span>
+				<span class="thermo-room--status icon-wifi color-{{restartSensorInProgress ? 'yellow' : (!sensor.enabled || sensor.windowOpen ? 'gray' : sensor.active ? 'mint' : 'red')}}" (click)="toggleSensorStatus()"></span>
 				<span class="thermo-room--label" (click)="changeLabel()">
 					<span>({{ sensor.id }})</span> {{ sensor.label || sensor.id }}
 				</span>

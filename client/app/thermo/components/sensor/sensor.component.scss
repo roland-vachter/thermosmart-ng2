@@ -51,7 +51,7 @@
 
 .thermo-room--disabled .thermo-room--humidity,
 .thermo-room--disabled .thermo-room--temperature {
-	color: $gray;
+	color: $gray !important;
 }
 
 .thermo-room--status {

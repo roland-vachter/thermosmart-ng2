@@ -15,6 +15,7 @@ export interface Sensor {
 	humidity: number;
 	active: boolean;
 	enabled: boolean;
+	windowOpen: boolean;
 	label: string;
 	tempAdjust: number;
 	humidityAdjust: number;
