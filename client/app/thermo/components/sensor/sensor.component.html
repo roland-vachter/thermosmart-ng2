@@ -1,4 +1,4 @@
-<div class="thermo-room" [ngClass]="{'thermo-room--disabled': !sensor.enabled || sensor.windowOpen}">
+<div class="thermo-room">
 	<div class="row no-gutters">
 		<div class="col-12">
 			<div class="thermo-room-label-container">
@@ -10,12 +10,12 @@
 		</div>
 		<div class="col-6">
 			<div class="thermo-room--temperature">
-				<temperature [value]="sensor.temperature" [withIcon]="true"></temperature>
+				<temperature [value]="sensor.temperature" [withIcon]="true" [color]="!sensor.enabled || sensor.windowOpen ? 'gray' : null"></temperature>
 			</div>
 		</div>
 		<div class="col-6">
 			<div class="thermo-room--humidity">
-				<humidity [value]="sensor.humidity" [withIcon]="true"></humidity>
+				<humidity [value]="sensor.humidity" [withIcon]="true" [color]="!sensor.enabled || sensor.windowOpen ? 'gray' : null"></humidity>
 			</div>
 		</div>
 	</div>

@@ -97,6 +97,7 @@ exports.set = async (data) => {
 					sensorData[id].onHoldTempLowest = data.temperature;
 					sensorData[id].windowOpen = true;
 
+					changesMade = true;
 					sensorData[id].onHoldStatus = 'decrease';
 				} else {
 					sensorData[id].onHoldStatus = null;

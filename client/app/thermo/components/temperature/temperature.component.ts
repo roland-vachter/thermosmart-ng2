@@ -19,7 +19,11 @@ export class TemperatureComponent implements OnInit, OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes.color) {
-            this.predefinedColor = true;
+            if (changes.color.currentValue) {
+                this.predefinedColor = true;
+            } else {
+                this.predefinedColor = false;
+            }
         }
 
         if (changes.value) {
