@@ -234,8 +234,6 @@ exports.motionSensor = {
 			});
 		}
 
-		console.log('belep');
-
 		await securityHealth.motionSensor.reportHealth(req.query.id, req.query.health === 'true' || req.query.health === true);
 
 		res.json({

@@ -114,8 +114,6 @@ const updateControllerHealthByLocation = (locationId) => {
 		controllerHealthByLocation[locationId] = HEALTH.PARTIAL;
 	}
 
-	console.log(securityControllersByLocations[locationId], controllerHealthByLocation[locationId]);
-
 	evts.emit('controller-health', {
 		health: controllerHealthByLocation[locationId],
 		location: locationId
@@ -473,7 +471,6 @@ exports.controller = {
 		}).exec();
 
 		const controller = securityControllersByLocations[securityControllerData.location]?.find(c => c.id === id);
-		console.log(securityControllerData.location, securityControllersByLocations[securityControllerData.location], controller);
 		if (controller) {
 			controller.healthy = true;
 			controller.lastHealthUpdate = Date.now();
@@ -508,8 +505,6 @@ exports.motionSensor = {
 		const securityControllerData = await SecurityControllers.findOne({
 			controllerid: parseInt(controllerId[1], 10)
 		}).exec();
-
-		console.log('reportHealth', id, controllerId, securityControllerData);
 
 		if (!motionSensorsByLocations[securityControllerData.location]) {
 			motionSensorsByLocations[securityControllerData.location] = {};

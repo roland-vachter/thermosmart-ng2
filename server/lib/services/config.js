@@ -42,7 +42,6 @@ const getAll = async (locationId) => {
 };
 
 const get = async (name, locationId) => {
-	console.log('get config', name, locationId);
 	const configItem = await Config.findOne({
 		name,
 		location: locationId

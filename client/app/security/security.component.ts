@@ -59,7 +59,6 @@ export class SecurityComponent implements OnInit {
 	handleServerData (data) {
 		if (data.security) {
 			if (data.security.status) {
-				console.log(data.security.status);
 				this.status = data.security.status;
 
 				if (this.status === 'arming') {

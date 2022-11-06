@@ -53,7 +53,6 @@ insideConditionsEvts.on('change', (data) => {
 });
 
 exports.isHeatingOn = (locationId, readFromControllerSensor) => {
-	console.log(locationId, readFromControllerSensor);
 	initLocation(locationId);
 	const locationStatus = statusByLocation[locationId];
 
