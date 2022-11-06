@@ -509,6 +509,8 @@ exports.motionSensor = {
 			controllerid: parseInt(controllerId[1], 10)
 		}).exec();
 
+		console.log('reportHealth', id, controllerId, securityControllerData);
+
 		if (!motionSensorsByLocations[securityControllerData.location]) {
 			motionSensorsByLocations[securityControllerData.location] = {};
 		}
