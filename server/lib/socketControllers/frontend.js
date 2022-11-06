@@ -98,7 +98,7 @@ exports.init = function () {
 			socket.io.of('/frontend/' + data.location).emit('update', {
 				temperatures: temps.map(t => ({
 					...t,
-					value: t.values?.find(v => v.location === location)?.value || t.defaultValue,
+					value: t.values?.find(v => v.location === data.location)?.value || t.defaultValue,
 					values: null
 				}))
 			});
@@ -109,7 +109,7 @@ exports.init = function () {
 		socket.io.of('/frontend/' + data.location).emit('update', {
 			heatingDefaultPlans: [{
 				...data.defaultPlan,
-				plan: data.defaultPlan.plans?.find(p => p.location === location)?.plan || data.defaultPlan.defaultPlan,
+				plan: data.defaultPlan.plans?.find(p => p.location === data.location)?.plan || data.defaultPlan.defaultPlan,
 				plans: null
 			}]
 		});
