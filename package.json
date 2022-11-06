@@ -7,7 +7,7 @@
     "start": "node ./server/bin/www",
     "build": "ng build",
     "build-prod": "ng build --prod",
-    "build-watch": "ng build -w",
+    "build-watch": "ng build --watch",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
@@ -79,6 +79,6 @@
     "typescript": ">=2.4.2 <2.7"
   },
   "engines": {
-    "node": "^12.0.0"
+    "node": "^16.0.0"
   }
 }
