@@ -3,6 +3,8 @@ import { ServerApiService } from './services/server-api.service';
 import { ServerUpdateService } from '../shared/server-update.service';
 import { SecuritySettingsModalComponent } from './components/security-settings-modal/security-settings-modal.component';
 import { BsModalService } from 'ngx-bootstrap/modal';
+import { RefreshEventService } from '../services/refresh-event.service';
+import { LocationService } from '../services/location.service';
 
 enum HEALTH {
 	OK = 'OK',
@@ -33,17 +35,31 @@ export class SecurityComponent implements OnInit {
 		(
 			private serverUpdateService: ServerUpdateService,
 			private serverApiService: ServerApiService,
-			private modalService: BsModalService
+			private modalService: BsModalService,
+			private refreshEventService: RefreshEventService,
+			private locationService: LocationService
 		) {	}
 
 	toggleArming () {
 		this.serverApiService.toggleArm().subscribe();
 	}
 
+	reset() {
+		this.status = null;
+		this.lastActivity = null;
+		this.lastArmedAt = null;
+		this.alarmTriggeredCount = null;
+		this.cameraHealth = HEALTH.FAIL;
+		this.controllerHealth = HEALTH.FAIL;
+		this.keypadHealth = HEALTH.FAIL;
+		this.motionSensorHealth = HEALTH.FAIL;
+	}
+
 
 	handleServerData (data) {
 		if (data.security) {
 			if (data.security.status) {
+				console.log(data.security.status);
 				this.status = data.security.status;
 
 				if (this.status === 'arming') {
@@ -90,16 +106,19 @@ export class SecurityComponent implements OnInit {
 	}
 
 	init () {
+		this.reset();
 		this.serverApiService.init()
 			.subscribe(this.handleServerData.bind(this));
 	}
 
-	refresh () {
-		this.init();
-	}
-
 	ngOnInit() {
-		this.init();
+		this.refreshEventService.subscribe(() => {
+			this.init();
+		});
+
+		this.locationService.subscribe(() => {
+			this.init();
+		});
 
 		this.serverUpdateService.onUpdate()
 			.subscribe(this.handleServerData.bind(this));

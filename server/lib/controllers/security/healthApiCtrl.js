@@ -10,7 +10,16 @@ exports.camera = {
 			});
 		}
 
-		const exists = await securityHealth.camera.ipExists(req.body.ip);
+		if (!req.body.location) {
+			return res.status(400).json({
+				status: types.RESPONSE_STATUS.ERROR,
+				reason: 'Location parameter is missing'
+			});
+		}
+
+		const location = parseInt(req.body.location, 10);
+
+		const exists = await securityHealth.camera.ipExists(req.body.ip, location);
 		if (exists) {
 			res.json({
 				status: types.RESPONSE_STATUS.ERROR,
@@ -18,7 +27,7 @@ exports.camera = {
 			})
 		} else {
 			try {
-				await securityHealth.camera.add(req.body.ip);
+				await securityHealth.camera.add(req.body.ip, location);
 				res.json({
 					status: types.RESPONSE_STATUS.OK
 				});
@@ -38,8 +47,17 @@ exports.camera = {
 			});
 		}
 
+		if (!req.body.location) {
+			return res.status(400).json({
+				status: types.RESPONSE_STATUS.ERROR,
+				reason: 'Location parameter is missing'
+			});
+		}
+
+		const location = parseInt(req.body.location, 10);
+
 		try {
-			await securityHealth.camera.remove(req.body.ip);
+			await securityHealth.camera.remove(req.body.ip, location);
 			res.json({
 				status: types.RESPONSE_STATUS.OK
 			});
@@ -51,29 +69,52 @@ exports.camera = {
 		}
 	},
 	list: async (req, res) => {
-		res.json(await securityHealth.camera.list());
-	},
-	listApis: async (req, res) => {
-		res.json({
-			ips: await securityHealth.camera.listIPs()
-		});
-	},
-	reportHealth: (req, res) => {
-		if (!req.query.ip || !req.query.health) {
+		if (!req.query.location) {
 			return res.status(400).json({
 				status: types.RESPONSE_STATUS.ERROR,
-				reason: 'IP or health parameter is missing'
+				reason: 'Location parameter is missing'
 			});
 		}
 
-		securityHealth.camera.reportHealth(req.query.ip, req.query.health === 'true' || req.query.health === true);
+		const location = parseInt(req.query.location, 10);
+
+		res.json(await securityHealth.camera.list(location));
+	},
+	listIps: async (req, res) => {
+		if (!req.query.id) {
+			return res.status(400).json({
+				status: types.RESPONSE_STATUS.ERROR,
+				reason: 'ID parameter is missing'
+			});
+		}
+
+		res.json({
+			ips: await securityHealth.camera.listIPs(await securityHealth.controller.getLocationById(req.query.id))
+		});
+	},
+	reportHealth: (req, res) => {
+		if (!req.query.ip || !req.query.health || !req.query.id) {
+			return res.status(400).json({
+				status: types.RESPONSE_STATUS.ERROR,
+				reason: 'IP, health or ID parameter is missing'
+			});
+		}
+
+		securityHealth.camera.reportHealth(req.query.id, req.query.ip, req.query.health === 'true' || req.query.health === true);
 
 		res.json({
 			status: types.RESPONSE_STATUS.OK
 		});
 	},
-	reportMovement: (req, res) => {
-		securityHealth.camera.reportMovement();
+	reportMovement: async (req, res) => {
+		if (!req.query.id) {
+			return res.status(400).json({
+				status: types.RESPONSE_STATUS.ERROR,
+				reason: 'ID parameter is missing'
+			});
+		}
+
+		securityHealth.camera.reportMovement(req.query.id, await securityHealth.controller.getLocationById(req.query.id));
 
 		res.sendStatus(200);
 	}
@@ -90,6 +131,15 @@ exports.controller = {
 			});
 		}
 
+		if (!req.body.location) {
+			return res.status(400).json({
+				status: types.RESPONSE_STATUS.ERROR,
+				reason: 'Location parameter is missing'
+			});
+		}
+
+		const location = parseInt(req.body.location, 10);
+
 		const exists = await securityHealth.controller.idExists(req.body.id);
 		if (exists) {
 			res.json({
@@ -98,7 +148,7 @@ exports.controller = {
 			})
 		} else {
 			try {
-				await securityHealth.controller.add(req.body.id);
+				await securityHealth.controller.add(req.body.id, location);
 				res.json({
 					status: types.RESPONSE_STATUS.OK
 				});
@@ -131,7 +181,16 @@ exports.controller = {
 		}
 	},
 	list: async (req, res) => {
-		res.json(await securityHealth.controller.list());
+		if (!req.query.location) {
+			return res.status(400).json({
+				status: types.RESPONSE_STATUS.ERROR,
+				reason: 'Location parameter is missing'
+			});
+		}
+
+		const location = parseInt(req.query.location, 10);
+
+		res.json(await securityHealth.controller.list(location));
 	},
 	reportHealth: (req, res) => {
 		if (!req.query.id) {
@@ -151,14 +210,14 @@ exports.controller = {
 
 exports.keypad = {
 	reportHealth: (req, res) => {
-		if (!req.query.health) {
+		if (!req.query.health || !req.query.id) {
 			return res.status(400).json({
 				status: types.RESPONSE_STATUS.ERROR,
-				reason: 'health parameter is missing'
+				reason: 'ID or health parameter is missing'
 			});
 		}
 
-		securityHealth.keypad.reportHealth(req.query.health === 'true' || req.query.health === true);
+		securityHealth.keypad.reportHealth(req.query.id, req.query.health === 'true' || req.query.health === true);
 
 		res.json({
 			status: types.RESPONSE_STATUS.OK
@@ -167,7 +226,7 @@ exports.keypad = {
 }
 
 exports.motionSensor = {
-	reportHealth: (req, res) => {
+	reportHealth: async (req, res) => {
 		if (!req.query.health || !req.query.id) {
 			return res.status(400).json({
 				status: types.RESPONSE_STATUS.ERROR,
@@ -175,7 +234,9 @@ exports.motionSensor = {
 			});
 		}
 
-		securityHealth.motionSensor.reportHealth(req.query.id, req.query.health === 'true' || req.query.health === true);
+		console.log('belep');
+
+		await securityHealth.motionSensor.reportHealth(req.query.id, req.query.health === 'true' || req.query.health === true);
 
 		res.json({
 			status: types.RESPONSE_STATUS.OK

@@ -9,34 +9,51 @@ const statisticsService = require('../../services/statistics');
 const restartSensorService = require('../../services/restartSensor');
 const configService = require('../../services/config');
 const targetTempService = require('../../services/targetTemp');
+const SensorSetting = require('../../models/SensorSetting');
+const types = require('../../utils/types');
 
 const moment = require('moment-timezone');
 const HeatingPlanOverrides = require('../../models/HeatingPlanOverrides');
 
 exports.init = function (req, res, next) {
+	if (!req.query.location) {
+		return res.status(400).json({
+			status: types.RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	const location = parseInt(req.query.location, 10);
+
 	Promise.all([
 		Temperature
 			.find()
+			.lean()
 			.exec(),
 		HeatingDefaultPlan
 			.find()
+			.lean()
 			.exec(),
 		HeatingPlan
 			.find()
+			.lean()
 			.sort({
 				displayOrder: 1
 			})
 			.exec(),
 		HeatingPlanOverrides
-			.find()
+			.find({
+				location: location
+			})
 			.sort({
 				date: 1
 			})
+			.lean()
 			.exec(),
 		statisticsService
-			.getStatisticsForToday(),
-		targetTempService.get(),
-		configService.getAll()
+			.getStatisticsForToday(location),
+		targetTempService.get(location),
+		configService.getAll(location)
 	]).then(([
 				temps,
 				heatingDefaultPlans,
@@ -46,20 +63,29 @@ exports.init = function (req, res, next) {
 				targetTemp,
 				config
 			]) => {
+
 		res.json({
 			status: 'ok',
 			data: {
 				outside: outsideConditions.get(),
-				sensors: insideConditions.get(),
-				isHeatingOn: heatingService.isHeatingOn(),
+				sensors: insideConditions.get(location),
+				isHeatingOn: heatingService.isHeatingOn(location),
 				heatingPower: {
-					status: heatingService.getPowerStatus().poweredOn,
-					until: heatingService.getPowerStatus().until
+					status: heatingService.getPowerStatus(location).poweredOn,
+					until: heatingService.getPowerStatus(location).until
 				},
-				targetTempId: targetTemp ? targetTemp.id : null,
-				temperatures: temps,
-				heatingPlans: heatingPlans,
-				heatingDefaultPlans: heatingDefaultPlans,
+				targetTempId: targetTemp ? targetTemp._id : null,
+				temperatures: (temps || []).map(t => ({
+					...t,
+					value: t.values?.find(v => v.location === location)?.value || t.defaultValue,
+					values: null
+				})),
+				heatingPlans: heatingPlans || [],
+				heatingDefaultPlans: (heatingDefaultPlans || []).map(hdp => ({
+					...hdp,
+					plan: hdp.plans?.find(p => p.location === location)?.plan || hdp.defaultPlan,
+					plans: null
+				})),
 				heatingPlanOverrides: heatingPlanOverrides.map(hp => {
 					hp.date = moment(hp.date).tz('Europe/Bucharest').startOf('day').valueOf();
 					return hp;
@@ -76,7 +102,7 @@ exports.init = function (req, res, next) {
 };
 
 exports.tempAdjust = function (req, res, next) {
-	if (isNaN(req.body.id) || isNaN(req.body.value)) {
+	if (isNaN(req.body.id) || isNaN(req.body.value) || !req.body.location) {
 		res.status(400).json({
 			status: 'error',
 			reason: 'Missing or incorrect parameters'
@@ -84,17 +110,27 @@ exports.tempAdjust = function (req, res, next) {
 		return;
 	}
 
-	Temperature.findOneAndUpdate({
+	const location = parseInt(req.body.location, 10);
+
+	Temperature.findOne({
 		_id: req.body.id
-	}, {
-		value: parseFloat(req.body.value)
-	}, {
-		new: true
 	})
 	.exec()
-	.then(temp => {
+	.then(async temp => {
 		if (temp) {
-			Temperature.triggerChange(temp._id);
+			const valueByLocation = temp.values.find(v => v.location === location);
+			if (valueByLocation) {
+				valueByLocation.value = parseFloat(req.body.value);
+			} else {
+				temp.values.push({
+					location,
+					value: parseFloat(req.body.value)
+				});
+			}
+
+			await temp.save();
+
+			Temperature.triggerChange(temp._id, location);
 
 			res.json({
 				status: 'ok',
@@ -111,7 +147,7 @@ exports.tempAdjust = function (req, res, next) {
 };
 
 exports.changeDefaultPlan = function (req, res, next) {
-	if (isNaN(req.body.dayOfWeek) || isNaN(req.body.planId)) {
+	if (isNaN(req.body.dayOfWeek) || isNaN(req.body.planId) || !req.body.location) {
 		res.status(400).json({
 			status: 'error',
 			reason: 'Missing or incorrect parameters'
@@ -119,17 +155,27 @@ exports.changeDefaultPlan = function (req, res, next) {
 		return;
 	}
 
-	HeatingDefaultPlan.findOneAndUpdate({
+	const location = parseInt(req.body.location, 10);
+
+	HeatingDefaultPlan.findOne({
 		dayOfWeek: req.body.dayOfWeek
-	}, {
-		plan: req.body.planId
-	}, {
-		new: true
 	})
 	.exec()
-	.then(heatingDefaultPlan => {
+	.then(async heatingDefaultPlan => {
 		if (heatingDefaultPlan) {
-			HeatingDefaultPlan.triggerChange(heatingDefaultPlan);
+			const planByLocation = heatingDefaultPlan.plans.find(v => v.location === location);
+			if (planByLocation) {
+				planByLocation.plan = parseFloat(req.body.planId);
+			} else {
+				heatingDefaultPlan.plans.push({
+					location,
+					plan: parseFloat(req.body.planId)
+				});
+			}
+
+			await heatingDefaultPlan.save();
+
+			HeatingDefaultPlan.triggerChange(heatingDefaultPlan, location);
 			targetTempService.update();
 
 			res.json({
@@ -147,8 +193,19 @@ exports.changeDefaultPlan = function (req, res, next) {
 };
 
 exports.listHeatingPlanOverride = async (req, res) => {
+	if (!req.query.location) {
+		return res.status(400).json({
+			status: types.RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	const location = parseInt(req.query.location, 10);
+
 	try {
-		const heatingPlanOverrides = await HeatingPlanOverrides.find().exec();
+		const heatingPlanOverrides = await HeatingPlanOverrides.find({
+			location: location
+		}).exec();
 
 		res.json({
 			status: 'ok',
@@ -163,7 +220,7 @@ exports.listHeatingPlanOverride = async (req, res) => {
 };
 
 exports.addOrUpdateHeatingPlanOverride = (req, res) => {
-	if (!req.body.date || !req.body.planId) {
+	if (!req.body.date || !req.body.planId || !req.body.location) {
 		res.status(400).json({
 			status: 'error',
 			reason: 'Date of plan parameters are missing'
@@ -171,9 +228,19 @@ exports.addOrUpdateHeatingPlanOverride = (req, res) => {
 		return;
 	}
 
+	const location = parseInt(req.body.location, 10);
+
 	const date = moment(parseInt(req.body.date, 10)).tz('Europe/Bucharest').startOf('day');
 
-	HeatingPlanOverrides.findOneAndUpdate({ date: date.valueOf() }, { plan: req.body.planId }, { upsert: true, new: true }, function(err, doc) {
+	HeatingPlanOverrides.findOneAndUpdate({
+		date: date.valueOf(),
+		location: location
+	}, {
+		plan: req.body.planId
+	}, {
+		upsert: true,
+		new: true
+	}, function(err, doc) {
 		if (err) {
 			return res.status(500).json({
 				status: 'error',
@@ -181,7 +248,7 @@ exports.addOrUpdateHeatingPlanOverride = (req, res) => {
 			});
 		}
 
-		HeatingPlanOverrides.triggerChange();
+		HeatingPlanOverrides.triggerChange(location);
 		targetTempService.update();
 
 		return res.json({
@@ -191,18 +258,21 @@ exports.addOrUpdateHeatingPlanOverride = (req, res) => {
 };
 
 exports.removeHeatingPlanOverride = (req, res) => {
-	if (!req.body.date) {
+	if (!req.body.date || !req.body.location) {
 		res.status(400).json({
 			status: 'Date parameter is missing'
 		});
 		return;
 	}
 
+	const location = parseInt(req.body.location, 10);
+
 	const date = moment(parseInt(req.body.date, 10)).tz('Europe/Bucharest').startOf('day');
 
 	HeatingPlanOverrides
 		.deleteOne({
-			date: date.valueOf()
+			date: date.valueOf(),
+			location
 		})
 		.exec(err => {
 			if (err) {
@@ -212,7 +282,7 @@ exports.removeHeatingPlanOverride = (req, res) => {
 				});
 			}
 
-			HeatingPlanOverrides.triggerChange();
+			HeatingPlanOverrides.triggerChange(location);
 			targetTempService.update();
 
 			res.json({
@@ -222,7 +292,16 @@ exports.removeHeatingPlanOverride = (req, res) => {
 }
 
 exports.toggleHeatingPower = (req, res) => {
-	heatingService.togglePower();
+	if (!req.body.location) {
+		return res.status(400).json({
+			status: types.RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	const location = parseInt(req.body.location, 10);
+
+	heatingService.togglePower(location);
 
 	res.json({
 		status: 'ok'
@@ -281,8 +360,23 @@ exports.changeSensorSettings = async (req, res, next) => {
 	}
 };
 
-exports.sensorPolling = function (req, res) {
-	const id = req.query.id || 1;
+exports.sensorPolling = async (req, res) => {
+	const id = req.query.id;
+	if (!id) {
+		return res.json({
+			error: 'Sensor ID is missing'
+		});
+	}
+
+	const sensorSetting = await SensorSetting.findOne({
+		_id: id
+	}).exec();
+
+	if (!sensorSetting) {
+		return res.json({
+			error: 'Sensor setting not found'
+		});
+	}
 
 	insideConditions.set({
 		id: id,
@@ -291,24 +385,34 @@ exports.sensorPolling = function (req, res) {
 	});
 
 	setTimeout(() => res.json({
-		isHeatingOn: heatingService.isHeatingOn(parseInt(id, 10) === 1 ? true : false),
+		isHeatingOn: heatingService.isHeatingOn(sensorSetting.location, sensorSetting.controller),
 		restart: restartSensorService.getStatus()
 	}), 200);
 };
 
 exports.statistics = async (req, res) => {
+	if (!req.query.location) {
+		return res.status(400).json({
+			status: types.RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	const location = parseInt(req.query.location, 10);
+
 	const [statisticsForToday, statisticsForLastMonth, statisticsByMonth] = await Promise.all([
 		HeatingHistory
 			.find({
 				datetime: {
 					$gt: new Date(moment().tz('Europe/Bucharest').subtract(1, 'day'))
-				}
+				},
+				location: location
 			})
 			.exec(),
 		statisticsService
-			.getStatisticsByDay(new Date(moment().tz('Europe/Bucharest').subtract(1, 'month')), new Date(moment().tz('Europe/Bucharest'))),
+			.getStatisticsByDay(location, new Date(moment().tz('Europe/Bucharest').subtract(1, 'month')), new Date(moment().tz('Europe/Bucharest'))),
 		statisticsService
-			.getStatisticsByMonth(new Date(moment('2017-01-01 12:00:00').tz('Europe/Bucharest')), new Date(moment().tz('Europe/Bucharest')))
+			.getStatisticsByMonth(location, new Date(moment('2017-01-01 12:00:00').tz('Europe/Bucharest')), new Date(moment().tz('Europe/Bucharest')))
 	]);
 
 	statisticsForToday.unshift({

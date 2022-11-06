@@ -4,151 +4,192 @@ const targetTempService = require('./targetTemp');
 const configService = require('./config');
 const heatingEvts = require('./heatingEvts');
 
-let isOn = false;
-let lastStatusReadBySensor = false;
-let lastChangeEventStatus;
-const avgValues = {
-	temperature: 0,
-	humidity: 0
+const defaultValues = {
+	isOn: false,
+	lastStatusReadBySensor: false,
+	lastChangeEventStatus: null,
+	avgValues: {
+		temperature: 0,
+		humidity: 0
+	},
+	poweredOn: true,
+	until: null,
+	suspendTimeout: null,
+	initialized: false
+};
+const statusByLocation = {};
+
+const initLocation = (locationId) => {
+	if (!statusByLocation[locationId]) {
+		statusByLocation[locationId] = { ...defaultValues, avgValues: { ...defaultValues.avgValues } };
+	}
 };
 
-let poweredOn = true;
-let until = null;
+insideConditionsEvts.on('change', (data) => {
+	initLocation(data.location);
+	const locationStatus = statusByLocation[data.location];
+	locationStatus.avgValues.temperature = 0;
+	locationStatus.avgValues.humidity = 0;
 
-let suspendTimeout;
-
-let initialized = false;
-
-insideConditionsEvts.on('change', () => {
-	avgValues.temperature = 0;
-	avgValues.humidity = 0;
-
-	const sensors = getSensors();
+	const sensors = getSensors(data.location);
 
 	const keys = Object.keys(sensors);
 	let activeCount = 0;
 	keys.forEach(key => {
 		if (sensors[key].active && sensors[key].enabled && !sensors[key].windowOpen) {
-			avgValues.temperature += sensors[key].temperature;
-			avgValues.humidity += sensors[key].humidity;
+			locationStatus.avgValues.temperature += sensors[key].temperature;
+			locationStatus.avgValues.humidity += sensors[key].humidity;
 			activeCount++;
 		}
 	});
 
-	avgValues.temperature = avgValues.temperature / activeCount;
+	locationStatus.avgValues.temperature = locationStatus.avgValues.temperature / activeCount;
 
-	if (!initialized) {
-		initialized = true;
+	if (!locationStatus.initialized) {
+		locationStatus.initialized = true;
 	}
 
-	updateHeatingStatus();
+	updateHeatingStatusByLocation(data.location);
 });
 
-exports.isHeatingOn = (readFromSensor) => {
-	if (readFromSensor) {
-		lastStatusReadBySensor = true;
+exports.isHeatingOn = (locationId, readFromControllerSensor) => {
+	console.log(locationId, readFromControllerSensor);
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
 
-		if (lastChangeEventStatus !== isOn && isOn === true) {
-			heatingEvts.emit('changeHeating', isOn);
-			console.log('heating turned ' + (isOn ? 'on' : 'off'));
+	if (readFromControllerSensor) {
+		locationStatus.lastStatusReadBySensor = true;
+
+		if (locationStatus.lastChangeEventStatus !== locationStatus.isOn && locationStatus.isOn === true) {
+			heatingEvts.emit('changeHeating', {
+				isOn: locationStatus.isOn,
+				location: locationId
+			});
+			console.log('[' + locationId + '] heating turned ' + (locationStatus.isOn ? 'on' : 'off'));
 		}
-		lastChangeEventStatus = isOn;
+		locationStatus.lastChangeEventStatus = locationStatus.isOn;
 	}
 
-	return isOn && lastStatusReadBySensor;
+	return locationStatus.isOn && locationStatus.lastStatusReadBySensor;
 };
 
-exports.getPowerStatus = () => {
+exports.getPowerStatus = (locationId) => {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
 	return {
-		poweredOn,
-		until
+		poweredOn: locationStatus.poweredOn,
+		until: locationStatus.until
 	};
 };
 
-exports.togglePower = () => {
-	clearTimeout(suspendTimeout);
-	if (poweredOn) {
-		console.log('heating power off');
-		poweredOn = false;
-		until = new Date(new Date().getTime() + 15 * 60 * 1000);
+exports.togglePower = (locationId) => {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
+	clearTimeout(locationStatus.suspendTimeout);
+	if (locationStatus.poweredOn) {
+		console.log(`[${locationId}] heating power off`);
+		locationStatus.poweredOn = false;
+		locationStatus.until = new Date(new Date().getTime() + 15 * 60 * 1000);
 
 		heatingEvts.emit('changeHeatingPower', {
-			poweredOn,
-			until
+			location: locationId,
+			poweredOn: locationStatus.poweredOn,
+			until: locationStatus.until
 		});
 
 		suspendTimeout = setTimeout(() => {
-			exports.togglePower();
+			exports.togglePower(locationId);
 		}, 15 * 60 * 1000);
 	} else {
-		console.log('heating power on');
-		poweredOn = true;
-		until = null;
+		console.log(`[${locationId}] heating power on`);
+		locationStatus.poweredOn = true;
+		locationStatus.until = null;
 
 		heatingEvts.emit('changeHeatingPower', {
-			poweredOn,
-			until
+			location: locationId,
+			poweredOn: locationStatus.poweredOn,
+			until: locationStatus.until
 		});
 	}
 
-	updateHeatingStatus();
+	updateHeatingStatusByLocation(locationId);
 };
 
 
-function turnHeatingOn () {
-	isOn = true;
-	lastStatusReadBySensor = false;
+function turnHeatingOn (locationId) {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
+	locationStatus.isOn = true;
+	locationStatus.lastStatusReadBySensor = false;
+
+	console.log(`[${locationId}] heating power on`);
 }
 
-function turnHeatingOff () {
-	isOn = false;
-	lastStatusReadBySensor = false;
-	if (lastChangeEventStatus !== isOn) {
-		heatingEvts.emit('changeHeating', isOn);
-		console.log('heating turned off');
+function turnHeatingOff (locationId) {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
+	locationStatus.isOn = false;
+	locationStatus.lastStatusReadBySensor = false;
+	if (locationStatus.lastChangeEventStatus !== locationStatus.isOn) {
+		heatingEvts.emit('changeHeating', {
+			isOn: locationStatus.isOn,
+			location: locationId
+		});
+		console.log(`[${locationId}] heating power off`);
 	}
-	lastChangeEventStatus = isOn;
+	locationStatus.lastChangeEventStatus = locationStatus.isOn;
 }
 
 async function updateHeatingStatus () {
-	if (!initialized) {
+	return Promise.all(Object.keys(statusByLocation).map(locationId => updateHeatingStatusByLocation(locationId)));
+}
+
+async function updateHeatingStatusByLocation (locationId) {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
+	if (!locationStatus.initialized) {
 		return Promise.resolve();
 	}
 
 	try {
 		let [switchThresholdBelow, switchThresholdAbove] = await Promise.all([
-			configService.get('switchThresholdBelow'),
-			configService.get('switchThresholdAbove')
+			configService.get('switchThresholdBelow', locationId),
+			configService.get('switchThresholdAbove', locationId)
 		]);
 
 		if (!switchThresholdBelow) {
 			switchThresholdBelow = {
-				value: 0.2
+				value: 0.1
 			};
 		}
 
 		if (!switchThresholdAbove) {
 			switchThresholdAbove = {
-				value: 0.2
+				value: 0.1
 			};
 		}
 
-		if (Number.isNaN(avgValues.temperature) || !poweredOn) {
-			turnHeatingOff();
+		if (Number.isNaN(locationStatus.avgValues.temperature) || !locationStatus.poweredOn) {
+			turnHeatingOff(locationId);
 			return;
 		}
 
-		const target = targetTempService.get();
+		const target = targetTempService.get(locationId);
 		if (target) {
-			const sensors = getSensors();
-			if (!isOn && avgValues.temperature <= target.value - switchThresholdBelow.value) {
+			const sensors = getSensors(locationId);
+			if (!locationStatus.isOn && locationStatus.avgValues.temperature <= target.value - switchThresholdBelow.value) {
 				console.log('sensor data', JSON.stringify(sensors));
-				turnHeatingOn();
-			} else if (avgValues.temperature >= target.value + switchThresholdAbove.value) {
-				if (isOn) {
+				turnHeatingOn(locationId);
+			} else if (locationStatus.avgValues.temperature >= target.value + switchThresholdAbove.value) {
+				if (locationStatus.isOn) {
 					console.log('sensor data', JSON.stringify(sensors));
 				}
-				turnHeatingOff();
+				turnHeatingOff(locationId);
 			}
 		}
 	} catch(err) {

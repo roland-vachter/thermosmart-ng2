@@ -8,7 +8,11 @@ const securityArmingHistorySchema = new Schema({
 		type: Date,
 		index: true
 	},
-	status: String
+	status: String,
+	location: {
+		type: Number,
+		ref: 'Location'
+	}
 });
 
 securityArmingHistorySchema.index({datetime: 1});

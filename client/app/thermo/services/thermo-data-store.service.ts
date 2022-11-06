@@ -4,6 +4,7 @@ import * as moment from 'moment-timezone';
 import { ServerUpdateService } from '../../shared/server-update.service';
 import { HeatingDefaultPlan, HeatingPlan, HeatingPlanOverride, Sensor, Temperature } from '../../types/types';
 import { ThermoServerApiService } from './thermo-server-api.service';
+import { LocationService } from '../../services/location.service';
 
 @Injectable()
 export class ThermoDataStoreService {
@@ -66,11 +67,46 @@ export class ThermoDataStoreService {
 			.subscribe(this.handleServerData.bind(this));
 
         setInterval(this.update.bind(this), 60000);
-
-        this.init();
     }
 
+	reset() {
+		this.lastUpdate = moment();
+		this.insideConditions = {
+			temperature: null,
+			humidity: null
+		};
+		this.sensorsById = {};
+		this.outsideConditions = {
+			temperature: null,
+			humidity: null,
+			color: null,
+			weatherIconClass: null
+		};
+		this.heatingStatus = false;
+		this.heatingDuration = 0;
+		this.temperatures = {};
+		this.heatingPlans = {};
+		this.defaultHeatingPlans = [];
+		this.todaysPlan = null;
+		this.nextDaysPlan = null;
+		this.targetTemp = {
+			value: 0,
+			color: 'gray'
+		} as Temperature;
+		this.percentInDay = 0;
+		this.currentTime = null;
+		this.currentDate = null;
+		this.config = {};
+		this.heatingPower = {
+			status: false,
+			until: moment(Date.now() + 15 * 60 * 1000)
+		};
+		this.sensorRestartInProgress = false;
+		this.heatingPlanOverrides = [];
+	}
+
     init() {
+		this.reset();
         this.serverApiService.init()
 			.subscribe(this.handleServerData.bind(this));
     }
@@ -142,7 +178,7 @@ export class ThermoDataStoreService {
 			});
 		}
 
-		if (data.targetTempId) {
+		if (!isNaN(data.targetTempId)) {
 			this.targetTemp = this.temperatures[data.targetTempId];
 		}
 

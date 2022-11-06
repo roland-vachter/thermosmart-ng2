@@ -1,30 +1,61 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import * as io from 'socket.io-client';
+import { LocationService } from '../services/location.service';
+import { RefreshEventService } from '../services/refresh-event.service';
 
 @Injectable()
 export class ServerUpdateService {
-	private socket: SocketIOClient.Socket;
+	private socketGlobal: SocketIOClient.Socket;
+	private socketLocation: SocketIOClient.Socket;
 
 	private observers = [];
 	private observable = Observable.create(function (observer) {
 		this.observers.push(observer);
 	}.bind(this));
 
-	constructor() {
-		this.socket = io('/frontend');
+	constructor(
+		private locationService: LocationService,
+		private refreshService: RefreshEventService
+	) {
+		this.initSocketGlobal();		
 
-		this.socket.on('update', data => {
+		this.locationService.subscribe(l => {
+			if (l) {
+				this.initSocketLocation(l._id);
+			}
+		});
+
+		this.refreshService.subscribe(() => {
+			this.initSocketGlobal();
+			if (this.locationService.getSelectedLocationId()) {
+				this.initSocketLocation(this.locationService.getSelectedLocationId());
+			}
+		});
+	}
+
+	private initSocketGlobal() {
+		if (this.socketGlobal) {
+			this.socketGlobal.disconnect();
+		}
+		this.socketGlobal = io('/frontend');
+		this.socketGlobal.on('update', data => {
 			this.observers.forEach(ob => ob.next(data));
 		});
 	}
 
-	// EMITTER
-	sendMessage(msg: string) {
-		this.socket.emit('sendMessage', { message: msg });
+	private initSocketLocation(location: number) {
+		if (this.socketLocation) {
+			this.socketLocation.disconnect();
+		}
+
+		this.socketLocation = io('/frontend/' + location);
+
+		this.socketLocation.on('update', data => {
+			this.observers.forEach(ob => ob.next(data));
+		});
 	}
 
-	// HANDLER
 	onUpdate() {
 		return this.observable;
 	}

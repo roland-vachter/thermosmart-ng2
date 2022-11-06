@@ -9,31 +9,41 @@ function isSocketAuthorized (socket) {
 }
 
 exports.init = function () {
-	const sensorIo = socket.io;
+	const io = socket.io.of('/sensor');
 
-	sensorIo.on('connection', (socket) => {
-		securityStatus.evts.on('status', data => {
-			socket.emit('update', {
-				security: {
-					status: data
-				}
+	securityStatus.evts.on('status', data => {
+		securityHealth.controller.getIdsByLocation(data.location).then(ids => {
+			ids.forEach(id => {
+				socket.io.of('/sensor/' + id).emit('update', {
+					security: {
+						status: data.status
+					}
+				});
 			});
 		});
+	});
 
-		securityStatus.evts.on('alarm', data => {
-			socket.emit('update', {
-				security: {
-					alarm: data
-				}
+	securityStatus.evts.on('alarm', data => {
+		securityHealth.controller.getIdsByLocation(data.location).then(ids => {
+			ids.forEach(id => {
+				socket.io.of('/sensor/' + id).emit('update', {
+					security: {
+						alarm: data.on
+					}
+				});
 			});
 		});
+	});
 
-		securityHealth.evts.on('camera-movement', () => {
-			socket.emit('update', {
-				security: {
-					cameraMovement: true
-				}
-			})
-		})
+	securityHealth.evts.on('camera-movement', () => {
+		securityHealth.controller.getIdsByLocation(data.location).then(ids => {
+			ids.forEach(id => {
+				socket.io.of('/sensor/' + id).emit('update', {
+					security: {
+						cameraMovement: true
+					}
+				});
+			});
+		});
 	});
 };

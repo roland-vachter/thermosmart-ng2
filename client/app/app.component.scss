@@ -44,16 +44,6 @@
 
 .smart-header {
 	width: 100%;
-
-	.dropdown-menu {
-		.dropdown-header {
-			font-size: 1.3rem;
-		}
-
-		li {
-			font-size: 0.9rem;
-		}
-	}
 }
 
 .smart-header--content {
@@ -63,7 +53,24 @@
     justify-content: space-between;
 }
 
-.logo-placeholder {
-	width: 25px;
+.smart-header--actions {
+	display: flex;
+	flex-direction: row;
+
+	> * {
+		margin-left: 10px;
+	}
+}
+
+.location-selector {
 	display: block;
+
+	.btn {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+
+	a {
+		cursor: pointer;
+	}
 }

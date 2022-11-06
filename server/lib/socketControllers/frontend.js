@@ -15,20 +15,21 @@ const config = require('../services/config');
 const Temperature = require('../models/Temperature');
 const HeatingDefaultPlan = require('../models/HeatingDefaultPlan');
 const HeatingPlanOverrides = require('../models/HeatingPlanOverrides');
+const Location = require('../models/Location');
 
 exports.init = function () {
 	const io = socket.io.of('/frontend');
 
-	const recalculateHeatingDuration = () => {
+	const recalculateHeatingDuration = (location) => {
 		Promise.all([
 			statisticsService
-				.getStatisticsForToday()
+				.getStatisticsForToday(location)
 		]).then(results => {
 			const [
 				statisticsForToday
 			] = results;
 
-			io.emit('update', {
+			socket.io.of('/frontend/' + location).emit('update', {
 				statisticsForToday: statisticsForToday
 			});
 		});
@@ -43,21 +44,21 @@ exports.init = function () {
 	});
 
 	insideConditions.evts.on('change', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			sensor: data
 		});
 	});
 
 	heatingEvts.on('changeHeating', data => {
-		io.emit('update', {
-			isHeatingOn: data
+		socket.io.of('/frontend/' + data.location).emit('update', {
+			isHeatingOn: data.isOn
 		});
 
 		recalculateHeatingDuration();
 	});
 
 	heatingEvts.on('changeHeatingPower', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			heatingPower: {
 				status: data.poweredOn,
 				until: data.until
@@ -72,20 +73,21 @@ exports.init = function () {
 	});
 
 	config.evts.on('change', data => {
-		io.emit('update', {
-			config: data
+		socket.io.of('/frontend/' + data.location).emit('update', {
+			config: data.config
 		});
 	});
 
 	targetTempService.evts.on('change', data => {
-		io.emit('update', {
-			targetTempId: data.id
+		socket.io.of('/frontend/' + data.location).emit('update', {
+			targetTempId: data.targetTemp.id
 		})
 	});
 
-	Temperature.evts.on('change', ids => {
-		if (!(ids instanceof Array)) {
-			ids = [ids];
+	Temperature.evts.on('change', data => {
+		let ids = data.ids;
+		if (!(data.ids instanceof Array)) {
+			ids = [data.ids];
 		}
 
 		Temperature.find({
@@ -93,27 +95,36 @@ exports.init = function () {
 				$in: ids
 			}
 		}).exec().then(temps => {
-			io.emit('update', {
-				temperatures: temps
+			socket.io.of('/frontend/' + data.location).emit('update', {
+				temperatures: temps.map(t => ({
+					...t,
+					value: t.values?.find(v => v.location === location)?.value || t.defaultValue,
+					values: null
+				}))
 			});
 		});
 	});
 
-	HeatingDefaultPlan.evts.on('change', defaultPlan => {
-		io.emit('update', {
-			heatingDefaultPlans: [defaultPlan]
+	HeatingDefaultPlan.evts.on('change', data => {
+		socket.io.of('/frontend/' + data.location).emit('update', {
+			heatingDefaultPlans: [{
+				...data.defaultPlan,
+				plan: data.defaultPlan.plans?.find(p => p.location === location)?.plan || data.defaultPlan.defaultPlan,
+				plans: null
+			}]
 		});
 	});
 
-	HeatingPlanOverrides.evts.on('change', () => {
+	HeatingPlanOverrides.evts.on('change', data => {
 		HeatingPlanOverrides
 			.find()
 			.sort({
-				date: 1
+				date: 1,
+				location
 			})
 			.exec()
 			.then(planOverrides => {
-				io.emit('update', {
+				socket.io.of('/frontend/' + data.location).emit('update', {
 					HeatingPlanOverrides: planOverrides
 				})
 			});
@@ -121,74 +132,78 @@ exports.init = function () {
 
 
 	setInterval(() => {
-		if (heatingService.isHeatingOn()) {
-			recalculateHeatingDuration();
-		}
+		Location.find().lean().exec().then(locations => {
+			locations.forEach(l => {
+				if (heatingService.isHeatingOn(l._id)) {
+					recalculateHeatingDuration(l._id);
+				}
+			});
+		});
 	}, 5 * 60 * 1000);
 
 
 
 	// security
 	securityStatus.evts.on('status', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			security: {
-				status: data
+				status: data.status
 			}
 		});
 	});
 
 	securityStatus.evts.on('alarm', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			security: {
-				alarm: data
+				alarm: data.on
 			}
 		});
 	});
 
 	securityStatus.evts.on('movement', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			security: {
-				movement: data
+				movement: true
 			}
 		});
 	});
 
 	securityStatus.evts.on('alarmTriggeredCount', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			security: {
-				alarmTriggeredCount: data
+				alarmTriggeredCount: data.count
 			}
 		})
 	});
 
 	securityHealth.evts.on('camera-health', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			security: {
-				cameraHealth: data
+				cameraHealth: data.health
 			}
 		})
 	});
 
 	securityHealth.evts.on('controller-health', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			security: {
-				controllerHealth: data
+				controllerHealth: data.health
 			}
 		})
 	});
 
 	securityHealth.evts.on('keypad-health', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			security: {
-				keypadHealth: data
+				keypadHealth: data.health
 			}
 		})
 	});
 
 	securityHealth.evts.on('motion-sensor-health', data => {
-		io.emit('update', {
+		socket.io.of('/frontend/' + data.location).emit('update', {
 			security: {
-				motionSensorHealth: data
+				motionSensorHealth: data.health
 			}
 		})
 	});

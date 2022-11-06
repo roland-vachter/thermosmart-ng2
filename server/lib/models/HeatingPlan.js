@@ -17,7 +17,7 @@ const heatingPlanSchema = new Schema({
 		startHour: Number,
 		startMinute: Number,
 		temp: {
-			type: String,
+			type: Number,
 			ref: 'Temperature'
 		}
 	}],

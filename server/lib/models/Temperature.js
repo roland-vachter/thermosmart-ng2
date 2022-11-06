@@ -14,7 +14,16 @@ const temperatureSchema = new Schema({
 	},
 	iconClass: String,
 	color: String,
-	value: Number
+	defaultValue: Number,
+	values: [{
+		value: Number,
+		location: {
+			type: Number,
+			ref: 'Location'
+		}
+	}]
+}, {
+	usePushEach: true
 });
 
 temperatureSchema.index({name: 1});
@@ -23,7 +32,10 @@ temperatureSchema.set('versionKey', false);
 module.exports = mongoose.model('Temperature', temperatureSchema);
 
 module.exports.evts = evts;
-module.exports.triggerChange = function (ids) {
-	console.log('temp change triggered', ids);
-	evts.emit('change', ids);
+module.exports.triggerChange = function (ids, location) {
+	console.log('temp change triggered', ids, 'for location', location);
+	evts.emit('change', {
+		ids,
+		location
+	});
 };

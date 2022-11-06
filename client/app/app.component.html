@@ -1,39 +1,54 @@
-<div class="navbar navbar-light navbar-expand-xl smart-navbar">
-	<div class="container">
-		<div class="smart-header">
-			<div class="smart-header--content">
-				<span class="logo-placeholder"></span>
+<ng-container *ngIf="user && locationService.getSelectedLocation()">
+	<div class="navbar navbar-light navbar-expand-xl smart-navbar">
+		<div class="container">
+			<div class="smart-header">
+				<div class="smart-header--content">
+					<div class="logo">
+						SmartHome
+					</div>
 
-				<div class="logo">
-					SmartHome
+					<div class="smart-header--actions">
+						<span class="location-selector" *ngIf="user.locations.length > 1">
+							<div class="btn-group" dropdown>
+								<button id="button-basic" dropdownToggle type="button" class="btn btn-secondary dropdown-toggle" aria-controls="dropdown-basic">
+									{{ locationService.getSelectedLocation().name }}
+								</button>
+								<ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+									<li role="menuitem" *ngFor="let location of user.locations">
+										<a class="dropdown-item" (click)="changeLocation(location)">{{ location.name }}</a>
+									</li>
+								</ul>
+							</div>
+						</span>
+
+						<div class="smart-refresh in-progress" [ngClass]="{'color-gray': updateStatus === 'fresh', 'color-orange': updateStatus === 'idle', 'color-red': updateStatus === 'outdated', 'smart-spin': refreshInProgress}" (click)="refresh(true)"></div>
+					</div>
 				</div>
-
-				<div class="smart-refresh in-progress" [ngClass]="{'color-gray': updateStatus === 'fresh', 'color-orange': updateStatus === 'idle', 'color-red': updateStatus === 'outdated', 'smart-spin': refreshInProgress}" (click)="refresh(true)"></div>
 			</div>
 		</div>
 	</div>
-</div>
 
-<div class="mainContent container">
-	<div class="row">
-		<div class="col-md-6 col-12">
-			<security class="align"></security>
+	<div class="mainContent container">
+		<div class="row">
+			<div class="col-md col-12" *ngIf="hasFeature('security')">
+				<security class="align"></security>
+			</div>
+
+			<div class="col-md col-12" *ngIf="hasFeature('heating')">
+				<thermo-heating-status class="align"></thermo-heating-status>
+			</div>
 		</div>
 
-		<div class="col-md-6 col-12">
-			<thermo-heating-status class="align"></thermo-heating-status>
+		<div class="row" *ngIf="hasFeature('heating')">
+			<div class="col-12">
+				<thermo-sensor-list></thermo-sensor-list>
+			</div>
+		</div>
+
+		<div class="row" *ngIf="hasFeature('heating')">
+			<div class="col-12">
+				<thermo-heating-current-plan></thermo-heating-current-plan>
+			</div>
 		</div>
 	</div>
-
-	<div class="row">
-		<div class="col-12">
-			<thermo-sensor-list></thermo-sensor-list>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-12">
-			<thermo-heating-current-plan></thermo-heating-current-plan>
-		</div>
-	</div>
-</div>
+</ng-container>

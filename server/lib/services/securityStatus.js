@@ -4,6 +4,7 @@ const evts = new EventEmitter();
 const pushNotifications = require('./pushNotifications');
 const SecurityMovementHistory = require('../models/SecurityMovementHistory');
 const SecurityArmingHistory = require('../models/SecurityArmingHistory');
+const Location = require('../models/Location');
 
 const STATUSES = {
 	DISARMED: 'disarmed',
@@ -13,126 +14,164 @@ const STATUSES = {
 	ALARM: 'alarm'
 };
 const ARMED_STATUSES = [STATUSES.ARMED, STATUSES.PREALARM, STATUSES.ALARM];
-let status = STATUSES.DISARMED;
-let timeout;
-let alarmTriggeredCount = 0;
-let lastArmedAt = null;
-let lastMovement = null;
+const securityByLocation = {};
+const defaultData = {
+	status: STATUSES.DISARMED,
+	timeout: null,
+	alarmTriggeredCount: 0,
+	lastArmedAt: null,
+	lastMovement: null
+};
 
 exports.evts = evts;
-exports.getStatus = () => status;
+exports.getStatus = (location) => {
+	return securityByLocation[location] && securityByLocation[location].status;
+}
 
-SecurityArmingHistory
-	.findOne()
-	.sort({
-		datetime: -1
-	})
+Location
+	.find()
 	.exec()
-	.then((result) => {
-		if (result && ARMED_STATUSES.indexOf(result.status) !== -1) {
-			if (status !== STATUSES.ARMED) {
-				changeStatus(STATUSES.ARMED);
-			} else {
-				status = STATUSES.ARMED;
-			}
-		}
+	.then(locations => {
+		locations.forEach(l => {
+			securityByLocation[l.id] = { ...defaultData };
+			SecurityArmingHistory
+				.findOne({
+					location: l._id
+				})
+				.sort({
+					datetime: -1
+				})
+				.exec()
+				.then((result) => {
+					if (result && ARMED_STATUSES.indexOf(result.status) !== -1) {
+						if (securityByLocation[l.id].status !== STATUSES.ARMED) {
+							changeStatus(l.id, STATUSES.ARMED);
+						} else {
+							securityByLocation[l.id].status = STATUSES.ARMED;
+						}
+					}
+				});
+
+			Promise.resolve([
+				SecurityMovementHistory
+					.findOne({
+						location: l._id
+					})
+					.sort({
+						datetime: -1
+					})
+					.exec(),
+				SecurityArmingHistory
+					.findOne({
+						status: 'arming',
+						location: l._id
+					})
+					.sort({
+						datetime: -1
+					})
+					.exec()
+			]).then(([movementHistory, lastArmed]) => {
+				securityByLocation[l._id].lastArmedAt = new Date(lastArmed.datetime);
+				securityByLocation[l._id].lastMovement = new Date(movementHistory.datetime);
+
+				SecurityArmingHistory
+					.count({
+						status: 'alarm',
+						location: l._id,
+						datetime: {
+							$gt: lastArmed.datetime
+						}
+					})
+					.exec()
+					.then(triggeredTimes => {
+						securityByLocation[l._id].alarmTriggeredCount = triggeredTimes;
+					});
+			});
+		});
 	});
 
-Promise.resolve([
-	SecurityMovementHistory
-		.findOne()
-		.sort({
-			datetime: -1
-		})
-		.exec(),
-	SecurityArmingHistory
-		.findOne({
-			status: 'arming'
-		})
-		.sort({
-			datetime: -1
-		})
-		.exec()
-]).then(([movementHistory, lastArmed]) => {
-	lastArmedAt = new Date(lastArmed.datetime);
-	lastMovement = new Date(movementHistory.datetime);
-
-	SecurityArmingHistory
-		.count({
-			status: 'alarm',
-			datetime: {
-				$gt: lastArmed.datetime
-			}
-		})
-		.exec()
-		.then(triggeredTimes => {
-			alarmTriggeredCount = triggeredTimes;
-		});
-});
-
-const changeStatus = (newStatus) => {
-	status = newStatus;
-	evts.emit('status', status);
+const changeStatus = (location, newStatus) => {
+	securityByLocation[location].status = newStatus;
+	evts.emit('status', {
+		status: securityByLocation[location].status,
+		location
+	});
 
 	new SecurityArmingHistory({
 		datetime: new Date(),
+		location,
 		status: newStatus
 	}).save();
 };
 
-const arm = () => {
-	clearTimeout(timeout);
-	changeStatus(STATUSES.ARMING);
+const arm = (location) => {
+	clearTimeout(securityByLocation[location].timeout);
+	changeStatus(location, STATUSES.ARMING);
 
-	timeout = setTimeout(() => {
-		changeStatus(STATUSES.ARMED);
-		lastArmedAt = new Date();
+	securityByLocation[location].timeout = setTimeout(() => {
+		changeStatus(location, STATUSES.ARMED);
+		securityByLocation[location].lastArmedAt = new Date();
 	}, 30 * 1000);
 };
 
-const disarm = () => {
-	clearTimeout(timeout);
-	alarmTriggeredCount = 0;
-	evts.emit('alarmTriggeredCount', alarmTriggeredCount);
+const disarm = (location) => {
+	clearTimeout(securityByLocation[location].timeout);
+	securityByLocation[location].alarmTriggeredCount = 0;
+	evts.emit('alarmTriggeredCount', {
+		location,
+		count: securityByLocation[location].alarmTriggeredCount
+	});
 
-	changeStatus(STATUSES.DISARMED);
+	changeStatus(location, STATUSES.DISARMED);
 };
 
-exports.toggleArm = () => {
-	if (status === STATUSES.DISARMED) {
-		arm();
+exports.toggleArm = (location) => {
+	if (securityByLocation[location].status === STATUSES.DISARMED) {
+		arm(location);
 	} else {
-		disarm();
+		disarm(location);
 	}
 };
 
-exports.movementDetected = () => {
-	evts.emit('movement', true);
-	lastMovement = new Date();
+exports.movementDetected = (location) => {
+	evts.emit('movement', {
+		location
+	});
+	securityByLocation[location].lastMovement = new Date();
 	new SecurityMovementHistory({
+		location,
 		datetime: new Date()
 	}).save();
 
-	if (status === STATUSES.ARMED && ARMED_STATUSES.includes(status)) {
-		changeStatus(STATUSES.PREALARM);
+	if (securityByLocation[location].status === STATUSES.ARMED && ARMED_STATUSES.includes(securityByLocation[location].status)) {
+		changeStatus(location, STATUSES.PREALARM);
 
-		clearTimeout(timeout);
-		timeout = setTimeout(() => {
-			evts.emit('alarm', true);
+		clearTimeout(securityByLocation[location].timeout);
+		securityByLocation[location].timeout = setTimeout(() => {
+			evts.emit('alarm', {
+				location,
+				on: true
+			});
 			pushNotifications.send(['security'], 'ThermoSmart - Security', 'Alarm triggered!');
-			changeStatus(STATUSES.ALARM);
-			alarmTriggeredCount++;
-			evts.emit('alarmTriggeredCount', alarmTriggeredCount);
+			changeStatus(location, STATUSES.ALARM);
+			securityByLocation[location].alarmTriggeredCount++;
+			evts.emit('alarmTriggeredCount', {
+				location,
+				count: securityByLocation[location].alarmTriggeredCount
+			});
 
-			clearTimeout(timeout);
+			clearTimeout(securityByLocation[location].timeout);
 			timeout = setTimeout(() => {
-				evts.emit('alarm', 'false');
-				changeStatus(STATUSES.ARMED);
+				evts.emit('alarm', {
+					location,
+					on: false
+				});
+				changeStatus(location, STATUSES.ARMED);
 			}, 60 * 1000);
 		}, 15 * 1000);
 	}
 };
 
-exports.getLastMovementDate = () => lastMovement;
-exports.getLastArmedDate = () => lastArmedAt;
-exports.getAlarmTriggeredCount = () => alarmTriggeredCount;
+exports.getLastMovementDate = (location) => securityByLocation[location].lastMovement;
+exports.getLastArmedDate = (location) => securityByLocation[location].lastArmedAt;
+exports.getAlarmTriggeredCount = (location) => securityByLocation[location].alarmTriggeredCount;

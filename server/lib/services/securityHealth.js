@@ -4,30 +4,40 @@ const SecurityCameras = require('../models/SecurityCameras');
 const SecurityControllers = require('../models/SecurityControllers');
 const configService = require('../services/config');
 
-let securityCameras = null;
-let securityControllers = null;
-let motionSensors = {};
+let securityCamerasByLocations = {};
+let securityControllersByLocations = {};
+let motionSensorsByLocations = {};
 
 const HEALTH = {
 	OK: 'OK',
 	PARTIAL: 'PARTIAL',
 	FAIL: 'FAIL'
 }
-let cameraHealth = HEALTH.FAIL;
-let controllerHealth = HEALTH.FAIL;
-let keypadHealth = HEALTH.FAIL;
-let lastKeypadHealthUpdate = null;
-let motionSensorHealth = HEALTH.FAIL;
+let cameraHealthByLocation = {};
+let controllerHealthByLocation = {};
+let keypadHealthByLocation = {};
+let lastKeypadHealthUpdateByLocation = {};
+let motionSensorHealthByLocation = {};
 
 SecurityCameras
 	.find()
 	.exec()
 	.then(result => {
-		securityCameras = result.map(r => ({
-			ip: r.ip,
-			healthy: false,
-			lastHealthUpdate: null
-		}));
+		securityCamerasByLocations = {};
+
+		result.forEach(r => {
+			if (!securityCamerasByLocations[r.location]) {
+				securityCamerasByLocations[r.location] = [];
+			}
+
+			securityCamerasByLocations[r.location].push({
+				ip: r.ip,
+				location: r.location,
+				healthy: false,
+				lastHealthUpdate: null
+			});
+		});
+
 		updateCameraHealth();
 	});
 
@@ -35,20 +45,30 @@ SecurityControllers
 	.find()
 	.exec()
 	.then(result => {
-		securityControllers = result.map(r => ({
-			id: r.controllerid,
-			healthy: false,
-			lastHealthUpdate: null
-		}));
+		securityControllersByLocations = {};
+
+		result.forEach(r => {
+			if (!securityControllersByLocations[r.location]) {
+				securityControllersByLocations[r.location] = [];
+			}
+
+			securityControllersByLocations[r.location].push({
+				id: r.controllerid,
+				location: r.location,
+				healthy: false,
+				lastHealthUpdate: null
+			});
+		});
+
 		updateControllerHealth();
 	});
 
 
-const updateCameraHealth = () => {
+const updateCameraHealthByLocation = (locationId) => {
 	let allHealthy = true;
 	let noneHealthy = true;
 
-	securityCameras.forEach(c => {
+	securityCamerasByLocations[locationId].forEach(c => {
 		if (c.healthy) {
 			noneHealthy = false;
 		} else {
@@ -57,173 +77,227 @@ const updateCameraHealth = () => {
 	});
 
 	if (allHealthy) {
-		cameraHealth = HEALTH.OK;
+		cameraHealthByLocation[locationId] = HEALTH.OK;
 	} else if (noneHealthy) {
-		cameraHealth = HEALTH.FAIL;
+		cameraHealthByLocation[locationId] = HEALTH.FAIL;
 	} else {
-		cameraHealth = HEALTH.PARTIAL;
+		cameraHealthByLocation[locationId] = HEALTH.PARTIAL;
 	}
 
-	evts.emit('camera-health', cameraHealth);
+	evts.emit('camera-health', {
+		health: cameraHealthByLocation[locationId],
+		location: locationId
+	});
+};
+
+const updateCameraHealth = () => {
+	Object.keys(securityCamerasByLocations).forEach(l => updateCameraHealthByLocation(l));
+};
+
+const updateControllerHealthByLocation = (locationId) => {
+	let allHealthy = true;
+	let noneHealthy = true;
+
+	securityControllersByLocations[locationId].forEach(c => {
+		if (c.healthy) {
+			noneHealthy = false;
+		} else {
+			allHealthy = false;
+		}
+	});
+
+	if (allHealthy) {
+		controllerHealthByLocation[locationId] = HEALTH.OK;
+	} else if (noneHealthy) {
+		controllerHealthByLocation[locationId] = HEALTH.FAIL;
+	} else {
+		controllerHealthByLocation[locationId] = HEALTH.PARTIAL;
+	}
+
+	console.log(securityControllersByLocations[locationId], controllerHealthByLocation[locationId]);
+
+	evts.emit('controller-health', {
+		health: controllerHealthByLocation[locationId],
+		location: locationId
+	});
 };
 
 const updateControllerHealth = () => {
-	let allHealthy = true;
-	let noneHealthy = true;
-
-	securityControllers.forEach(c => {
-		if (c.healthy) {
-			noneHealthy = false;
-		} else {
-			allHealthy = false;
-		}
-	});
-
-	if (allHealthy) {
-		controllerHealth = HEALTH.OK;
-	} else if (noneHealthy) {
-		controllerHealth = HEALTH.FAIL;
-	} else {
-		controllerHealth = HEALTH.PARTIAL;
-	}
-
-	evts.emit('controller-health', controllerHealth);
+	Object.keys(securityControllersByLocations).forEach(l => updateControllerHealthByLocation(l));
 };
 
-const updateMotionSensorHealth = async () => {
-	const motionSensorCountObj = await configService.get('motionSensorCount');
+const updateMotionSensorHealth = async (locationId) => {
+	const motionSensorCountObj = await configService.get('motionSensorCount', locationId);
 	const motionSensorCount = motionSensorCountObj ? motionSensorCountObj.value : 0;
 	let allHealthy = true;
 	let noneHealthy = true;
 
-	Object.keys(motionSensors).forEach(id => {
-		if (motionSensors[id].health) {
+	Object.keys(motionSensorsByLocations[locationId]).forEach(id => {
+		if (motionSensorsByLocations[locationId][id].health) {
 			noneHealthy = false;
 		} else {
 			allHealthy = false;
 		}
 	});
 
-	if (allHealthy && Object.keys(motionSensors).length === motionSensorCount) {
-		motionSensorHealth = HEALTH.OK;
+	if (allHealthy && Object.keys(motionSensorsByLocations[locationId]).length === motionSensorCount) {
+		motionSensorHealthByLocation[locationId] = HEALTH.OK;
 	} else if (noneHealthy) {
-		motionSensorHealth = HEALTH.FAIL;
+		motionSensorHealthByLocation[locationId] = HEALTH.FAIL;
 	} else {
-		motionSensorHealth = HEALTH.PARTIAL;
+		motionSensorHealthByLocation[locationId] = HEALTH.PARTIAL;
 	}
 
-	evts.emit('motion-sensor-health', motionSensorHealth);
+	evts.emit('motion-sensor-health', {
+		health: motionSensorHealthByLocation[locationId],
+		location: locationId
+	});
 };
 
-const updateKeypadHealth = () => {
-	evts.emit('keypad-health', keypadHealth);
+const updateKeypadHealth = (locationId) => {
+	evts.emit('keypad-health', {
+		health: keypadHealthByLocation[locationId],
+		location: locationId
+	});
 };
 
 setInterval(() => {
-	if (securityCameras) {
-		let cameraMadeUpdate = false;
-		securityCameras.forEach(c => {
-			if (c.lastHealthUpdate !== null && Date.now() - c.lastHealthUpdate > 180000) {
-				c.healthy = false;
-				cameraMadeUpdate = true;
+	if (securityCamerasByLocations) {
+		Object.keys(securityCamerasByLocations).forEach(l => {
+			if (securityControllersByLocations[l]) {
+				let cameraMadeUpdate = false;
+
+				securityCamerasByLocations[l].forEach(c => {
+					if (c.lastHealthUpdate !== null && Date.now() - c.lastHealthUpdate > 180000) {
+						c.healthy = false;
+						cameraMadeUpdate = true;
+					}
+				});
+
+				if (cameraMadeUpdate) {
+					updateCameraHealthByLocation(l);
+				}
 			}
 		});
-		if (cameraMadeUpdate) {
-			updateCameraHealth();
-		}
 	}
 
-	if (securityControllers) {
-		let controllerMadeUpdate = false;
-		securityControllers.forEach(c => {
-			if (c.lastHealthUpdate !== null && Date.now() - c.lastHealthUpdate > 180000) {
-				c.healthy = false;
-				controllerMadeUpdate = true;
+	if (securityControllersByLocations) {
+		Object.keys(securityControllersByLocations).forEach(l => {
+			if (securityControllersByLocations[l]) {
+				let controllerMadeUpdate = false;
+
+				securityControllersByLocations[l].forEach(c => {
+					if (c.lastHealthUpdate !== null && Date.now() - c.lastHealthUpdate > 180000) {
+						c.healthy = false;
+						controllerMadeUpdate = true;
+					}
+				});
+
+				if (controllerMadeUpdate) {
+					updateControllerHealthByLocation(l);
+				}
 			}
 		});
-		if (controllerMadeUpdate) {
-			updateControllerHealth();
-		}
 	}
 
-	if (lastKeypadHealthUpdate !== null && Date.now() - lastKeypadHealthUpdate > 180000) {
-		keypadHealth = HEALTH.FAIL;
-		updateKeypadHealth();
-	}
-
-	if (motionSensors) {
-		let motionSensorMadeUpdate = false;
-		Object.keys(motionSensors).forEach(id => {
-			if (motionSensors[id].lastHealthUpdate !== null && Date.now() - motionSensors[id].lastHealthUpdate > 180000) {
-				motionSensors[id].health = false;
-				motionSensorMadeUpdate = true;
+	if (securityControllersByLocations) {
+		Object.keys(securityControllersByLocations).forEach(l => {
+			if (securityControllersByLocations[l]) {
+				securityControllersByLocations[l].forEach(c => {
+					if (lastKeypadHealthUpdateByLocation[l] !== null && Date.now() - lastKeypadHealthUpdateByLocation[l] > 180000) {
+						keypadHealthByLocation[l] = HEALTH.FAIL;
+						updateKeypadHealth(l);
+					}
+				});
 			}
 		});
-		if (motionSensorMadeUpdate) {
-			updateMotionSensorHealth();
-		}
+	}
+
+	if (motionSensorsByLocations) {
+		Object.keys(securityControllersByLocations).forEach(l => {
+			let motionSensorMadeUpdate = false;
+
+			if (motionSensorsByLocations[l]) {
+				Object.keys(motionSensorsByLocations[l]).forEach(id => {
+					if (motionSensorsByLocations[l][id].lastHealthUpdate !== null && Date.now() - motionSensorsByLocations[l][id].lastHealthUpdate > 180000) {
+						motionSensorsByLocations[l][id].health = false;
+						motionSensorMadeUpdate = true;
+					}
+				});
+
+				if (motionSensorMadeUpdate) {
+					updateMotionSensorHealth(l);
+				}
+			}
+		});
 	}
 }, 60000);
 
 exports.evts = evts;
 
 exports.camera = {
-	ipExists: async (ip) => {
-		if (securityCameras && securityCameras.find(c => c.ip === ip)) {
+	ipExists: async (ip, location) => {
+		if (securityCamerasByLocations[location] && securityCamerasByLocations[location].find(c => c.ip === ip)) {
 			return true;
 		}
 
 		return SecurityCameras
-			.find({ ip })
+			.find({ ip, location })
 			.exec()
 			.then(results => {
 				return !!results.length;
 			});
 	},
-	list: async () => {
-		if (securityCameras) {
-			return securityCameras;
+	list: async (location) => {
+		if (securityCamerasByLocations[location]) {
+			return securityCamerasByLocations[location];
 		} else {
 			return SecurityCameras
-				.find()
+				.find({
+					location
+				})
 				.exec()
 				.then(results => {
 					return results;
 				});
 		}
 	},
-	listIPs: async () => {
-		if (securityCameras) {
-			return securityCameras.map(c => c.ip);
+	listIPs: async (location) => {
+		if (securityCamerasByLocations) {
+			return securityCamerasByLocations[location].map(c => c.ip);
 		} else {
 			return SecurityCameras
-				.find()
+				.find({
+					location
+				})
 				.exec()
 				.then(results => {
 					return results.map(r => r.ip);
 				});
 		}
 	},
-	add: (ip) => {
+	add: (ip, location) => {
 		return new Promise((resolve, reject) => {
 			new SecurityCameras({
-				ip
+				ip,
+				location
 			}).save(err => {
 				if (err) {
 					return reject(err);
 				}
 
-				securityCameras.push({
+				securityCamerasByLocations[location].push({
 					ip,
+					location,
 					healthy: false,
 					lastHealthUpdate: null
 				});
-				updateCameraHealth();
+				updateCameraHealthByLocation(location);
 				resolve();
 			});
 		});
 	},
-	remove: (ip) => {
+	remove: (ip, location) => {
 		return new Promise((resolve, reject) => {
 			SecurityCameras
 				.deleteOne({
@@ -234,32 +308,51 @@ exports.camera = {
 						return reject(err);
 					}
 
-					if (securityCameras.find(c => c.ip === ip)) {
-						securityCameras.splice(securityCameras.indexOf(ip), 1);
+					if (securityCamerasByLocations[location].find(c => c.ip === ip)) {
+						securityCamerasByLocations[location].splice(securityCamerasByLocations[location].indexOf(ip), 1);
 					}
-					updateCameraHealth();
+					updateCameraHealthByLocation(location);
 					resolve();
 				});
 		});
 	},
-	reportHealth: (ip, health) => {
-		const camera = securityCameras.find(c => c.ip === ip);
+	reportHealth: async (id, ip, health) => {
+		id = parseInt(id, 10);
+
+		const securityControllerData = await SecurityControllers.findOne({
+			controllerid: id
+		}).exec();
+
+		if (!securityControllerData) {
+			throw new Error(`Security controller with ID ${id} is not found.`);
+		}
+
+		const camera = securityCamerasByLocations[securityControllerData.location].find(c => c.ip === ip);
 		if (camera) {
 			camera.healthy = health;
 			camera.lastHealthUpdate = Date.now();
 		}
-		updateCameraHealth();
+		updateCameraHealthByLocation(securityControllerData.location);
 	},
-	getHealth: () => cameraHealth,
-	reportMovement: () => {
-		evts.emit('camera-movement');
+	getHealth: (location) => cameraHealthByLocation[location],
+	reportMovement: (id, location) => {
+		evts.emit('camera-movement', {
+			location
+		});
 	}
 }
 
 
 exports.controller = {
 	idExists: async (id) => {
-		if (securityControllers && securityControllers.find(c => c.id === id)) {
+		let found = false;
+		Object.keys(securityControllersByLocations).forEach(l => {
+			if (securityControllersByLocations[l] && securityControllersByLocations[l].find(c => c.id === id)) {
+				found = true;
+			}
+		});
+
+		if (found) {
 			return true;
 		}
 
@@ -270,41 +363,89 @@ exports.controller = {
 				return !!results.length;
 			});
 	},
-	list: async () => {
-		if (securityControllers) {
-			return securityControllers;
+	getLocationById: async (id) => {
+		id = parseInt(id, 10);
+
+		let location;
+		Object.keys(securityControllersByLocations).forEach(l => {
+			if (securityControllersByLocations[l] && securityControllersByLocations[l].find(c => c.id === id)) {
+				location = l;
+			}
+		});
+
+		if (location) {
+			return location;
+		}
+
+		return SecurityControllers
+			.findOne({ controllerid: id })
+			.lean()
+			.exec()
+			.then(result => {
+				return result.location;
+			});
+	},
+	getIdsByLocation: async (location) => {
+		if (typeof location === 'string') {
+			location = parseInt(location, 10);
+		}
+
+		if (securityControllersByLocations[location]) {
+			return securityControllersByLocations[location].map(sc => sc.id);
+		}
+
+		return SecurityControllers
+			.find({
+				location
+			})
+			.lean()
+			.exec()
+			.then(result => result.controllerid)
+	},
+	list: async (location) => {
+		if (securityControllersByLocations[location]) {
+			return securityControllersByLocations[location];
 		} else {
 			return SecurityControllers
-				.find()
+				.find({
+					location
+				})
+				.lean()
 				.exec()
 				.then(results => {
 					return results.map(r => ({
 						...r,
-						id: controllerid
+						id: r.controllerid
 					}));
 				});
 		}
 	},
-	add: (id) => {
+	add: (id, location) => {
+		id = parseInt(id, 10);
+
 		return new Promise((resolve, reject) => {
 			new SecurityControllers({
-				controllerid: id
+				controllerid: id,
+				location
 			}).save(err => {
 				if (err) {
 					return reject(err);
 				}
 
-				securityControllers.push({
+				securityControllersByLocations[location].push({
 					id,
+					location,
 					healthy: false,
 					lastHealthUpdate: null
 				});
-				updateControllerHealth();
+				updateControllerHealthByLocation(location);
 				resolve();
 			});
 		});
 	},
 	remove: (id) => {
+		id = parseInt(id, 10);
+
 		return new Promise((resolve, reject) => {
 			SecurityControllers
 				.deleteOne({
@@ -315,43 +456,68 @@ exports.controller = {
 						return reject(err);
 					}
 
-					if (securityControllers.find(c => c.id === id)) {
-						console.log('removed!');
-						securityControllers.splice(securityControllers.indexOf(id), 1);
-					}
-					updateControllerHealth();
+					Object.keys(securityCamerasByLocations).forEach(l => {
+						if (securityControllersByLocations[l].find(c => c.id === id)) {
+							securityControllersByLocations[l].splice(securityControllersByLocations[l].findIndex(c => c.id === id), 1);
+						}
+						updateControllerHealthByLocation(l);
+					});
 					resolve();
 				});
 		});
 	},
-	reportHealth: (id) => {
-		const controller = securityControllers.find(c => c.id === id);
+	reportHealth: async (id) => {
+		id = parseInt(id, 10);
+		const securityControllerData = await SecurityControllers.findOne({
+			controllerid: id
+		}).exec();
+
+		const controller = securityControllersByLocations[securityControllerData.location]?.find(c => c.id === id);
+		console.log(securityControllerData.location, securityControllersByLocations[securityControllerData.location], controller);
 		if (controller) {
 			controller.healthy = true;
 			controller.lastHealthUpdate = Date.now();
 		}
-		updateControllerHealth();
+		updateControllerHealthByLocation(securityControllerData.location);
 	},
-	getHealth: () => controllerHealth
+	getHealth: (location) => controllerHealthByLocation[location]
 };
 
 
 exports.keypad = {
-	reportHealth: (health) => {
+	reportHealth: async (id, health) => {
+		id = parseInt(id, 10);
+		const securityControllerData = await SecurityControllers.findOne({
+			controllerid: id
+		}).exec();
+
+		if (!motionSensorsByLocations[securityControllerData.location]) {
+			motionSensorsByLocations[securityControllerData.location] = {};
+		}
+
 		keypadHealth = health ? HEALTH.OK : HEALTH.FAIL;
 		lastKeypadHealthUpdate = Date.now();
 		updateKeypadHealth();
 	},
-	getHealth: () => keypadHealth
+	getHealth: (location) => keypadHealthByLocation[location]
 };
 
 exports.motionSensor = {
-	reportHealth: (id, health) => {
-		motionSensors[id] = {
+	reportHealth: async (id, health) => {
+		const controllerId = id.toString().match('([0-9]+)(\.[0-9]+)?');
+		const securityControllerData = await SecurityControllers.findOne({
+			controllerid: parseInt(controllerId[1], 10)
+		}).exec();
+
+		if (!motionSensorsByLocations[securityControllerData.location]) {
+			motionSensorsByLocations[securityControllerData.location] = {};
+		}
+
+		motionSensorsByLocations[securityControllerData.location][id] = {
 			health,
 			lastHealthUpdate: Date.now()
 		};
-		updateMotionSensorHealth();
+		updateMotionSensorHealth(securityControllerData.location);
 	},
-	getHealth: () => motionSensorHealth
+	getHealth: (location) => motionSensorHealthByLocation[location]
 };

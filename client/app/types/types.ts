@@ -61,3 +61,9 @@ export enum ALERT_TYPE {
 	WARNING = 'warning',
 	ERROR = 'danger'
 }
+
+export interface Location {
+    _id: number;
+    name: string;
+    features: string[];
+}

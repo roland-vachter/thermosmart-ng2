@@ -14,9 +14,10 @@ const cors = require('cors');
 // generic
 router.post('/changeconfig', loginMiddleware, cors(), apiCtrl.changeConfig);
 router.get('/getconfig', loginMiddleware, cors(), apiCtrl.getConfig);
+router.get('/init', loginMiddleware, cors(), apiCtrl.init);
 
 // heating
-router.get('/init', loginMiddleware, cors(), heatingApiCtrl.init);
+router.get('/heating/init', loginMiddleware, cors(), heatingApiCtrl.init);
 router.post('/tempadjust', loginMiddleware, cors(), heatingApiCtrl.tempAdjust);
 router.post('/restartsensor', loginMiddleware, cors(), heatingApiCtrl.restartSensor);
 router.post('/togglesensorstatus', loginMiddleware, cors(), heatingApiCtrl.toggleSensorStatus);
@@ -44,7 +45,7 @@ router.post('/security/controller/remove', loginMiddleware, cors(), securityHeal
 router.get('/security/sensor/status', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.status);
 router.get('/security/sensor/togglearm', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.toggleArm);
 router.get('/security/sensor/movement', apiKeyMiddleware, cors(), securityStatusAndMovementApiCtrl.movement);
-router.get('/security/sensor/camera/ips', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.listApis);
+router.get('/security/sensor/camera/ips', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.listIps);
 router.get('/security/sensor/camera/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.reportHealth);
 router.get('/security/sensor/camera/movement', apiKeyMiddleware, cors(), securityHealthApiCtrl.camera.reportMovement);
 router.get('/security/sensor/controller/healthreport', apiKeyMiddleware, cors(), securityHealthApiCtrl.controller.reportHealth);

@@ -5,6 +5,15 @@ import { LoginStatusService } from './shared/login-status.service';
 import { ThermoDataStoreService } from './thermo/services/thermo-data-store.service';
 import * as moment from 'moment';
 import { Moment } from 'moment';
+import { ServerApiService } from './services/server-api.service';
+import { RefreshEventService } from './services/refresh-event.service';
+import { LocationService } from './services/location.service';
+import { Location } from './types/types';
+
+interface User {
+	email: string;
+	locations: Location[];
+}
 
 @Component({
 	selector: 'app-root',
@@ -19,6 +28,8 @@ export class AppComponent {
 	lastVisible = new Date();
 	lastLoginStatusCheck = new Date();
 
+	user: User;
+
 	@ViewChild(ThermoComponent)
 	public thermoComponent: ThermoComponent;
 
@@ -28,7 +39,10 @@ export class AppComponent {
 
 	constructor(
 		private loginStatusService: LoginStatusService,
-		private thermoDataStore: ThermoDataStoreService
+		private thermoDataStore: ThermoDataStoreService,
+		private serverApiService: ServerApiService,
+		private refreshEventService: RefreshEventService,
+		public locationService: LocationService
 	) {
 	}
 
@@ -64,8 +78,7 @@ export class AppComponent {
 
 	refresh (onDemand = false) {
 		this.checkLoginStatus(onDemand);
-		this.thermoDataStore.init();
-		this.securityComponent.refresh();
+		this.refreshEventService.trigger();
 
 		this.refreshInProgress = true;
 		setTimeout(() => {
@@ -94,5 +107,19 @@ export class AppComponent {
 				this.lastVisible = new Date();
 			}
 		}).bind(this));
+
+		this.serverApiService.init().subscribe(data => {
+			this.user = data.user;
+
+			this.changeLocation(this.user.locations[0]);
+		});
+	}
+
+	changeLocation (location: Location) {
+		this.locationService.updateLocation(location);
+	}
+
+	hasFeature(featureName: string) {
+		return this.locationService.getSelectedLocation().features.includes(featureName);
 	}
 }

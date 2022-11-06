@@ -8,6 +8,10 @@ import { FormsModule } from '@angular/forms';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AppComponent } from './app.component';
 import { LoginStatusService } from './shared/login-status.service';
+import { BsDropdownModule } from 'ngx-bootstrap';
+import { ServerApiService } from './services/server-api.service';
+import { RefreshEventService } from './services/refresh-event.service';
+import { LocationService } from './services/location.service';
 
 
 @NgModule({
@@ -17,6 +21,7 @@ import { LoginStatusService } from './shared/login-status.service';
 	imports: [
 		BrowserModule,
 		ModalModule.forRoot(),
+		BsDropdownModule.forRoot(),
 		FormsModule,
 		SharedModule,
 		ThermoModule,
@@ -24,7 +29,10 @@ import { LoginStatusService } from './shared/login-status.service';
 		PlantwateringModule
 	],
 	providers: [
-		LoginStatusService
+		LoginStatusService,
+		ServerApiService,
+		RefreshEventService,
+		LocationService
 	],
 	bootstrap: [AppComponent],
 	exports: [

@@ -1,3 +1,5 @@
+const Location = require('../models/Location');
+
 const OutsideConditionHistory = require('../models/OutsideConditionHistory');
 const outsideConditions = require('./outsideConditions');
 
@@ -22,29 +24,40 @@ outsideConditions.evts.on('change', values => {
 	}
 });
 
-heatingEvts.on('changeHeating', status => {
+heatingEvts.on('changeHeating', data => {
 	HeatingHistory
-		.findOne()
+		.findOne({
+			location: data.location
+		})
 		.sort({
 			datetime: -1
 		})
 		.exec()
 		.then((result) => {
-			if (!result || result.status !== status) {
+			if (!result || result.status !== data.isOn) {
 				new HeatingHistory({
 					datetime: new Date(),
-					status: status
+					location: data.location,
+					status: data.isOn
 				}).save();
 			}
 		});
 });
 
 
-function monitorTargetTemp () {
-	const target = targetTempService.get();
+function monitorTargetTemps () {
+	Location.find().exec().then(locations => {
+		locations.forEach(l => monitorTargetTempByLocation(l._id));
+	});
+}
+
+function monitorTargetTempByLocation (location) {
+	const target = targetTempService.get(location);
 	if (target) {
 		TargetTempHistory
-			.findOne()
+			.findOne({
+				location: location
+			})
 			.sort({
 				datetime: -1
 			})
@@ -53,17 +66,18 @@ function monitorTargetTemp () {
 				if (!result || result.t !== target.value) {
 					new TargetTempHistory({
 						datetime: new Date(),
+						location,
 						t: target.value
 					}).save();
 				}
 			});
 	}
 }
-monitorTargetTemp();
-setInterval(monitorTargetTemp, 60000);
+monitorTargetTemps();
+setInterval(monitorTargetTemps, 60000);
 
 
-async function calculateHeatingDuration (date) {
+async function calculateHeatingDuration (location, date) {
 	if (!date) {
 		date = new Date(moment().tz("Europe/Bucharest"));
 	}
@@ -73,7 +87,8 @@ async function calculateHeatingDuration (date) {
 			.findOne({
 				datetime: {
 					$lt: moment(date).tz("Europe/Bucharest").startOf('day')
-				}
+				},
+				location
 			})
 			.sort({
 				datetime: -1
@@ -84,7 +99,8 @@ async function calculateHeatingDuration (date) {
 				datetime: {
 					$gt: moment(date).tz("Europe/Bucharest").startOf('day'),
 					$lt: moment(date).tz("Europe/Bucharest").endOf('day')
-				}
+				},
+				location
 			})
 			.sort({
 				datetime: 1
@@ -126,7 +142,7 @@ async function calculateHeatingDuration (date) {
 	return Math.round(heatingDuration);
 }
 
-async function calculateAvgTargetTemp (date) {
+async function calculateAvgTargetTemp (location, date) {
 	if (!date) {
 		date = new Date(moment().tz("Europe/Bucharest"));
 	}
@@ -136,7 +152,8 @@ async function calculateAvgTargetTemp (date) {
 			.findOne({
 				datetime: {
 					$lt: new Date(moment(date).tz("Europe/Bucharest").startOf('day'))
-				}
+				},
+				location
 			})
 			.sort({
 				datetime: -1
@@ -147,7 +164,8 @@ async function calculateAvgTargetTemp (date) {
 				datetime: {
 					$gt: new Date(moment(date).tz("Europe/Bucharest").startOf('day')),
 					$lt: new Date(moment(date).tz("Europe/Bucharest").endOf('day'))
-				}
+				},
+				location
 			})
 			.sort({
 				datetime: 1
@@ -268,15 +286,22 @@ async function calculateAvgOutsideCondition (date) {
 }
 
 
-
-const saveStatisticsForADay = async () => {
+const saveStatisticsForADay = () => {
 	console.log('statistics save started');
 
+	Location.find().exec().then(locations => {
+		locations.forEach(l => saveStatisticsForADayByLocation(l._id));
+	});
+};
+
+const saveStatisticsForADayByLocation = async (location) => {
 	let startDate = null;
 
 	try {
 		const lastHeatingStatistic = await HeatingStatistics
-			.findOne()
+			.findOne({
+				location
+			})
 			.sort({
 				date: -1
 			})
@@ -286,7 +311,9 @@ const saveStatisticsForADay = async () => {
 			startDate = new Date(lastHeatingStatistic.date.getTime() + 24 * 60 * 60 * 1000);
 		} else {
 			const lastHeatingHistory = await HeatingHistory
-				.findOne()
+				.findOne({
+					location
+				})
 				.sort({
 					datetime: 1
 				})
@@ -310,20 +337,21 @@ const saveStatisticsForADay = async () => {
 		while (currentDate < todayStart) {
 			try {
 				const [heatingDuration, avgTargetTemp, avgOutsideCondition] = await Promise.all([
-					calculateHeatingDuration(currentDate),
-					calculateAvgTargetTemp(currentDate),
+					calculateHeatingDuration(location, currentDate),
+					calculateAvgTargetTemp(location, currentDate),
 					calculateAvgOutsideCondition(currentDate)
 				]);
 
 				await new HeatingStatistics({
 					date: new Date(currentDate.getTime() + 12 * 60 * 60 * 1000),
-					avgTargetTemp: avgTargetTemp,
+					avgTargetTemp: avgTargetTemp || null,
 					avgOutsideTemp: avgOutsideCondition.t,
 					avgOutsideHumi: avgOutsideCondition.h,
-					runningMinutes: heatingDuration
+					runningMinutes: heatingDuration,
+					location
 				}).save();
 			} catch (e) {
-				console.error('error while calculating statistics or saving it for date', date, e);
+				console.error('error while calculating statistics or saving it for date', e);
 			}
 
 			currentDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
@@ -335,29 +363,30 @@ const saveStatisticsForADay = async () => {
 
 
 
-exports.getStatisticsForToday = async () => {
-	const heatingDuration = await calculateHeatingDuration();
+exports.getStatisticsForToday = async (location) => {
+	const heatingDuration = await calculateHeatingDuration(location);
 
 	return {
 		heatingDuration
 	};
 };
 
-exports.getStatisticsByDay = async (dateStart, dateEnd) => {
+exports.getStatisticsByDay = async (location, dateStart, dateEnd) => {
 	const heatingStatistics = await HeatingStatistics
 		.find({
 			date: {
 				$gt: new Date(moment(dateStart).tz("Europe/Bucharest").startOf('day')),
 				$lt: new Date(moment(dateEnd).tz("Europe/Bucharest").endOf('day'))
-			}
+			},
+			location
 		})
 		.exec();
 
 	if (new Date(moment(dateEnd).tz("Europe/Bucharest").endOf('day')).getTime() === new Date(moment().tz("Europe/Bucharest").endOf('day')).getTime()) {
 		const [todayOutsideCondition, todayTargetTemp, todayRunningMinutes] = await Promise.all([
 				calculateAvgOutsideCondition(),
-				calculateAvgTargetTemp(),
-				calculateHeatingDuration()
+				calculateAvgTargetTemp(location),
+				calculateHeatingDuration(location)
 			]);
 
 		heatingStatistics.push({
@@ -372,13 +401,14 @@ exports.getStatisticsByDay = async (dateStart, dateEnd) => {
 	return heatingStatistics || [];
 };
 
-exports.getStatisticsByMonth = async (dateStart, dateEnd) => {
+exports.getStatisticsByMonth = async (location, dateStart, dateEnd) => {
 	const heatingStatistics = await HeatingStatistics
 		.find({
 			date: {
 				$gt: new Date(moment(dateStart).tz('Europe/Bucharest').startOf('month')),
 				$lt: new Date(moment(dateEnd).tz('Europe/Bucharest').endOf('month'))
-			}
+			},
+			location
 		})
 		.exec();
 

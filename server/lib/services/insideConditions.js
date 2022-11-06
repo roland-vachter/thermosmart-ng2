@@ -5,15 +5,14 @@ const pushNotifications = require('./pushNotifications');
 const EventEmitter = require('events');
 const evts = new EventEmitter();
 
-let sensorData = {};
-
-let heatingOn = false;
-heatingEvts.on('changeHeating', (isOn) => {
-	if (isOn) {
-		activateAllSensors();
-		heatingOn = true;
+const sensorData = {};
+const heatingOnByLocation = {};
+heatingEvts.on('changeHeating', data => {
+	if (data.isOn) {
+		activateAllSensors(data.location);
+		heatingOnByLocation[data.location] = true;
 	} else {
-		heatingOn = false;
+		heatingOnByLocation[data.location] = false;
 	}
 });
 
@@ -33,19 +32,6 @@ exports.set = async (data) => {
 			_id: id
 		});
 
-		if (!sensorSetting) {
-			sensorSetting = new SensorSetting({
-				_id: id,
-				order: id,
-				label: id,
-				enabled: true,
-				tempAdjust: 0,
-				humidityAdjust: 0
-			});
-			await sensorSetting.save();
-		}
-
-
 		if (!sensorData[id]) {
 			sensorData[id] = {
 				id: id,
@@ -54,7 +40,8 @@ exports.set = async (data) => {
 				tempHistory: [],
 				onHoldTempLowest: null,
 				onHoldTempHighest: null,
-				onHoldStatus: null
+				onHoldStatus: null,
+				location: sensorSetting.location
 			};
 		}
 
@@ -80,7 +67,7 @@ exports.set = async (data) => {
 		sensorData[id].tempAdjust = sensorSetting.tempAdjust;
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
 
-		if (!heatingOn && sensorSetting.enabled && sensorData[id].tempHistory.length) {
+		if (!heatingOnByLocation[data.location] && sensorSetting.enabled && sensorData[id].tempHistory.length) {
 			const lastTemp = sensorData[id].tempHistory[0];
 			const prevLastTemp = sensorData[id].tempHistory[1];
 
@@ -162,14 +149,22 @@ exports.set = async (data) => {
 	}
 };
 
-exports.get = () => {
-	return sensorData;
+exports.get = (locationId) => {
+	const sensorDataByLocation = {};
+
+	Object.keys(sensorData).forEach(id => {
+		if (sensorData[id].location === locationId) {
+			sensorDataByLocation[id] = sensorData[id];
+		}
+	});
+
+	return sensorDataByLocation;
 };
 
-const activateAllSensors = () => {
-	Object.keys(sensorData).forEach(async id => {
+const activateAllSensors = (locationId) => {
+	Object.keys(sensorData).forEach(id => {
 		const s = sensorData[id];
-		if (s.windowOpen) {
+		if (s.location === locationId && s.windowOpen) {
 			s.windowOpen = false;
 			s.onHoldStatus = null;
 			s.onHoldTempLowest = null;

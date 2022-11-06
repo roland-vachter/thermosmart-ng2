@@ -3,32 +3,42 @@ import { HttpClient } from '@angular/common/http';
 import 'rxjs/add/operator/map';
 import { Moment } from 'moment';
 import { ApiResult } from '../../types/types';
+import { LocationService } from '../../services/location.service';
+import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class ThermoServerApiService {
 
-	constructor(private http: HttpClient) { }
+	constructor(
+		private http: HttpClient,
+		private locationService: LocationService
+	) { }
 
 	init (force = false) {
-		return this.http.get('/api/init')
-			.map((res: any) => {
-				if (res.status === 'ok') {
-					return res.data;
-				} else {
-					return {};
-				}
-			});
+		if (this.locationService.getSelectedLocationId()) {
+			return this.http.get('/api/heating/init?location=' + this.locationService.getSelectedLocationId())
+				.map((res: any) => {
+					if (res.status === 'ok') {
+						return res.data;
+					} else {
+						return {};
+					}
+				});
+		} else {
+			return of();
+		}
 	}
 
 	toggleHeatingPower () {
-		const obs = this.http.post('/api/toggleheatingpower', {});
+		const obs = this.http.post('/api/toggleheatingpower', { location: this.locationService.getSelectedLocationId() });
 		obs.subscribe();
 		return obs;
 	}
 
 	toggleSensorStatus (id) {
 		const obs = this.http.post('/api/togglesensorstatus', {
-			id
+			id,
+			location: this.locationService.getSelectedLocationId()
 		});
 
 		obs.subscribe();
@@ -50,7 +60,8 @@ export class ThermoServerApiService {
 	tempAdjust (id, value) {
 		const obs = this.http.post('/api/tempadjust', {
 			id,
-			value
+			value,
+			location: this.locationService.getSelectedLocationId()
 		});
 
 		obs.subscribe();
@@ -67,7 +78,8 @@ export class ThermoServerApiService {
 	changeDefaultPlan (dayOfWeek: number, planId: number) {
 		const obs = this.http.post('/api/changedefaultplan', {
 			dayOfWeek,
-			planId
+			planId,
+			location: this.locationService.getSelectedLocationId()
 		});
 
 		obs.subscribe();
@@ -75,23 +87,25 @@ export class ThermoServerApiService {
 	}
 
 	statistics () {
-		return this.http.get('/api/statistics');
+		return this.http.get('/api/statistics?location=' + this.locationService.getSelectedLocationId());
 	}
 
 	listPlanOverrides() {
-		return this.http.get<ApiResult>('/api/heating/planoverride/list');
+		return this.http.get<ApiResult>('/api/heating/planoverride/list?location=' + this.locationService.getSelectedLocationId());
 	}
 
 	addPlanOverride(date: Date, planId: number) {
 		return this.http.post<ApiResult>('/api/heating/planoverride/add', {
 			date: date.valueOf(),
-			planId
+			planId,
+			location: this.locationService.getSelectedLocationId()
 		});
 	}
 
 	removePlanOverride(date: Date) {
 		return this.http.post<ApiResult>('/api/heating/planoverride/remove', {
-			date: date.valueOf()
+			date: date.valueOf(),
+			location: this.locationService.getSelectedLocationId()
 		})
 	}
 }

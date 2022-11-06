@@ -6,6 +6,8 @@ import { ServerUpdateService } from '../shared/server-update.service';
 import { MomentModule } from 'angular2-moment';
 import { SecuritySettingsModalComponent } from './components/security-settings-modal/security-settings-modal.component';
 import { FormsModule } from '@angular/forms';
+import { RefreshEventService } from '../services/refresh-event.service';
+import { LocationService } from '../services/location.service';
 
 @NgModule({
 	imports: [
@@ -22,10 +24,13 @@ import { FormsModule } from '@angular/forms';
 	],
 	providers: [
 		ServerApiService,
-		ServerUpdateService
+		ServerUpdateService,
+		RefreshEventService,
+		LocationService
 	],
 	entryComponents: [
 		SecuritySettingsModalComponent
 	]
 })
-export class SecurityModule { }
+export class SecurityModule {
+}

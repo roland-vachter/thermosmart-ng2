@@ -1,5 +1,7 @@
 const plantWateringService = require('../services/plantWatering');
 const configService = require('../services/config');
+const UserModel = require('../models/User');
+const types = require('../utils/types');
 
 exports.plantWateringInit = async (req, res) => {
 	res.json({
@@ -64,15 +66,17 @@ exports.log = async (req, res) => {
 }
 
 exports.changeConfig = async (req, res) => {
-	if (!req.body.name || !req.body.value) {
+	if (!req.body.name || !req.body.value || !req.body.location) {
 		return res.status(400).json({
 			status: types.RESPONSE_STATUS.ERROR,
-			reason: 'name or value parameter is missing'
+			reason: 'name, value or location parameter is missing'
 		});
 	}
 
+	const location = parseInt(req.body.location, 10);
+
 	try {
-		await configService.set(req.body.name, req.body.value);
+		await configService.set(req.body.name, req.body.value, location);
 		res.json({
 			status: 'ok'
 		});
@@ -85,20 +89,50 @@ exports.changeConfig = async (req, res) => {
 };
 
 exports.getConfig = async (req, res) => {
-	if (!req.query.name) {
+	if (!req.query.name || !req.query.location) {
 		return res.status(400).json({
 			status: types.RESPONSE_STATUS.ERROR,
-			reason: 'name parameter is missing'
+			reason: 'name or location parameter is missing'
 		});
 	}
 
+	const location = parseInt(req.query.location, 10);
+
 	try {
-		const configItem = await configService.get(req.query.name);
+		const configItem = await configService.get(req.query.name, location);
 		res.json(configItem.value);
 	} catch(e) {
 		res.json({
 			status: 'error',
 			error: e.message
 		});
+	}
+}
+
+exports.init = async (req, res) => {
+	if (!req.user?.emails?.length) {
+		return res.json({
+			status: 'error',
+			error: 'User email not available'
+		})
+	}
+
+	try {
+		const user = await UserModel.findOne({
+			email: req.user.emails[0].value
+		}).populate({
+			path: 'locations'
+		}).exec();
+		res.json({
+			status: 'ok',
+			data: {
+				user
+			}
+		});
+	} catch(e) {
+		res.json({
+			status: 'error',
+			error: e.message
+		})
 	}
 }

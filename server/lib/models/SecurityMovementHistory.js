@@ -7,6 +7,10 @@ const securityMovementHistorySchema = new Schema({
 	datetime: {
 		type: Date,
 		index: true
+	},
+	location: {
+		type: Number,
+		ref: 'Location'
 	}
 });
 

@@ -42,6 +42,7 @@ export class SecuritySettingsModalComponent implements OnInit {
 
 	getCameras() {
 		this.serverApiService.getSecurityCameras().subscribe(cameras => {
+			console.log(cameras);
 			this.cameras = cameras;
 		});
 	}

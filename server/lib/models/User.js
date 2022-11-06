@@ -7,7 +7,11 @@ const userSchema = new Schema({
 	email: {
 		type: String,
 		index: true
-	}
+	},
+	locations: [{
+		type: Number,
+		ref: 'Location'
+	}]
 });
 
 userSchema.index({email: 1});

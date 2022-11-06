@@ -1,17 +1,17 @@
 const Config = require('../models/Config');
 
-let configInst;
-
 const EventEmitter = require('events');
 const evts = new EventEmitter();
 
-const set = async (name, value) => {
+const set = async (name, value, locationId) => {
 	let config = await Config.findOne({
-		name
-	});
+		name,
+		location: locationId
+	}).exec();
 	if (!config) {
 		config = new Config({
-			name
+			name,
+			location: locationId
 		});
 	}
 
@@ -20,24 +20,33 @@ const set = async (name, value) => {
 
 	const changeObj = {};
 	changeObj[name] = value;
-	evts.emit('change', changeObj);
+	evts.emit('change', {
+		config: {
+			[name]: value
+		},
+		location: locationId
+	});
 };
 
-const getAll = async () => {
-	const config = await Config.find();
+const getAll = async (locationId) => {
+	const config = await Config.find().exec();
 	const configObj = {};
 
 	config.forEach(conf => {
-		configObj[conf.name] = conf.value;
+		if (conf.location === locationId) {
+			configObj[conf.name] = conf.value;
+		}
 	});
 
 	return configObj || {};
 };
 
-const get = async (name) => {
+const get = async (name, locationId) => {
+	console.log('get config', name, locationId);
 	const configItem = await Config.findOne({
-		name
-	});
+		name,
+		location: locationId
+	}).exec();
 
 	return configItem || null;
 };

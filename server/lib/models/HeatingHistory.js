@@ -8,7 +8,11 @@ const heatingHistorySchema = new Schema({
 		type: Date,
 		index: true
 	},
-	status: Boolean
+	status: Boolean,
+	location: {
+		type: Number,
+		ref: 'Location'
+	}
 });
 
 heatingHistorySchema.index({datetime: 1});

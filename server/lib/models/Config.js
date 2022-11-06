@@ -8,7 +8,11 @@ const config = new Schema({
 		type: String,
 		index: true
 	},
-	value: Schema.Types.Mixed
+	value: Schema.Types.Mixed,
+	location: {
+		type: Number,
+		ref: 'Location'
+	}
 });
 
 config.set('versionKey', false);

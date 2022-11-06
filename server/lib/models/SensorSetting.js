@@ -16,7 +16,15 @@ const sensorSettingSchema = new Schema({
 		default: true
 	},
 	tempAdjust: Float,
-	humidityAdjust: Number
+	humidityAdjust: Number,
+	location: {
+		type: Number,
+		ref: 'Location'
+	},
+	controller: {
+		type: Boolean,
+		default: false
+	}
 });
 
 sensorSettingSchema.set('versionKey', false);

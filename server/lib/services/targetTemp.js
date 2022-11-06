@@ -1,16 +1,17 @@
 const HeatingDefaultPlan = require('../models/HeatingDefaultPlan');
 const HeatingPlanOverrides = require('../models/HeatingPlanOverrides');
+const Location = require('../models/Location');
 const moment = require('moment-timezone');
 
 const EventEmitter = require('events');
 const evts = new EventEmitter();
 
-let lastTargetTemp = null;
+let lastTargetTempByLocation = {};
 
 exports.evts = evts;
 
-exports.get = () => {
-	return lastTargetTemp;
+exports.get = (location) => {
+	return lastTargetTempByLocation[location];
 };
 
 exports.update = () => {
@@ -18,48 +19,71 @@ exports.update = () => {
 }
 
 async function update () {
-	const [defaultPlan, planOverride] = await Promise.all([
-		HeatingDefaultPlan.findOne({
-			dayOfWeek: moment().tz("Europe/Bucharest").day()
-		})
-			.populate({
-				path: 'plan',
-				populate: {
-					path: 'intervals.temp'
-				}
+	const locations = await Location.find().exec();
+
+	return Promise.all(locations.map(async l => {
+		const [defaultPlan, planOverride] = await Promise.all([
+			HeatingDefaultPlan.findOne({
+				dayOfWeek: moment().tz("Europe/Bucharest").day(),
 			})
-			.exec(),
-		HeatingPlanOverrides.findOne({
-			date: moment().tz("Europe/Bucharest").startOf('day').valueOf()
-		})
-			.populate({
-				path: 'plan',
-				populate: {
-					path: 'intervals.temp'
-				}
+				.populate({
+					path: 'defaultPlan',
+					populate: {
+						path: 'intervals.temp'
+					}
+				})
+				.populate({
+					path: 'plans.plan',
+					populate: {
+						path: 'intervals.temp'
+					}
+				})
+				.lean()
+				.exec(),
+			HeatingPlanOverrides.findOne({
+				date: moment().tz("Europe/Bucharest").startOf('day').valueOf(),
+				location: l._id
 			})
-			.exec()
-	]);
+				.populate({
+					path: 'plan',
+					populate: {
+						path: 'intervals.temp'
+					}
+				})
+				.lean()
+				.exec()
+		]);
 
-	const todaysPlan = planOverride || defaultPlan;
-	let targetTemp;
+		const todaysPlan = planOverride || {
+			...defaultPlan,
+			plan: defaultPlan.plans?.find(p => p.location === l._id)?.plan || defaultPlan.defaultPlan
+		};
 
-	const now = moment().tz("Europe/Bucharest");
-	const nowHours = now.hours();
-	const nowMinutes = now.minutes();
+		let targetTemp;
 
-	todaysPlan.plan.intervals.forEach(interval => {
-		if (nowHours > interval.startHour ||
-				(nowHours === interval.startHour &&
-				nowMinutes >= interval.startMinute)) {
-			targetTemp = interval.temp;
+		const now = moment().tz("Europe/Bucharest");
+		const nowHours = now.hours();
+		const nowMinutes = now.minutes();
+
+		todaysPlan?.plan?.intervals.forEach(interval => {
+			if (nowHours > interval.startHour ||
+					(nowHours === interval.startHour &&
+					nowMinutes >= interval.startMinute)) {
+				targetTemp = {
+					...interval.temp,
+					value: interval.temp.values?.find(v => v.location === l._id)?.value || interval.temp.defaultValue
+				};
+			}
+		});
+
+		if (lastTargetTempByLocation[l._id] !== targetTemp) {
+			lastTargetTempByLocation[l._id] = targetTemp;
+			evts.emit('change', {
+				targetTemp,
+				location: l._id
+			});
 		}
-	});
-
-	if (lastTargetTemp !== targetTemp) {
-		lastTargetTemp = targetTemp;
-		evts.emit('change', targetTemp);
-	}
+	}));
 };
 
 update();

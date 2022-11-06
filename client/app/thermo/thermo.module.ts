@@ -22,6 +22,8 @@ import { TemperatureComponent } from './components/temperature/temperature.compo
 import { HumidityComponent } from './components/humidity/humidity.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { BsDatepickerModule } from 'ngx-bootstrap';
+import { RefreshEventService } from '../services/refresh-event.service';
+import { LocationService } from '../services/location.service';
 
 @NgModule({
 	imports: [
@@ -60,7 +62,9 @@ import { BsDatepickerModule } from 'ngx-bootstrap';
 		ThermoServerApiService,
 		ThermoDataStoreService,
 		ThermoActionsService,
-		ThermoModalsService
+		ThermoModalsService,
+		RefreshEventService,
+		LocationService
 	],
 	entryComponents: [
 		ChangeHeatingPlanModalComponent,
@@ -69,4 +73,18 @@ import { BsDatepickerModule } from 'ngx-bootstrap';
 		ThermoConfigModalComponent
 	]
 })
-export class ThermoModule { }
+export class ThermoModule {
+	constructor(
+		private thermoDataStore: ThermoDataStoreService,
+		private refreshService: RefreshEventService,
+		private locationService: LocationService
+	) {
+		this.refreshService.subscribe(() => {
+			this.thermoDataStore.init();
+		});
+
+		this.locationService.subscribe(() => {
+			this.thermoDataStore.init();
+		})
+	}
+}

@@ -8,7 +8,11 @@ const targetTempHistorySchema = new Schema({
 		type: Date,
 		index: true
 	},
-	t: Number
+	t: Number,
+	location: {
+		type: Number,
+		ref: 'Location'
+	}
 });
 
 targetTempHistorySchema.index({datetime: 1});

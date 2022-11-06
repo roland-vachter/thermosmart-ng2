@@ -11,6 +11,10 @@ const heatingPlanOverridesSchema = new Schema({
 	plan: {
 		type: String,
 		ref: 'HeatingPlan'
+	},
+	location: {
+		type: Number,
+		ref: 'Location'
 	}
 });
 
@@ -20,7 +24,9 @@ heatingPlanOverridesSchema.set('versionKey', false);
 module.exports = mongoose.model('HeatingPlanOverrides', heatingPlanOverridesSchema);
 
 module.exports.evts = evts;
-module.exports.triggerChange = function () {
+module.exports.triggerChange = function (location) {
 	console.log('heating plan override change triggered');
-	evts.emit('change');
+	evts.emit('change', {
+		location
+	});
 };

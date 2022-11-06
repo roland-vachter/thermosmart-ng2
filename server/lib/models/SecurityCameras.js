@@ -7,7 +7,11 @@ const EventEmitter = require('events');
 const evts = new EventEmitter();
 
 const securityCamerasSchema = new Schema({
-	ip: String
+	ip: String,
+	location: {
+		type: Number,
+		ref: 'Location'
+	}
 });
 
 securityCamerasSchema.set('versionKey', false);
