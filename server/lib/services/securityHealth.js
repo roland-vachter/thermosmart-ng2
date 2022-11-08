@@ -261,7 +261,6 @@ exports.camera = {
 		}
 	},
 	listIPs: async (location) => {
-		console.log('$$$', location, securityCamerasByLocations[location]);
 		if (securityCamerasByLocations[location]) {
 			return securityCamerasByLocations[location].map(c => c.ip);
 		} else {
@@ -496,7 +495,6 @@ exports.keypad = {
 		keypadHealthByLocation[securityControllerData.location] = health ? HEALTH.OK : HEALTH.FAIL;
 		lastKeypadHealthUpdateByLocation[securityControllerData.location] = Date.now();
 
-		console.log('belep', id, health, keypadHealthByLocation);
 		updateKeypadHealth(securityControllerData.location);
 	},
 	getHealth: (location) => keypadHealthByLocation[location]
