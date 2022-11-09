@@ -120,7 +120,7 @@ exports.init = function () {
 			.find()
 			.sort({
 				date: 1,
-				location
+				location: data.location
 			})
 			.exec()
 			.then(planOverrides => {
