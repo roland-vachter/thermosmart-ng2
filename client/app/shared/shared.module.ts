@@ -15,7 +15,7 @@ import { SharedServerApiService } from './shared-server-api.service';
 import { AlertModule } from 'ngx-bootstrap';
 import { SharedModalsService } from './shared-modals.service';
 import { AlertWrapperComponent } from './components/alert.component';
-import { MomentModule } from 'angular2-moment';
+import { MomentModule } from 'ngx-moment';
 
 const config: SocketIoConfig = {
 	url: '/frontend',

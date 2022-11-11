@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import 'rxjs/add/operator/map';
-import { Subject } from 'rxjs';
-import { PartialObserver } from 'rxjs/Observer';
+
+import { Subject ,  PartialObserver } from 'rxjs';
 
 @Injectable()
 export class RefreshEventService {

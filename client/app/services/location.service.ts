@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/map';
+
 import { Moment } from 'moment';
 import { ApiResult, Location } from '../types/types';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { PartialObserver } from 'rxjs/Observer';
+import { BehaviorSubject, Subject ,  PartialObserver } from 'rxjs';
 
 @Injectable()
 export class LocationService {

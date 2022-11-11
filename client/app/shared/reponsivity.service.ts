@@ -12,8 +12,7 @@
  * from LiquidShare.
  *****************************************************************************/
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { fromEvent } from 'rxjs/observable/fromEvent';
+import { BehaviorSubject ,  fromEvent } from 'rxjs';
 
 export enum Breakpoint {
 	xs = 'xs',
