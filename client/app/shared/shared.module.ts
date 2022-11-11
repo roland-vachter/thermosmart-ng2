@@ -1,10 +1,7 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { DurationPipe } from './duration.pipe';
 import { DecimalPipe } from './decimal.pipe';
 import { IntegerPipe } from './integer.pipe';
 import { SocketIoModule, SocketIoConfig } from 'ng-socket-io';
-import { HttpClientModule } from '@angular/common/http';
 import { ObjectKeysPipe } from './object-keys.pipe';
 import { PercentStringPipe } from './percent-string.pipe';
 import { DayOfWeekNamePipe } from './day-of-week-name.pipe';
