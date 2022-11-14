@@ -67,3 +67,17 @@ export interface Location {
     name: string;
     features: string[];
 }
+
+export interface Camera {
+	ip: string;
+	location: number;
+	healthy: boolean;
+	lastHealthUpdate: Date;
+}
+
+export interface Controller {
+	id: number;
+	location: number;
+	healthy: boolean;
+	lastHealthUpdate: Date;
+}

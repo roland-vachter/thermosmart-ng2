@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ServerApiService {
@@ -9,13 +9,15 @@ export class ServerApiService {
 
 	init (force = false) {
 		return this.http.get('/api/plantwatering/init')
-			.map((res: any) => {
-				if (res.status === 'ok') {
-					return res.data;
-				} else {
-					return {};
-				}
-			});
+			.pipe(
+				map((res: any) => {
+					if (res.status === 'ok') {
+						return res.data;
+					} else {
+						return {};
+					}
+				})
+			);
 	}
 
 }

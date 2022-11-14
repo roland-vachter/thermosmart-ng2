@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
 import { Chart } from 'chart.js';
-import * as moment from 'moment';
+import moment from 'moment';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({

@@ -3,8 +3,7 @@ import { ThermoComponent }  from './thermo/thermo.component';
 import { SecurityComponent } from './security/security.component';
 import { LoginStatusService } from './shared/login-status.service';
 import { ThermoDataStoreService } from './thermo/services/thermo-data-store.service';
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import moment from 'moment';
 import { ServerApiService } from './services/server-api.service';
 import { RefreshEventService } from './services/refresh-event.service';
 import { LocationService } from './services/location.service';
@@ -30,10 +29,10 @@ export class AppComponent {
 
 	user: User;
 
-	@ViewChild(ThermoComponent)
+	@ViewChild(ThermoComponent, { static: true })
 	public thermoComponent: ThermoComponent;
 
-	@ViewChild(SecurityComponent)
+	@ViewChild(SecurityComponent, { static: true })
 	public securityComponent: SecurityComponent;
 
 
@@ -108,7 +107,7 @@ export class AppComponent {
 			}
 		}).bind(this));
 
-		this.serverApiService.init().subscribe(data => {
+		this.serverApiService.init().subscribe((data: { user: User }) => {
 			this.user = data.user;
 
 			this.changeLocation(this.user.locations[0]);

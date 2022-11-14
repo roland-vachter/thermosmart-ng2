@@ -21,7 +21,7 @@ import { SensorListComponent } from './components/sensor-list/sensor-list.compon
 import { TemperatureComponent } from './components/temperature/temperature.component';
 import { HumidityComponent } from './components/humidity/humidity.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { BsDatepickerModule } from 'ngx-bootstrap';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { RefreshEventService } from '../services/refresh-event.service';
 import { LocationService } from '../services/location.service';
 

@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
-import { Moment } from 'moment';
-import { ApiResult } from '../types/types';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ServerApiService {
@@ -11,12 +9,14 @@ export class ServerApiService {
 
 	init () {
 		return this.http.get('/api/init')
-			.map((res: any) => {
-				if (res.status === 'ok') {
-					return res.data;
-				} else {
-					return {};
-				}
-			});
+			.pipe(
+				map((res: any) => {
+					if (res.status === 'ok') {
+						return res.data;
+					} else {
+						return {};
+					}
+				})
+			);
 	}
 }

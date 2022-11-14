@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Moment } from 'moment';
 import { ApiResult } from '../../types/types';
 import { LocationService } from '../../services/location.service';
 import { of } from 'rxjs';

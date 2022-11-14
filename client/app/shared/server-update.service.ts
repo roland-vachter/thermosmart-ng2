@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import * as io from 'socket.io-client';
+import { io } from 'socket.io';
 import { LocationService } from '../services/location.service';
 import { RefreshEventService } from '../services/refresh-event.service';
 

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { ApiResult } from '../../types/types';
+import { ApiResult, Camera, Controller } from '../../types/types';
 import { LocationService } from '../../services/location.service';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ServerApiService {
@@ -16,13 +17,15 @@ export class ServerApiService {
 	init (force = false) {
 		if (this.locationService.getSelectedLocationId()) {
 			return this.http.get('/api/security/init?location=' + this.locationService.getSelectedLocationId())
-				.map((res: any) => {
-					if (res.status === 'ok') {
-						return res.data;
-					} else {
-						return {};
-					}
-				});
+				.pipe(
+					map((res: any) => {
+						if (res.status === 'ok') {
+							return res.data;
+						} else {
+							return {};
+						}
+					})
+				);
 		} else {
 			return of();
 		}
@@ -35,10 +38,12 @@ export class ServerApiService {
 	}
 
 	getSecurityCameras() {
-		return this.http.get('/api/security/camera/list?location=' + this.locationService.getSelectedLocationId())
-			.map((res: any) => {
-				return res || [];
-			})
+		return this.http.get<Camera[]>('/api/security/camera/list?location=' + this.locationService.getSelectedLocationId())
+			.pipe(
+				map((res: any) => {
+					return res || [];
+				})
+			)
 	}
 
 	addSecurityCamera(ip: string) {
@@ -57,10 +62,12 @@ export class ServerApiService {
 
 
 	getSecurityControllers() {
-		return this.http.get('/api/security/controller/list?location=' + this.locationService.getSelectedLocationId())
-			.map((res: any) => {
-				return res || [];
-			})
+		return this.http.get<Controller[]>('/api/security/controller/list?location=' + this.locationService.getSelectedLocationId())
+			.pipe(
+				map((res: any) => {
+					return res || [];
+				})
+			)
 	}
 
 	addSecurityController(id: string) {

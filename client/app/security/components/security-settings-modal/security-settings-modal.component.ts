@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { SharedServerApiService } from '../../../shared/shared-server-api.service';
+import { Camera, Controller } from '../../../types/types';
 import { ServerApiService } from '../../services/server-api.service';
 
 @Component({
@@ -15,11 +16,11 @@ export class SecuritySettingsModalComponent implements OnInit {
 	@Input() heatingPlans = [];
 	@Output() onResult: EventEmitter<any> = new EventEmitter();
 
-	cameras = [];
+	cameras: Camera[] = [];
 	newCameraIp = '';
 	cameraReason: string;
 
-	controllers = [];
+	controllers: Controller[] = [];
 	newControllerId = '';
 	controllerReason: string;
 

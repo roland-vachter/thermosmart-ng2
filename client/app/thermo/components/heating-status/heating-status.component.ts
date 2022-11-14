@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { BsModalService } from 'ngx-bootstrap';
-import { SharedModalsService } from '../../../shared/shared-modals.service';
+import { BsModalService } from 'ngx-bootstrap/modal';
 import { ThermoActionsService } from '../../services/thermo-actions.service';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 import { ThermoModalsService } from '../../services/thermo-modals.service';
