@@ -44,9 +44,6 @@ import { NgModule } from '@angular/core';
 		ResponsivityService,
 		SharedServerApiService,
 		SharedModalsService
-	],
-	entryComponents: [
-		AlertWrapperComponent
 	]
 })
 export class SharedModule { }

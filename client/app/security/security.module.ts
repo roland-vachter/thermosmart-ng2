@@ -25,9 +25,6 @@ import { LocationService } from '../services/location.service';
 		ServerUpdateService,
 		RefreshEventService,
 		LocationService
-	],
-	entryComponents: [
-		SecuritySettingsModalComponent
 	]
 })
 export class SecurityModule {

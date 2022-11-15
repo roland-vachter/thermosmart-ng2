@@ -65,12 +65,6 @@ import { LocationService } from '../services/location.service';
 		ThermoModalsService,
 		RefreshEventService,
 		LocationService
-	],
-	entryComponents: [
-		ChangeHeatingPlanModalComponent,
-		ChangeSensorSettingsModalComponent,
-		StatisticsModalComponent,
-		ThermoConfigModalComponent
 	]
 })
 export class ThermoModule {
