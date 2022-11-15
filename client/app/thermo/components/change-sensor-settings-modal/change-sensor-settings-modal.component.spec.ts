@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ChangeSensorLabelModalComponent } from './change-sensor-label-modal.component';
 
@@ -6,7 +6,7 @@ describe('ChangeSensorLabelModalComponent', () => {
   let component: ChangeSensorLabelModalComponent;
   let fixture: ComponentFixture<ChangeSensorLabelModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ChangeSensorLabelModalComponent ]
     })

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ThermoConfigModalComponent } from './thermo-config-modal.component';
 
@@ -6,7 +6,7 @@ describe('ThermoConfigModalComponent', () => {
   let component: ThermoConfigModalComponent;
   let fixture: ComponentFixture<ThermoConfigModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ThermoConfigModalComponent ]
     })
