@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { io } from 'socket.io';
+import { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { LocationService } from '../services/location.service';
 import { RefreshEventService } from '../services/refresh-event.service';
 
 @Injectable()
 export class ServerUpdateService {
-	private socketGlobal: SocketIOClient.Socket;
-	private socketLocation: SocketIOClient.Socket;
+	private socketGlobal: Socket;
+	private socketLocation: Socket;
 
 	private observers = [];
 	private observable = Observable.create(function (observer) {

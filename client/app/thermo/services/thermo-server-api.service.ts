@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 import { ApiResult } from '../../types/types';
 import { LocationService } from '../../services/location.service';
 import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ThermoServerApiService {
@@ -16,13 +16,15 @@ export class ThermoServerApiService {
 	init (force = false) {
 		if (this.locationService.getSelectedLocationId()) {
 			return this.http.get('/api/heating/init?location=' + this.locationService.getSelectedLocationId())
-				.map((res: any) => {
-					if (res.status === 'ok') {
-						return res.data;
-					} else {
-						return {};
-					}
-				});
+				.pipe(
+					map((res: any) => {
+						if (res.status === 'ok') {
+							return res.data;
+						} else {
+							return {};
+						}
+					})
+				);
 		} else {
 			return of();
 		}

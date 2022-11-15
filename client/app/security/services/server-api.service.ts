@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { ApiResult, Camera, Controller } from '../../types/types';
 import { LocationService } from '../../services/location.service';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable()
