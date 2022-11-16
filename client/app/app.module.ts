@@ -12,7 +12,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ServerApiService } from './services/server-api.service';
 import { RefreshEventService } from './services/refresh-event.service';
 import { LocationService } from './services/location.service';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
 	declarations: [
@@ -20,6 +20,7 @@ import { LocationService } from './services/location.service';
 	],
 	imports: [
 		BrowserModule,
+		BrowserAnimationsModule,
 		ModalModule.forRoot(),
 		BsDropdownModule.forRoot(),
 		FormsModule,
