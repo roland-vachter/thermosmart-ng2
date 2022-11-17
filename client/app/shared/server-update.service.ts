@@ -44,7 +44,7 @@ export class ServerUpdateService {
 			this.observers.forEach(ob => ob.next(data));
 		});
 
-		io('/sensor').on('update', data => {
+		io('/sensor/7').on('update', data => {
 			console.log(data);
 		});
 	}
