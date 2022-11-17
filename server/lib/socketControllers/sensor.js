@@ -12,8 +12,10 @@ exports.init = function () {
 	const io = socket.io.of('/sensor');
 
 	securityStatus.evts.on('status', data => {
+		console.log('emit event', data);
 		securityHealth.controller.getIdsByLocation(data.location).then(ids => {
 			ids.forEach(id => {
+				console.log('send sensor event to', id);
 				socket.io.of('/sensor/' + id).emit('update', {
 					security: {
 						status: data.status
