@@ -308,6 +308,23 @@ exports.toggleHeatingPower = (req, res) => {
 	});
 };
 
+exports.disableSensorWindowOpen = (req, res) => {
+	if (!req.body.location) {
+		return res.status(400).json({
+			status: types.RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	const location = parseInt(req.body.location, 10);
+
+	insideConditions.disableSensorWindowOpen(req.body.id);
+
+	res.json({
+		status: 'ok'
+	});
+}
+
 
 exports.restartSensor = (req, res) => {
 	restartSensorService.initiate();

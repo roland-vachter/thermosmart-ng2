@@ -199,6 +199,13 @@ exports.toggleSensorStatus = async (id) => {
 	return false;
 };
 
+exports.disableSensorWindowOpen = (id) => {
+	if (sensorData[id]) {
+		sensorData[id].windowOpen = false;
+		evts.emit('change', sensorData[id]);
+	}
+}
+
 exports.changeSensorSettings = async (id, settings) => {
 	const sensorSetting = await SensorSetting.findOne({
 		_id: id

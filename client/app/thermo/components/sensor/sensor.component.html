@@ -2,20 +2,21 @@
 	<div class="row no-gutters">
 		<div class="col-12">
 			<div class="thermo-room-label-container">
-				<span class="thermo-room--status icon-wifi color-{{restartSensorInProgress ? 'yellow' : (!sensor.enabled || sensor.windowOpen ? 'gray' : sensor.active ? 'mint' : 'red')}}" (click)="toggleSensorStatus()"></span>
+				<span class="thermo-room--status icon-wifi color-{{restartSensorInProgress ? 'yellow' : (!sensor.enabled ? 'gray' : sensor.active ? 'mint' : 'red')}}" (click)="toggleSensorStatus()"></span>
 				<span class="thermo-room--label" (click)="changeLabel()">
 					<span>({{ sensor.id }})</span> {{ sensor.label || sensor.id }}
 				</span>
+				<span class="thermo-room--window-status icon-window-open-icon" *ngIf="sensor.windowOpen" (click)="disableSensorWindowOpen()"></span>
 			</div>
 		</div>
 		<div class="col-6">
 			<div class="thermo-room--temperature">
-				<temperature [value]="sensor.temperature" [withIcon]="true" [color]="!sensor.enabled || sensor.windowOpen ? 'gray' : null"></temperature>
+				<temperature [value]="sensor.temperature" [withIcon]="true" [color]="!sensor.enabled ? 'gray' : null"></temperature>
 			</div>
 		</div>
 		<div class="col-6">
 			<div class="thermo-room--humidity">
-				<humidity [value]="sensor.humidity" [withIcon]="true" [color]="!sensor.enabled || sensor.windowOpen ? 'gray' : null"></humidity>
+				<humidity [value]="sensor.humidity" [withIcon]="true" [color]="!sensor.enabled ? 'gray' : null"></humidity>
 			</div>
 		</div>
 	</div>

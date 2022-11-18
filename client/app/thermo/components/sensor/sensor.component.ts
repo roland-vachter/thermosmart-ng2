@@ -27,6 +27,10 @@ export class SensorComponent implements OnInit {
 		this.serverApiService.toggleSensorStatus(this.sensor.id);
 	}
 
+	disableSensorWindowOpen () {
+		this.serverApiService.disableSensorWindowOpen(this.sensor.id).subscribe();
+	}
+
 	changeLabel () {
 		const initialState = {
 			label: this.sensor.label || '',

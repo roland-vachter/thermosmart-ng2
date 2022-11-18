@@ -46,6 +46,13 @@ export class ThermoServerApiService {
 		return obs;
 	}
 
+	disableSensorWindowOpen (id) {
+		return this.http.post('/api/disablesensorwindowopen', {
+			id,
+			location: this.locationService.getSelectedLocationId()
+		})
+	}
+
 	changeSensorSettings (id, options) {
 		const obs = this.http.post('/api/changesensorsettings', {
 			id,

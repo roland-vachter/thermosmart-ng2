@@ -64,6 +64,17 @@
 	}
 }
 
+.thermo-room--window-status {
+	font-size: 1.35rem;
+	color: $orange;
+	margin-left: 10px;
+
+	&:hover {
+		color: $dark-gray;
+		cursor: pointer;
+	}
+}
+
 .thermo-room--switch {
 	display: none;
 

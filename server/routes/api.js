@@ -29,6 +29,7 @@ router.get('/heating/planoverride/list', loginMiddleware, cors(), heatingApiCtrl
 router.get('/sensorpolling', apiKeyMiddleware, cors(), heatingApiCtrl.sensorPolling);
 router.get('/statistics', loginMiddleware, cors(), heatingApiCtrl.statistics);
 router.post('/toggleheatingpower', loginMiddleware, cors(), heatingApiCtrl.toggleHeatingPower);
+router.post('/disablesensorwindowopen', loginMiddleware, cors(), heatingApiCtrl.disableSensorWindowOpen);
 
 
 // security UI

@@ -13,6 +13,7 @@ const defaultValues = {
 		humidity: 0
 	},
 	poweredOn: true,
+	hasWindowOpen: false,
 	until: null,
 	suspendTimeout: null,
 	initialized: false
@@ -35,14 +36,18 @@ insideConditionsEvts.on('change', (data) => {
 
 	const keys = Object.keys(sensors);
 	let activeCount = 0;
+	let hasWindowOpen = false;
 	keys.forEach(key => {
-		if (sensors[key].active && sensors[key].enabled && !sensors[key].windowOpen) {
+		if (sensors[key].active && sensors[key].enabled) {
 			locationStatus.avgValues.temperature += sensors[key].temperature;
 			locationStatus.avgValues.humidity += sensors[key].humidity;
 			activeCount++;
 		}
+
+		hasWindowOpen = hasWindowOpen || (sensors[key].windowOpen && sensors[key].enabled);
 	});
 
+	locationStatus.hasWindowOpen = hasWindowOpen;
 	locationStatus.avgValues.temperature = locationStatus.avgValues.temperature / activeCount;
 
 	if (!locationStatus.initialized) {
@@ -173,7 +178,7 @@ async function updateHeatingStatusByLocation (locationId) {
 			};
 		}
 
-		if (Number.isNaN(locationStatus.avgValues.temperature) || !locationStatus.poweredOn) {
+		if (Number.isNaN(locationStatus.avgValues.temperature) || !locationStatus.poweredOn || locationStatus.hasWindowOpen) {
 			turnHeatingOff(locationId);
 			return;
 		}
