@@ -430,12 +430,14 @@ exports.controller = {
 					return reject(err);
 				}
 
-				securityControllersByLocations[location].push({
+				const newController = {
 					id,
 					location,
 					healthy: false,
 					lastHealthUpdate: null
-				});
+				};
+				securityControllersByLocations[location].push(newController);
+				evts.emit('controller-added', newController);
 				updateControllerHealthByLocation(location);
 				resolve();
 			});

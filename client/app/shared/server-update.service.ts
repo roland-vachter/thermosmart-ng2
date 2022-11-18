@@ -43,10 +43,6 @@ export class ServerUpdateService {
 		this.socketGlobal.on('update', data => {
 			this.observers.forEach(ob => ob.next(data));
 		});
-
-		io('/sensor/7').on('update', data => {
-			console.log(data);
-		});
 	}
 
 	private initSocketLocation(location: number) {
