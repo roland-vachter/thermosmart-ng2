@@ -33,7 +33,7 @@ securityStatus.evts.on('alarm', data => {
 				security: {
 					alarm: data.on
 				}
-			});
+			}));
 		});
 	});
 });
@@ -45,7 +45,7 @@ securityHealth.evts.on('camera-movement', () => {
 				security: {
 					cameraMovement: true
 				}
-			});
+			}));
 		});
 	});
 });
