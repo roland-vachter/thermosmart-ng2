@@ -28,7 +28,8 @@ var server = http.createServer(app);
 
 require('../lib/services/socketio').init(server);
 require('../lib/socketControllers/frontend').init();
-require('../lib/socketControllers/sensor').init();
+require('../lib/services/websocket').init(server);
+require('../lib/socketControllers/sensor');
 
 /**
  * Listen on provided port, on all network interfaces.

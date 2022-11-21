@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+	</head>
+	<body>
+		<script>
+			fetch('http://local.thermosmart:7000/socket.io/?EIO=4&transport=polling')
+				.then((response) => response.text())
+				.then(body => body.replace(/^[0-9]+\{/, '{'))
+				.then(jsonStr => JSON.parse(jsonStr))
+				.then(data => {
+					fetch(`http://local.thermosmart:7000/socket.io/?EIO=4&transport=polling&sid=${data.sid}`, {
+						method: 'POST',
+						body: '40/sensor'
+					}).then(() => {
+						fetch(`http://local.thermosmart:7000/socket.io/?EIO=4&transport=polling&sid=${data.sid}`, {
+							method: 'POST',
+							body: '40/sensor/7'
+						}).then(() => {
+							let webSocket = new WebSocket(`ws://local.thermosmart:7000/socket.io/?EIO=4&transport=websocket&sid=${data.sid}`);
+							webSocket.onmessage = function(m) {
+								console.log(m);
+
+								if (m.data === '2') {
+									webSocket.send('3');
+								}
+							};
+							webSocket.onopen = function (e) {
+								console.log('opened');
+								webSocket.send("2probe");
+
+								setTimeout(() => {
+									webSocket.send('5');
+								}, 3000);
+
+								// setInterval(() => {
+								// 	webSocket.send('3');
+								// }, 5000);
+							}
+							webSocket.onerror = function(error) {
+								console.log(error);
+							};
+							webSocket.onclose = function(event) {
+								if (event.wasClean) {
+									console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+								} else {
+								// e.g. server process killed or network down
+								// event.code is usually 1006 in this case
+									console.log('[close] Connection died');
+								}
+							};
+						});
+					});
+				});
+		</script>
+	</body>
+</html>

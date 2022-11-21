@@ -1,67 +1,55 @@
-const socket = require('../services/socketio');
+
 const securityStatus = require('../services/securityStatus');
 const securityHealth = require('../services/securityHealth');
+const websocket = require('../services/websocket');
 
 const SecurityControllers = require('../models/SecurityControllers');
 
-const authorizedSockets = [];
 
-function isSocketAuthorized (socket) {
-	return authorizedSockets.indexOf(socket) !== -1;
-}
+websocket.initWssConnection('/sensor/security');
+SecurityControllers.find().exec().then(controllers => {
+	controllers.forEach(c => {
+		websocket.initWssConnection(`/sensor/security/${c.controllerid}`);
+	});
+});
 
-let initialized = false;
+securityStatus.evts.on('status', data => {
+	securityHealth.controller.getIdsByLocation(data.location).then(ids => {
+		ids.forEach(id => {
+			console.log('send sensor event to', id);
+			websocket.broadcastMessage('/sensor/security/' + id, 'update', JSON.stringify({
+				security: {
+					status: data.status
+				}
+			}));
+		});
+	});
+});
 
-exports.init = function () {
-	if (!initialized) {
-		initialized = true;
-
-		const io = socket.io.of('/sensor');
-		SecurityControllers.find().exec().then(controllers => {
-			controllers.forEach(c => {
-				socket.io.of(`/sensor/${c.controllerid}`)
+securityStatus.evts.on('alarm', data => {
+	securityHealth.controller.getIdsByLocation(data.location).then(ids => {
+		ids.forEach(id => {
+			websocket.broadcastMessage('/sensor/security/' + id, 'update', JSON.stringify({
+				security: {
+					alarm: data.on
+				}
 			});
 		});
+	});
+});
 
-		securityStatus.evts.on('status', data => {
-			securityHealth.controller.getIdsByLocation(data.location).then(ids => {
-				ids.forEach(id => {
-					console.log('send sensor event to', id);
-					socket.io.of('/sensor/' + id).emit('update', {
-						security: {
-							status: data.status
-						}
-					});
-				});
+securityHealth.evts.on('camera-movement', () => {
+	securityHealth.controller.getIdsByLocation(data.location).then(ids => {
+		ids.forEach(id => {
+			websocket.broadcastMessage('/sensor/security/' + id, 'update', JSON.stringify({
+				security: {
+					cameraMovement: true
+				}
 			});
 		});
-
-		securityStatus.evts.on('alarm', data => {
-			securityHealth.controller.getIdsByLocation(data.location).then(ids => {
-				ids.forEach(id => {
-					socket.io.of('/sensor/' + id).emit('update', {
-						security: {
-							alarm: data.on
-						}
-					});
-				});
-			});
-		});
-
-		securityHealth.evts.on('camera-movement', () => {
-			securityHealth.controller.getIdsByLocation(data.location).then(ids => {
-				ids.forEach(id => {
-					socket.io.of('/sensor/' + id).emit('update', {
-						security: {
-							cameraMovement: true
-						}
-					});
-				});
-			});
-		});
-	}
-};
+	});
+});
 
 securityHealth.evts.on('controller-added', controller => {
-	socket.io.of(`/sensor/${controller.id}`);
+	websocket.initWssConnection(`/sensor/security/${controller.id}`);
 });
