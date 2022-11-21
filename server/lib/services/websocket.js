@@ -42,6 +42,10 @@ exports.initWssConnection = (path) => {
 					});
 					newWss.connections = [];
 				});
+
+				newWss.wss.on('wsClientError', error => {
+					console.log('&&&&&&&&&', error);
+				});
 			}
 
 			currentWss = currentWss.children[currentPath];
@@ -112,7 +116,11 @@ exports.init = function (server) {
 				return;
 			}
 
-			apiKeyAuthorization({ ...request, ...parseUrl(request.url, true) }, null, (err, client) => {
+			socket.on('wsClientError', function () {
+				console.log('$$$$$$$$$$', args);
+			});
+
+			apiKeyAuthorization({ ...request, ...parseUrl(request.url, true) }, null, (err) => {
 				if (err) {
 				  socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
 				  socket.destroy();
@@ -131,6 +139,10 @@ exports.init = function (server) {
 					socket.destroy();
 				}
 			});
+		});
+
+		server.on('wsClientError', function () {
+			console.log('########', args);
 		});
 	}
 };
