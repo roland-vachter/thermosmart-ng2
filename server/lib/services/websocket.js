@@ -105,6 +105,12 @@ exports.init = function (server) {
 	if (!initialized) {
 		initialized = true;
 
+		server.on('request', (request, res) => {
+			if (request.url.startsWith('/websocket')) {
+				res.sendStatus(101);
+			}
+		});
+
 		server.on('upgrade', (request, socket, head) => {
 			if (request.url.startsWith('/socket.io')) {
 				console.log('ignore socket.io', request.url);
