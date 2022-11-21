@@ -107,6 +107,7 @@ exports.init = function (server) {
 
 		server.on('request', (request, res) => {
 			if (request.url.startsWith('/websocket')) {
+				console.log(request);
 				res.sendStatus(101);
 			}
 		});
