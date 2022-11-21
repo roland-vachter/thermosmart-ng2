@@ -15,6 +15,11 @@ const cors = require('cors');
 router.post('/changeconfig', loginMiddleware, cors(), apiCtrl.changeConfig);
 router.get('/getconfig', loginMiddleware, cors(), apiCtrl.getConfig);
 router.get('/init', loginMiddleware, cors(), apiCtrl.init);
+router.get('/websocket/*', cors(), (req, res) => {
+	console.log('%%%% belep');
+	console.log(req);
+	res.sendStatus(101);
+})
 
 // heating
 router.get('/heating/init', loginMiddleware, cors(), heatingApiCtrl.init);
