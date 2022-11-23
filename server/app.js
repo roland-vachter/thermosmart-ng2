@@ -161,7 +161,11 @@ app.use(`/assets/`, express.static(path.join(__dirname, '../dist'), {
 
 app.use('/privacy-policy', (req, res) => {
 	res.render('privacy-policy');
-})
+});
+
+app.use('/data-deletion', (req, res) => {
+	res.render('data-deletion');
+});
 
 app.use('/', require('./router'));
 
