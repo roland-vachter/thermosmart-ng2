@@ -134,7 +134,6 @@ app.use(compression());
 const defaultOptions = {
 	assetsBasePath: `/assets`,
 	assetsStaticBasePath: `/assets/static`,
-	assetsBowerBasePath: `/assets/bower`,
 	basePath: '/',
 	isTest: !prodEnv,
 	isProd: prodEnv
@@ -153,13 +152,6 @@ app.use( function( req, res, next ) {
 
 const ayear = 365 * 24 * 60 * 60 * 1000;
 
-app.get(`/assets/bower/*.(woff|svg|ttf|eot|gif|png|jpg|js|css)`, (req, res) => {
-	const newPath = req.originalUrl.split('/').slice(4).join('/');
-
-	cacheHeaders.setCache(res, ayear/1000);
-
-	res.sendFile(path.join(__dirname, '/bower_components', newPath));
-});
 app.use(`/assets/static/`, express.static(path.join(__dirname, 'public'), {
 	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
 }));
@@ -167,7 +159,9 @@ app.use(`/assets/`, express.static(path.join(__dirname, '../dist'), {
 	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
 }));
 
-
+app.use('/privacy-policy', (req, res) => {
+	res.render('privacy-policy');
+})
 
 app.use('/', require('./router'));
 
