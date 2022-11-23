@@ -5,6 +5,7 @@ const pushNotifications = require('./pushNotifications');
 const SecurityMovementHistory = require('../models/SecurityMovementHistory');
 const SecurityArmingHistory = require('../models/SecurityArmingHistory');
 const Location = require('../models/Location');
+const moment = require('moment');
 
 const STATUSES = {
 	DISARMED: 'disarmed',
@@ -171,6 +172,29 @@ exports.movementDetected = (location) => {
 		}, 15 * 1000);
 	}
 };
+
+const clearOldMovementHistory = () => {
+	SecurityMovementHistory
+		.deleteMany({
+			datetime: {
+				$lte: moment().subtract(1, 'month').subtract(1, 'day').toDate()
+			}
+		})
+		.exec()
+		.then(result => {
+			console.log('Security momvent history cleaned up, deleted:', result.deletedCount);
+		})
+		.catch(err => {
+			console.log('Failed to cleanup security movement history with error', err);
+		});
+};
+
+setInterval(() => {
+	clearOldMovementHistory();
+}, 60 * 60 * 1000); // every hour
+clearOldMovementHistory();
+
+
 
 exports.getLastMovementDate = (location) => securityByLocation[location].lastMovement;
 exports.getLastArmedDate = (location) => securityByLocation[location].lastArmedAt;

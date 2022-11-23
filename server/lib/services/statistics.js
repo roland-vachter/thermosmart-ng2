@@ -286,12 +286,40 @@ async function calculateAvgOutsideCondition (date) {
 }
 
 
-const saveStatisticsForADay = () => {
+const saveStatisticsForADay = async () => {
 	console.log('statistics save started');
 
-	Location.find().exec().then(locations => {
-		locations.forEach(l => saveStatisticsForADayByLocation(l._id));
-	});
+	try {
+		const locations = await Location.find().lean().exec();
+		await Promise.all(locations.map(l => saveStatisticsForADayByLocation(l._id)));
+
+		const lastHeatingStatistic = await HeatingStatistics
+			.findOne()
+			.sort({
+				date: -1
+			})
+			.exec();
+
+		if (lastHeatingStatistic && lastHeatingStatistic.date) {
+			await OutsideConditionHistory
+				.deleteMany({
+					datetime: {
+						$lt: moment(lastHeatingStatistic.date).subtract(1, 'month').toDate()
+					}
+				})
+				.exec()
+				.then(result => {
+					console.log('Successfully cleaned up outside condition history, deleted count:', result.deletedCount);
+				})
+				.catch(e => {
+					console.log('Failed to cleanup outside condition history with error:', e);
+				});
+		}
+
+		console.log('statistics save complete');
+	} catch (e) {
+		console.log('statistics save failed with error', e);
+	}
 };
 
 const saveStatisticsForADayByLocation = async (location) => {
@@ -356,9 +384,38 @@ const saveStatisticsForADayByLocation = async (location) => {
 
 			currentDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
 		}
-	}
 
-	console.log('statistics save complete');
+		// cleanup unused data + keep last month as buffer
+		await HeatingHistory
+			.deleteMany({
+				location: location,
+				datetime: {
+					$lt: moment(currentDate).subtract(1, 'month').toDate()
+				}
+			})
+			.exec()
+			.then(result => {
+				console.log('Successfully cleaned up heating history, deleted count:', result.deletedCount);
+			})
+			.catch(e => {
+				console.log('Failed to cleanup heating history with error:', e);
+			});
+
+		await TargetTempHistory
+			.deleteMany({
+				location: location,
+				datetime: {
+					$lt: moment(currentDate).subtract(1, 'month').toDate()
+				}
+			})
+			.exec()
+			.then(result => {
+				console.log('Successfully cleaned up target temp history, deleted count:', result.deletedCount);
+			})
+			.catch(e => {
+				console.log('Failed to cleanup target temp history with error:', e);
+			});
+	}
 };
 
 
@@ -467,7 +524,4 @@ exports.getStatisticsByMonth = async (location, dateStart, dateEnd) => {
 
 
 saveStatisticsForADay();
-setTimeout(() => {
-	saveStatisticsForADay();
-	setInterval(saveStatisticsForADay, 24 * 60 * 60 * 1000);
-}, new Date(moment().tz("Europe/Bucharest").endOf('day')).getTime() - new Date(moment().tz("Europe/Bucharest")).getTime() + 10);
+setInterval(saveStatisticsForADay, 24 * 60 * 60 * 1000);
