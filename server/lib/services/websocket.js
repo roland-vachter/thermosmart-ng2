@@ -33,12 +33,14 @@ exports.initWssConnection = (path) => {
 					ping(ws);
 
 					ws.on('close', () => {
+						console.log('disconnected');
 						ws.terminate();
 						newWss.connections.splice(newWss.connections.indexOf(ws), 1);
 					});
 				});
 
 				newWss.wss.on('close', () => {
+					console.log('all connections closed');
 					newWss.connections.forEach(ws => {
 						ws.terminate();
 					});
@@ -133,7 +135,7 @@ exports.init = function (server) {
 
 				if (wss) {
 					wss.wss.handleUpgrade(request, socket, head, function done(ws) {
-						console.log('handle upgrade', request.url);
+						console.log('========== handle upgrade', request.url);
 						wss.wss.emit('connection', ws, request);
 					});
 				} else {
@@ -156,6 +158,7 @@ const heartbeat = (wss) => {
 					ws.terminate();
 					wss.children[p].connections.splice(i, 1);
 				} else {
+					console.log('not alive', p);
 					ws.isAlive = false;
 					ping(ws);
 					i++;
@@ -168,7 +171,7 @@ const heartbeat = (wss) => {
 
 setInterval(() => {
 	heartbeat(wssByPaths);
-}, 30000);
+}, 20000);
 
 const ping = (ws) => {
 	ws.send('==ping==');
