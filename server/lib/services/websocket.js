@@ -23,13 +23,14 @@ exports.initWssConnection = (path) => {
 				newWss.wss.on('connection', (ws) => {
 					newWss.connections.push(ws);
 
-					ws.on('pong', () => {
-						console.log('========= pong');
-						ws.isAlive = true;
+					ws.on('message', message => {
+						if (Buffer.from(message).toString() === '==pong==') {
+							ws.isAlive = true;
+						}
 					});
 
 					ws.isAlive = true;
-					ws.ping();
+					ping(ws);
 
 					ws.on('close', () => {
 						ws.terminate();
@@ -45,7 +46,7 @@ exports.initWssConnection = (path) => {
 				});
 
 				newWss.wss.on('wsClientError', error => {
-					console.log('&&&&&&&&&', error);
+					console.log('&&&&&&&&& wsClientError', error);
 				});
 			}
 
@@ -107,9 +108,7 @@ exports.init = function (server) {
 		initialized = true;
 
 		server.on('upgrade', (request, socket, head) => {
-			console.log(request.headers);
 			if (request.url.startsWith('/socket.io')) {
-				console.log('ignore socket.io', request.url);
 				return;
 			}
 
@@ -119,7 +118,7 @@ exports.init = function (server) {
 			}
 
 			socket.on('wsClientError', function () {
-				console.log('$$$$$$$$$$', args);
+				console.log('$$$$$$$$$$ wsClientError', args);
 			});
 
 			apiKeyAuthorization({ ...request, ...parseUrl(request.url, true) }, null, (err) => {
@@ -142,10 +141,6 @@ exports.init = function (server) {
 				}
 			});
 		});
-
-		server.on('wsClientError', function () {
-			console.log('########', args);
-		});
 	}
 };
 
@@ -162,7 +157,7 @@ const heartbeat = (wss) => {
 					wss.children[p].connections.splice(i, 1);
 				} else {
 					ws.isAlive = false;
-					ws.ping();
+					ping(ws);
 					i++;
 				}
 			}
@@ -174,3 +169,7 @@ const heartbeat = (wss) => {
 setInterval(() => {
 	heartbeat(wssByPaths);
 }, 30000);
+
+const ping = (ws) => {
+	ws.send('==ping==');
+}
