@@ -24,6 +24,7 @@ exports.initWssConnection = (path) => {
 					newWss.connections.push(ws);
 
 					ws.on('pong', () => {
+						console.log('========= pong');
 						ws.isAlive = true;
 					});
 
