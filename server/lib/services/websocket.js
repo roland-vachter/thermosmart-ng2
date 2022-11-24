@@ -25,6 +25,7 @@ exports.initWssConnection = (path) => {
 
 					ws.on('message', message => {
 						if (Buffer.from(message).toString() === '==pong==') {
+							console.log('pong');
 							ws.isAlive = true;
 						}
 					});
@@ -174,5 +175,6 @@ setInterval(() => {
 }, 20000);
 
 const ping = (ws) => {
+	console.log('ping');
 	ws.send('==ping==');
 }
