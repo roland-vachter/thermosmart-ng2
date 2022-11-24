@@ -159,7 +159,6 @@ const heartbeat = (wss) => {
 					ws.terminate();
 					wss.children[p].connections.splice(i, 1);
 				} else {
-					console.log('not alive', p);
 					ws.isAlive = false;
 					ping(ws);
 					i++;
