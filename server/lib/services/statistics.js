@@ -182,6 +182,7 @@ async function calculateAvgTargetTemp (location, date) {
 	}
 
 	if (!results || !results.length) {
+		console.log('no target temp history found');
 		return null;
 	}
 
@@ -524,4 +525,7 @@ exports.getStatisticsByMonth = async (location, dateStart, dateEnd) => {
 
 
 saveStatisticsForADay();
-setInterval(saveStatisticsForADay, 24 * 60 * 60 * 1000);
+setTimeout(() => {
+	saveStatisticsForADay();
+	setInterval(saveStatisticsForADay, 24 * 60 * 60 * 1000);
+}, moment().tz('Europe/Bucharest').endOf('day').diff(moment()) + 60 * 1000);

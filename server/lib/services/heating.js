@@ -129,7 +129,13 @@ function turnHeatingOn (locationId) {
 	locationStatus.isOn = true;
 	locationStatus.lastStatusReadBySensor = false;
 
-	console.log(`[${locationId}] heating power on`);
+	if (locationStatus.lastChangeEventStatus === false) {
+		heatingEvts.emit('changeHeating', {
+			isOn: locationStatus.isOn,
+			location: locationId
+		});
+		console.log(`[${locationId}] heating turn off`);
+	}
 }
 
 function turnHeatingOff (locationId) {
@@ -138,12 +144,12 @@ function turnHeatingOff (locationId) {
 
 	locationStatus.isOn = false;
 	locationStatus.lastStatusReadBySensor = false;
-	if (locationStatus.lastChangeEventStatus !== locationStatus.isOn) {
+	if (locationStatus.lastChangeEventStatus === true) {
 		heatingEvts.emit('changeHeating', {
 			isOn: locationStatus.isOn,
 			location: locationId
 		});
-		console.log(`[${locationId}] heating power off`);
+		console.log(`[${locationId}] heating turn off`);
 	}
 	locationStatus.lastChangeEventStatus = locationStatus.isOn;
 }
