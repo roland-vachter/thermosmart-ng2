@@ -103,7 +103,7 @@ exports.togglePower = (locationId) => {
 			until: locationStatus.until
 		});
 
-		suspendTimeout = setTimeout(() => {
+		locationStatus.suspendTimeout = setTimeout(() => {
 			exports.togglePower(locationId);
 		}, 15 * 60 * 1000);
 	} else {
