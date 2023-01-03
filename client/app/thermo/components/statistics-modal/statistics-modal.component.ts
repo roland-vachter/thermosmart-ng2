@@ -475,8 +475,8 @@ export class StatisticsModalComponent implements OnInit {
 									ticks: {
 										callback: value => value,
 										// fixedStepSize: 2,
-										min: minTemp - 0.1,
-										max: maxTemp + 0.1
+										min: parseFloat((minTemp - 0.1).toFixed(1)),
+										max: parseFloat((maxTemp + 0.1).toFixed(1))
 									},
 									tooltipFormat: value => value.toFixed(1)
 								}]
