@@ -10,6 +10,7 @@ const restartSensorService = require('../../services/restartSensor');
 const configService = require('../../services/config');
 const targetTempService = require('../../services/targetTemp');
 const SensorSetting = require('../../models/SensorSetting');
+const HeatingSensorHistory = require('../../models/HeatingSensorHistory');
 const types = require('../../utils/types');
 
 const moment = require('moment-timezone');
@@ -417,7 +418,7 @@ exports.statistics = async (req, res) => {
 
 	const location = parseInt(req.query.location, 10);
 
-	const [statisticsForToday, statisticsForLastMonth, statisticsByMonth] = await Promise.all([
+	const [statisticsForToday, statisticsForLastMonth, statisticsByMonth, sensorTempHistory] = await Promise.all([
 		HeatingHistory
 			.find({
 				datetime: {
@@ -429,7 +430,19 @@ exports.statistics = async (req, res) => {
 		statisticsService
 			.getStatisticsByDay(location, new Date(moment().tz('Europe/Bucharest').subtract(1, 'month')), new Date(moment().tz('Europe/Bucharest'))),
 		statisticsService
-			.getStatisticsByMonth(location, new Date(moment('2017-01-01 12:00:00').tz('Europe/Bucharest')), new Date(moment().tz('Europe/Bucharest')))
+			.getStatisticsByMonth(location, new Date(moment('2017-01-01 12:00:00').tz('Europe/Bucharest')), new Date(moment().tz('Europe/Bucharest'))),
+		HeatingSensorHistory
+			.find({
+				datetime: {
+					$gt: new Date(moment().tz('Europe/Bucharest').subtract(1, 'day'))
+				}
+			})
+			.populate({
+				path: 'sensor'
+			})
+			.lean()
+			.exec()
+			.then(result => result.filter(r => r.sensor.location === location))
 	]);
 
 	statisticsForToday.unshift({
@@ -447,7 +460,8 @@ exports.statistics = async (req, res) => {
 		data: {
 			statisticsForToday,
 			statisticsForLastMonth,
-			statisticsByMonth
+			statisticsByMonth,
+			sensorTempHistory
 		}
 	});
 };

@@ -3,6 +3,7 @@ const heatingEvts = require('./heatingEvts');
 const pushNotifications = require('./pushNotifications');
 
 const EventEmitter = require('events');
+const HeatingSensorHistory = require('../models/HeatingSensorHistory');
 const evts = new EventEmitter();
 
 const sensorData = {};
@@ -66,6 +67,15 @@ exports.set = async (data) => {
 		sensorData[id].label = sensorSetting.label;
 		sensorData[id].tempAdjust = sensorSetting.tempAdjust;
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
+
+		if (changesMade) {
+			new HeatingSensorHistory({
+				sensor: id,
+				t: sensorData[id].temperature,
+				h: sensorData[id].humidity,
+				datetime: new Date()
+			}).save();
+		}
 
 		if (!heatingOnByLocation[data.location] && sensorSetting.enabled && sensorData[id].tempHistory.length) {
 			const lastTemp = sensorData[id].tempHistory[0];

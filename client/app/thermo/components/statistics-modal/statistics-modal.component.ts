@@ -10,6 +10,15 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 	styleUrls: ['./statistics-modal.component.scss']
 })
 export class StatisticsModalComponent implements OnInit {
+	colors = [
+		[75, 192, 192],
+		[255, 116, 0],
+		[115, 136, 10],
+		[255, 26, 0],
+		[199, 152, 16],
+		[63, 76, 107]
+	];
+
 	constructor(
 			private serverApiService: ThermoServerApiService,
 			public bsModalRef: BsModalRef) { }
@@ -25,17 +34,17 @@ export class StatisticsModalComponent implements OnInit {
 								label: 'Heating status',
 								data: response.data.statisticsForToday.map(item => {return {x: item.datetime, y: item.status ? 10 : 0}; }),
 								steppedLine: true,
-								backgroundColor: "rgba(75,192,192,0.4)",
-								borderColor: "rgba(75,192,192,1)",
+								backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
+								borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: "rgba(75,192,192,1)",
+								pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: "rgba(75,192,192,1)",
+								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
@@ -107,17 +116,17 @@ export class StatisticsModalComponent implements OnInit {
 								data: [
 									...response.data.statisticsForLastMonth.map(item => {return {x: item.date, y: item.runningMinutes}; })
 								],
-								backgroundColor: "rgba(75,192,192,0.4)",
-								borderColor: "rgba(75,192,192,1)",
+								backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
+								borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: "rgba(75,192,192,1)",
+								pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: "rgba(75,192,192,1)",
+								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
@@ -128,16 +137,16 @@ export class StatisticsModalComponent implements OnInit {
 								data: [
 									...response.data.statisticsForLastMonth.map(item => {return {x: item.date, y: item.avgTargetTemp}; })
 								],
-								borderColor: "rgba(255,116,0,1)",
+								borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: "rgba(255,116,0,1)",
+								pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: "rgba(255,116,0,1)",
+								pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
@@ -149,16 +158,16 @@ export class StatisticsModalComponent implements OnInit {
 								data: [
 									...response.data.statisticsForLastMonth.map(item => {return {x: item.date, y: item.avgOutsideTemp}; })
 								],
-								borderColor: "rgba(115,136,10,1)",
+								borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: "rgba(115,136,10,1)",
+								pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: "rgba(115,136,10,1)",
+								pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
@@ -257,17 +266,17 @@ export class StatisticsModalComponent implements OnInit {
 								data: [
 									...response.data.statisticsByMonth.map(item => {return {x: item.date, y: item.avgRunningMinutes}; })
 								],
-								backgroundColor: "rgba(75,192,192,0.4)",
-								borderColor: "rgba(75,192,192,1)",
+								backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
+								borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: "rgba(75,192,192,1)",
+								pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: "rgba(75,192,192,1)",
+								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
@@ -278,16 +287,16 @@ export class StatisticsModalComponent implements OnInit {
 								data: [
 									...response.data.statisticsByMonth.map(item => {return {x: item.date, y: item.avgTargetTemp}; })
 								],
-								borderColor: "rgba(255,116,0,1)",
+								borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: "rgba(255,116,0,1)",
+								pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: "rgba(255,116,0,1)",
+								pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
@@ -299,16 +308,16 @@ export class StatisticsModalComponent implements OnInit {
 								data: [
 									...response.data.statisticsByMonth.map(item => {return {x: item.date, y: item.avgOutsideTemp}; })
 								],
-								borderColor: "rgba(115,136,10,1)",
+								borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: "rgba(115,136,10,1)",
+								pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: "rgba(115,136,10,1)",
+								pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
@@ -383,6 +392,90 @@ export class StatisticsModalComponent implements OnInit {
 										fixedStepSize: 2,
 										min: Math.floor(Math.min(minTargetTemp, minAvgOutsideTemp)),
 										max: Math.ceil(Math.max(maxTargetTemp, maxAvgOutsideTemp))
+									},
+									tooltipFormat: value => value.toFixed(1)
+								}]
+							}
+						}
+					});
+				}
+
+				if (response.data.sensorTempHistory) {
+					const minTemp = Math.min(...response.data.sensorTempHistory.map(item => item.t));
+					const maxTemp = Math.max(...response.data.sensorTempHistory.map(item => item.t));
+
+					const sensors = [];
+					response.data.sensorTempHistory.forEach(sth => {
+						if (!sensors.find(s => s._id === sth.sensor._id)) {
+							sensors.push(sth.sensor);
+						}
+					});
+
+					new Chart(document.querySelector('#sensorTempHistoryChart'), {
+						type: 'line',
+						data: {
+							datasets: sensors.map((s, index) => ({
+								label: s.label,
+								yAxisID: "temp",
+								data: [
+									...response.data.sensorTempHistory.filter(sth => sth.sensor._id === s._id).map(item => {return {x: item.datetime, y: item.t}; })
+								],
+								backgroundColor: `rgba(${this.colors[index % this.colors.length][0]},${this.colors[index % this.colors.length][1]},${this.colors[index % this.colors.length][2]},0.4)`,
+								borderColor: `rgba(${this.colors[index % this.colors.length][0]},${this.colors[index % this.colors.length][1]},${this.colors[index % this.colors.length][2]},1)`,
+								borderCapStyle: 'butt',
+								borderDash: [],
+								borderDashOffset: 0.0,
+								borderJoinStyle: 'miter',
+								pointBorderColor: `rgba(${this.colors[index % this.colors.length][0]},${this.colors[index % this.colors.length][1]},${this.colors[index % this.colors.length][2]},1)`,
+								pointBackgroundColor: "#fff",
+								pointBorderWidth: 1,
+								pointHoverRadius: 6,
+								pointHoverBackgroundColor: `rgba(${this.colors[index % this.colors.length][0]},${this.colors[index % this.colors.length][1]},${this.colors[index % this.colors.length][2]},1)`,
+								pointHoverBorderColor: "rgba(220,220,220,1)",
+								pointHoverBorderWidth: 2,
+								pointRadius: 3,
+								pointHitRadius: 9,
+							}))
+						},
+						options: {
+							maintainAspectRatio: false,
+							responsive: true,
+							tooltips: {
+								mode: 'x',
+								intersect: true,
+								callbacks: {
+									label: function(tooltipItem, data) {
+										return `${data.datasets[tooltipItem.datasetIndex].label}: ${tooltipItem.yLabel.toFixed(1)}`;
+									}
+								}
+							},
+							scales: {
+								xAxes: [{
+									type: 'time',
+									time: {
+										unit: 'hour',
+										tooltipFormat: 'MMM Do, HH:mm',
+										unitStepSize: 1,
+										displayFormats: {
+											millisecond: 'SSS [ms]',
+											second: 'h:mm:ss a',
+											minute: 'h:mm:ss a',
+											hour: 'HH:mm',
+											day: 'MMM D',
+											week: 'll',
+											month: 'MMM YYYY',
+											quarter: '[Q]Q - YYYY',
+											year: 'YYYY'
+										}
+									}
+								}],
+								yAxes: [{
+									id: "temp",
+									ticks: {
+										callback: value => value,
+										// fixedStepSize: 2,
+										min: Math.floor(minTemp),
+										max: Math.ceil(maxTemp)
 									},
 									tooltipFormat: value => value.toFixed(1)
 								}]
