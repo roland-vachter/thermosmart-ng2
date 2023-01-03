@@ -475,8 +475,8 @@ export class StatisticsModalComponent implements OnInit {
 									ticks: {
 										callback: value => value,
 										// fixedStepSize: 2,
-										min: Math.floor(minTemp),
-										max: Math.ceil(maxTemp)
+										min: minTemp - 0.1,
+										max: maxTemp + 0.1
 									},
 									tooltipFormat: value => value.toFixed(1)
 								}]

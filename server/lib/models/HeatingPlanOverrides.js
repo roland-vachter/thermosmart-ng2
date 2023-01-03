@@ -5,11 +5,12 @@ const Schema = mongoose.Schema;
 
 const EventEmitter = require('events');
 const evts = new EventEmitter();
+const moment = require('moment-timezone');
 
 const heatingPlanOverridesSchema = new Schema({
 	date: Number,
 	plan: {
-		type: String,
+		type: Number,
 		ref: 'HeatingPlan'
 	},
 	location: {
@@ -30,3 +31,14 @@ module.exports.triggerChange = function (location) {
 		location
 	});
 };
+
+
+function cleanup () {
+
+}
+
+cleanup();
+setTimeout(() => {
+	cleanup();
+	setInterval(saveStatisticsForADay, 24 * 60 * 60 * 1000);
+}, moment().tz('Europe/Bucharest').endOf('day').diff(moment()) + 60 * 1000);
