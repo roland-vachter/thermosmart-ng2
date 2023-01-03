@@ -55,6 +55,15 @@ exports.set = async (data) => {
 			changesMade = true;
 		}
 
+		if (sensorData[id].temperature !== data.temperature + sensorSetting.tempAdjust) {
+			new HeatingSensorHistory({
+				sensor: id,
+				t: data.temperature + sensorSetting.tempAdjust,
+				h: data.humidity + sensorSetting.humidityAdjust,
+				datetime: new Date()
+			}).save();
+		}
+
 		sensorData[id].temperature = data.temperature + sensorSetting.tempAdjust;
 		sensorData[id].humidity = data.humidity + sensorSetting.humidityAdjust;
 
@@ -67,15 +76,6 @@ exports.set = async (data) => {
 		sensorData[id].label = sensorSetting.label;
 		sensorData[id].tempAdjust = sensorSetting.tempAdjust;
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
-
-		if (changesMade) {
-			new HeatingSensorHistory({
-				sensor: id,
-				t: sensorData[id].temperature,
-				h: sensorData[id].humidity,
-				datetime: new Date()
-			}).save();
-		}
 
 		if (!heatingOnByLocation[data.location] && sensorSetting.enabled && sensorData[id].tempHistory.length) {
 			const lastTemp = sensorData[id].tempHistory[0];
