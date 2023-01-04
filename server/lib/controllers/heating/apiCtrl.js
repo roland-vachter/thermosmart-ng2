@@ -454,6 +454,24 @@ exports.statistics = async (req, res) => {
 		status: statisticsForToday.length ? statisticsForToday[statisticsForToday.length - 1].status : false
 	});
 
+	const lastHistoryBySensor = [];
+	sensorTempHistory.forEach(sth => {
+		const historyFound = lastHistoryBySensor.find(s => s.sensor._id === sth.sensor._id);
+		if (!historyFound) {
+			lastHistoryBySensor.push(sth);
+		} else {
+			lastHistoryBySensor.splice(lastHistoryBySensor.indexOf(historyFound), 1);
+			lastHistoryBySensor.push(sth);
+		}
+	});
+
+	lastHistoryBySensor.forEach(history => {
+		sensorTempHistory.push({
+			...history,
+			datetime: Date.now()
+		});
+	});
+
 
 	return res.json({
 		status: 'ok',
