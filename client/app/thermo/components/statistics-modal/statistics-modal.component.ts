@@ -411,6 +411,8 @@ export class StatisticsModalComponent implements OnInit {
 						}
 					});
 
+					sensors.sort((a, b) => a.order - b.order);
+
 					new Chart(document.querySelector('#sensorTempHistoryChart'), {
 						type: 'line',
 						data: {
