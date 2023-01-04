@@ -22,8 +22,9 @@ const heatingPlanOverridesSchema = new Schema({
 heatingPlanOverridesSchema.index({date: 1});
 heatingPlanOverridesSchema.set('versionKey', false);
 
-module.exports = mongoose.model('HeatingPlanOverrides', heatingPlanOverridesSchema);
+const HeatingPlanOverrides = mongoose.model('HeatingPlanOverrides', heatingPlanOverridesSchema);
 
+module.exports = HeatingPlanOverrides;
 module.exports.evts = evts;
 module.exports.triggerChange = function (location) {
 	console.log('heating plan override change triggered');
@@ -32,13 +33,24 @@ module.exports.triggerChange = function (location) {
 	});
 };
 
-
 function cleanup () {
-
+	HeatingPlanOverrides
+		.deleteMany({
+			date: {
+				$lt: moment().tz("Europe/Bucharest").startOf('day').valueOf()
+			}
+		})
+		.exec()
+		.then(result => {
+			console.log('Successfully cleaned up heating plan overrides, deleted count:', result.deletedCount);
+		})
+		.catch(e => {
+			console.log('Failed to cleanup heating plan overrides with error:', e);
+		});
 }
 
 cleanup();
 setTimeout(() => {
 	cleanup();
-	setInterval(saveStatisticsForADay, 24 * 60 * 60 * 1000);
+	setInterval(cleanup, 24 * 60 * 60 * 1000);
 }, moment().tz('Europe/Bucharest').endOf('day').diff(moment()) + 60 * 1000);
