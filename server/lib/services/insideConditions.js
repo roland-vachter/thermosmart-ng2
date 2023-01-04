@@ -42,7 +42,8 @@ exports.set = async (data) => {
 				onHoldTempLowest: null,
 				onHoldTempHighest: null,
 				onHoldStatus: null,
-				location: sensorSetting.location
+				location: sensorSetting.location,
+				lastSavedTemperature: null
 			};
 		}
 
@@ -53,15 +54,6 @@ exports.set = async (data) => {
 				sensorData[id].humidity !== data.humidity + sensorSetting.humidityAdjust ||
 				sensorData[id].active !== true) {
 			changesMade = true;
-		}
-
-		if (sensorData[id].temperature !== data.temperature + sensorSetting.tempAdjust) {
-			new HeatingSensorHistory({
-				sensor: id,
-				t: data.temperature + sensorSetting.tempAdjust,
-				h: data.humidity + sensorSetting.humidityAdjust,
-				datetime: new Date()
-			}).save();
 		}
 
 		sensorData[id].temperature = data.temperature + sensorSetting.tempAdjust;
@@ -76,6 +68,17 @@ exports.set = async (data) => {
 		sensorData[id].label = sensorSetting.label;
 		sensorData[id].tempAdjust = sensorSetting.tempAdjust;
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
+
+
+		if (!sensorData[id].lastSavedTemperature || Math.abs(sensorData[id].temperature - sensorData[id].lastSavedTemperature) > 0.1) {
+			new HeatingSensorHistory({
+				sensor: id,
+				t: sensorData[id].temperature,
+				h: data.humidity + sensorSetting.humidityAdjust,
+				datetime: new Date()
+			}).save();
+			sensorData[id].lastSavedTemperature = sensorData[id].temperature;
+		}
 
 		if (!heatingOnByLocation[data.location] && sensorSetting.enabled && sensorData[id].tempHistory.length) {
 			const lastTemp = sensorData[id].tempHistory[0];
