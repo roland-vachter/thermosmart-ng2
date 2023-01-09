@@ -65,7 +65,7 @@ exports.set = async (data) => {
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
 
 
-		if (!sensorData[id].lastSavedTemperature || Math.abs(sensorData[id].temperature - sensorData[id].lastSavedTemperature) > 0.15) {
+		if (!sensorData[id].lastSavedTemperature || sensorData[id].temperature !== sensorData[id].lastSavedTemperature) {
 			new HeatingSensorHistory({
 				sensor: id,
 				t: sensorData[id].temperature,
