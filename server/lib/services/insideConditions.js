@@ -21,17 +21,12 @@ exports.set = async (data) => {
 	try {
 		const id = data.id;
 
-		if (
-				!(sensorData[id] && Math.abs(data.temperature - sensorData[id].temperature) < 10) &&
-				!(!sensorData[id] && data.temperature > 10)
-			) {
-			console.log(`INVALID SENSOR VALUES - id: ${id}, temperature: ${data.temperature}, humidity: ${data.humidity}`);
-			return;
-		}
-
 		let sensorSetting = await SensorSetting.findOne({
 			_id: id
 		});
+
+		const temp = parseFloat((data.temperature + sensorSetting.tempAdjust).toFixed(1));
+		const humidity = Math.round(data.humidity + sensorSetting.humidityAdjust);
 
 		if (!sensorData[id]) {
 			sensorData[id] = {
@@ -50,14 +45,14 @@ exports.set = async (data) => {
 
 		let changesMade = false;
 
-		if (sensorData[id].temperature !== data.temperature + sensorSetting.tempAdjust ||
-				sensorData[id].humidity !== data.humidity + sensorSetting.humidityAdjust ||
+		if (sensorData[id].temperature !== temp ||
+				sensorData[id].humidity !== humidity ||
 				sensorData[id].active !== true) {
 			changesMade = true;
 		}
 
-		sensorData[id].temperature = data.temperature + sensorSetting.tempAdjust;
-		sensorData[id].humidity = data.humidity + sensorSetting.humidityAdjust;
+		sensorData[id].temperature = temp;
+		sensorData[id].humidity = humidity;
 
 		sensorData[id].reportedTemperature = data.temperature;
 		sensorData[id].reportedHumidity = data.humidity;
