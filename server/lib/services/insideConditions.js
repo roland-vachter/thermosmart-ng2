@@ -67,7 +67,7 @@ exports.set = async (data) => {
 
 
 		if (!sensorData[id].lastSavedTemperature || sensorData[id].temperature !== sensorData[id].lastSavedTemperature) {
-			const newDir = sensorData[id].temperature < sensorData[id].lastSavedTemperature ? 'falling' : 'rising';
+			const newDir = !sensorData[id].lastSavedTemperature ? null : sensorData[id].temperature < sensorData[id].lastSavedTemperature ? 'falling' : 'rising';
 			if (!sensorData[id].lastSavedTemperature ||
 				!sensorData[id].tempDirection ||
 				sensorData[id].tempDirection === newDir ||
