@@ -33,6 +33,7 @@ exports.set = async (data) => {
 				id: id,
 				enabled: sensorSetting.enabled,
 				windowOpen: false,
+				windowOpenTimeout: null,
 				tempHistory: [],
 				onHoldTempLowest: null,
 				onHoldTempHighest: null,
@@ -86,9 +87,12 @@ exports.set = async (data) => {
 		if (!heatingOnByLocation[data.location] && sensorSetting.enabled && sensorData[id].tempHistory.length) {
 			const lastTemp = sensorData[id].tempHistory[0];
 			const prevLastTemp = sensorData[id].tempHistory[1];
+			const preprevLastTemp = sensorData[id].tempHistory[1];
 
 			if (!sensorData[id].onHoldStatus) {
-				if (lastTemp - data.temperature >= 0.15 || (prevLastTemp && prevLastTemp - data.temperature >= 0.25)) {
+				if (lastTemp - data.temperature >= 0.15 ||
+						(prevLastTemp && prevLastTemp - data.temperature >= 0.25) ||
+						(preprevLastTemp && preprevLastTemp - data.temperature >= 0.35)) {
 					sensorData[id].onHoldTempLowest = data.temperature;
 					sensorData[id].onHoldTempHighest = null;
 					changesMade = true;
@@ -96,9 +100,16 @@ exports.set = async (data) => {
 					sensorData[id].onHoldStatus = 'firstDecrease';
 				}
 			} else if (sensorData[id].onHoldStatus === 'firstDecrease') {
-				if (lastTemp - data.temperature >= 0.15) {
+				if (lastTemp - data.temperature >= 0.15 ||
+						(prevLastTemp && prevLastTemp - data.temperature >= 0.25) ||
+						(preprevLastTemp && preprevLastTemp - data.temperature >= 0.35)) {
 					sensorData[id].onHoldTempLowest = data.temperature;
 					sensorData[id].windowOpen = true;
+
+					clearTimeout(sensorData[id].windowOpenTimeout);
+					sensorData[id].windowOpenTimeout = setTimeout(() => {
+						sensorData[id].windowOpen = false;
+					}, 20000);
 
 					changesMade = true;
 					sensorData[id].onHoldStatus = 'decrease';
@@ -107,6 +118,7 @@ exports.set = async (data) => {
 					sensorData[id].onHoldTempLowest = null;
 					sensorData[id].onHoldTempHighest = null;
 					sensorData[id].windowOpen = false;
+					clearTimeout(sensorData[id].windowOpenTimeout);
 					changesMade = true;
 				}
 			} else if (sensorData[id].onHoldStatus === 'decrease') {
@@ -139,6 +151,7 @@ exports.set = async (data) => {
 					sensorData[id].onHoldStatus = 'increase';
 				} else {
 					sensorData[id].windowOpen = false;
+					clearTimeout(sensorData[id].windowOpenTimeout);
 					sensorData[id].onHoldStatus = null;
 					sensorData[id].onHoldTempHighest = null;
 					sensorData[id].onHoldTempLowest = null;
@@ -149,6 +162,7 @@ exports.set = async (data) => {
 			if (data.temperature <= 10) {
 				sensorData[id].onHoldStatus = null;
 				sensorData[id].windowOpen = false;
+				clearTimeout(sensorData[id].windowOpenTimeout);
 			}
 		}
 
@@ -158,7 +172,10 @@ exports.set = async (data) => {
 		}
 
 		if (changesMade) {
-			evts.emit('change', sensorData[id]);
+			evts.emit('change', {
+				...sensorData[id],
+				windowOpenTimeout: null
+			});
 		}
 	} catch (e) {
 		console.error("Error saving sensor data", e);
@@ -218,6 +235,7 @@ exports.toggleSensorStatus = async (id) => {
 exports.disableSensorWindowOpen = (id) => {
 	if (sensorData[id]) {
 		sensorData[id].windowOpen = false;
+		clearTimeout(sensorData[id].windowOpenTimeout);
 		evts.emit('change', sensorData[id]);
 	}
 }
@@ -262,6 +280,7 @@ setInterval(() => {
 
 				sensorData[id].enabled = sensorSetting.enabled;
 				sensorData[id].windowOpen = false;
+				clearTimeout(sensorData[id].windowOpenTimeout);
 				sensorData[id].onHoldTempLowest = null;
 				sensorData[id].onHoldTempHighest = null;
 				sensorData[id].onHoldStatus = null;
