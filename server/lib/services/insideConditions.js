@@ -187,7 +187,10 @@ exports.get = (locationId) => {
 
 	Object.keys(sensorData).forEach(id => {
 		if (sensorData[id].location === locationId) {
-			sensorDataByLocation[id] = sensorData[id];
+			sensorDataByLocation[id] = {
+				...sensorData[id],
+				windowOpenTimeout: null
+			};
 		}
 	});
 
