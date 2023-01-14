@@ -109,7 +109,7 @@ exports.set = async (data) => {
 					clearTimeout(sensorData[id].windowOpenTimeout);
 					sensorData[id].windowOpenTimeout = setTimeout(() => {
 						sensorData[id].windowOpen = false;
-					}, 20000);
+					}, 20 * 60 * 1000);
 
 					changesMade = true;
 					sensorData[id].onHoldStatus = 'decrease';
@@ -226,7 +226,10 @@ exports.toggleSensorStatus = async (id) => {
 			sensorData[id].onHoldTempHighest = null;
 			sensorData[id].onHoldStatus = null;
 			sensorData[id].windowOpen = false;
-			evts.emit('change', sensorData[id]);
+			evts.emit('change', {
+				...sensorData[id],
+				windowOpenTimeout: null
+			});
 		}
 
 		return true;
@@ -239,7 +242,10 @@ exports.disableSensorWindowOpen = (id) => {
 	if (sensorData[id]) {
 		sensorData[id].windowOpen = false;
 		clearTimeout(sensorData[id].windowOpenTimeout);
-		evts.emit('change', sensorData[id]);
+		evts.emit('change', {
+			...sensorData[id],
+			windowOpenTimeout: null
+		});
 	}
 }
 
@@ -263,7 +269,10 @@ exports.changeSensorSettings = async (id, settings) => {
 
 		await sensorSetting.save();
 
-		evts.emit('change', sensorData[id]);
+		evts.emit('change', {
+			...sensorData[id],
+			windowOpenTimeout: null
+		});
 
 		return true;
 	}
@@ -288,13 +297,17 @@ setInterval(() => {
 				sensorData[id].onHoldTempHighest = null;
 				sensorData[id].onHoldStatus = null;
 
-				evts.emit('change', sensorData[id]);
+				evts.emit('change', {
+					...sensorData[id],
+					windowOpenTimeout: null
+				});
 			}
 		}
 
 		if (new Date().getTime() - sensorData[id].lastUpdate.getTime() > 15 * 60 * 1000) {
 			evts.emit('change', Object.assign({}, sensorData[id], {
-				deleted: true
+				deleted: true,
+				windowOpenTimeout: null
 			}));
 
 			if (sensorData.length === 1) {
