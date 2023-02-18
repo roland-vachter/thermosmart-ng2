@@ -64,7 +64,7 @@ exports.isHeatingOn = (locationId, readFromControllerSensor) => {
 	if (readFromControllerSensor) {
 		locationStatus.lastStatusReadBySensor = true;
 
-		if (locationStatus.lastChangeEventStatus !== locationStatus.isOn && locationStatus.isOn === true) {
+		if (locationStatus.lastChangeEventStatus !== locationStatus.isOn) {
 			heatingEvts.emit('changeHeating', {
 				isOn: locationStatus.isOn,
 				location: locationId
@@ -136,6 +136,7 @@ function turnHeatingOn (locationId) {
 		});
 		console.log(`[${locationId}] heating turn off`);
 	}
+	locationStatus.lastChangeEventStatus = locationStatus.isOn;
 }
 
 function turnHeatingOff (locationId) {
