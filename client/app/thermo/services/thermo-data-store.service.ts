@@ -201,6 +201,7 @@ export class ThermoDataStoreService {
 				this.defaultHeatingPlans[heatingPlan.dayOfWeek].plan = this.heatingPlans[heatingPlan.plan];
 				this.defaultHeatingPlans[heatingPlan.dayOfWeek].nameOfDay = this.dayNameByIndex[heatingPlan.dayOfWeek];
 			});
+			this.defaultHeatingPlans = [...this.defaultHeatingPlans];
 		}
 
 		if (data.statisticsForToday) {
