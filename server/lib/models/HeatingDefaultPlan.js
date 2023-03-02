@@ -34,7 +34,6 @@ module.exports = mongoose.model('HeatingDefaultPlan', heatingPlanSchema);
 
 module.exports.evts = evts;
 module.exports.triggerChange = function (defaultPlan, location) {
-	console.log('heating default plan change triggered', defaultPlan, 'for location', location);
 	evts.emit('change', {
 		defaultPlan,
 		location

@@ -56,7 +56,9 @@ export class ThermoConfigModalComponent implements OnInit {
 		this.modalService.selectPlanModal(this.dataStore.defaultHeatingPlans[dayOfWeek].plan)
 			.subscribe(planId => {
 				if (typeof planId === 'number') {
-					this.serverApiService.changeDefaultPlan(dayOfWeek, planId);
+					this.serverApiService.changeDefaultPlan(dayOfWeek, planId).subscribe(() => {
+						this.heatingDefaultPlans[dayOfWeek].plan = this.dataStore.heatingPlans[planId];
+					});
 				}
 			});
 	}

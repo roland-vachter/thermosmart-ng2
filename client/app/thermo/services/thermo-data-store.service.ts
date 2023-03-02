@@ -1,4 +1,4 @@
-import { ApplicationRef, EventEmitter, Injectable } from '@angular/core';
+import { ApplicationRef, EventEmitter, Injectable, NgZone } from '@angular/core';
 import { Moment } from 'moment-timezone';
 import * as moment from 'moment-timezone';
 import { ServerUpdateService } from '../../shared/server-update.service';
@@ -230,7 +230,7 @@ export class ThermoDataStoreService {
 
 		this.update();
 
-        this.evt.next();
+		this.evt.next();
 	}
 
 	get sensorList() {

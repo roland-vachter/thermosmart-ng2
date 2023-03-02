@@ -84,14 +84,11 @@ export class ThermoServerApiService {
 	}
 
 	changeDefaultPlan (dayOfWeek: number, planId: number) {
-		const obs = this.http.post('/api/changedefaultplan', {
+		return this.http.post('/api/changedefaultplan', {
 			dayOfWeek,
 			planId,
 			location: this.locationService.getSelectedLocationId()
 		});
-
-		obs.subscribe();
-		return obs;
 	}
 
 	statistics () {
