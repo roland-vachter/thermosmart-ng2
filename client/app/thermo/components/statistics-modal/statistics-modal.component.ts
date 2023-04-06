@@ -179,6 +179,8 @@ export class StatisticsModalComponent implements OnInit {
 							maintainAspectRatio: false,
 							responsive: true,
 							tooltips: {
+								intersect: true,
+								mode: 'x',
 								callbacks: {
 									label: function(tooltipItem, data) {
 										switch (tooltipItem.datasetIndex) {
@@ -327,6 +329,8 @@ export class StatisticsModalComponent implements OnInit {
 							maintainAspectRatio: false,
 							responsive: true,
 							tooltips: {
+								intersect: true,
+								mode: 'x',
 								callbacks: {
 									label: function(tooltipItem, data) {
 										switch (tooltipItem.datasetIndex) {
