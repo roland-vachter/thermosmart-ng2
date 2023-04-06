@@ -47,7 +47,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
-								pointRadius: 3
+								pointRadius: 3,
+								pointHitRadius: 5,
 							}]
 						},
 						options: {
@@ -128,7 +129,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
-								pointRadius: 3
+								pointRadius: 3,
+								pointHitRadius: 5,
 							}, {
 								label: 'Avg target temperature',
 								yAxisID: "temp",
@@ -148,6 +150,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
+								pointHitRadius: 5,
 								fill: false,
 							}, {
 								label: 'Avg outside temperature',
@@ -168,6 +171,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
+								pointHitRadius: 5,
 								fill: false,
 							}]
 						},
@@ -175,8 +179,6 @@ export class StatisticsModalComponent implements OnInit {
 							maintainAspectRatio: false,
 							responsive: true,
 							tooltips: {
-								mode: 'x',
-								intersect: true,
 								callbacks: {
 									label: function(tooltipItem, data) {
 										switch (tooltipItem.datasetIndex) {
@@ -275,7 +277,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
-								pointRadius: 3
+								pointRadius: 3,
+								pointHitRadius: 5,
 							}, {
 								label: 'Avg target temperature',
 								yAxisID: "temp",
@@ -295,6 +298,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
+								pointHitRadius: 5,
 								fill: false,
 							}, {
 								label: 'Avg outside temperature',
@@ -315,6 +319,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
+								pointHitRadius: 5,
 								fill: false,
 							}]
 						},
@@ -322,8 +327,6 @@ export class StatisticsModalComponent implements OnInit {
 							maintainAspectRatio: false,
 							responsive: true,
 							tooltips: {
-								mode: 'x',
-								intersect: true,
 								callbacks: {
 									label: function(tooltipItem, data) {
 										switch (tooltipItem.datasetIndex) {
@@ -429,6 +432,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
+								pointHitRadius: 5,
 								fill: false,
 								tension: 0.3
 							}))
@@ -437,8 +441,6 @@ export class StatisticsModalComponent implements OnInit {
 							maintainAspectRatio: false,
 							responsive: true,
 							tooltips: {
-								mode: 'x',
-								intersect: true,
 								callbacks: {
 									label: function(tooltipItem, data) {
 										return `${data.datasets[tooltipItem.datasetIndex].label}: ${tooltipItem.yLabel.toFixed(1)}`;
