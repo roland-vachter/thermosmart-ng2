@@ -48,7 +48,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
-								pointHitRadius: 9,
+								pointHitRadius: 5,
+								mode: 'nearest'
 							}]
 						},
 						options: {
@@ -130,7 +131,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
-								pointHitRadius: 9,
+								pointHitRadius: 5,
+								mode: 'nearest'
 							}, {
 								label: 'Avg target temperature',
 								yAxisID: "temp",
@@ -150,7 +152,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
-								pointHitRadius: 9,
+								pointHitRadius: 5,
+								mode: 'nearest',
 								fill: false,
 							}, {
 								label: 'Avg outside temperature',
@@ -171,7 +174,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
-								pointHitRadius: 9,
+								pointHitRadius: 5,
+								mode: 'nearest',
 								fill: false,
 							}]
 						},
@@ -280,7 +284,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
-								pointHitRadius: 9,
+								pointHitRadius: 5,
+								mode: 'nearest'
 							}, {
 								label: 'Avg target temperature',
 								yAxisID: "temp",
@@ -300,7 +305,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
-								pointHitRadius: 9,
+								pointHitRadius: 5,
+								mode: 'nearest',
 								fill: false,
 							}, {
 								label: 'Avg outside temperature',
@@ -321,7 +327,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
-								pointHitRadius: 9,
+								pointHitRadius: 5,
+								mode: 'nearest',
 								fill: false,
 							}]
 						},
@@ -436,7 +443,8 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
-								pointHitRadius: 9,
+								pointHitRadius: 5,
+								mode: 'nearest',
 								fill: false,
 								tension: 0.3
 							}))
