@@ -38,6 +38,7 @@
     "express-handlebars": "^3.0.0",
     "express-session": "^1.14.2",
     "jquery": "^3.6.0",
+    "lodash": "^4.17.21",
     "moment": "^2.20.0",
     "moment-timezone": "0.5.29",
     "mongoose": "^7.0.0",
