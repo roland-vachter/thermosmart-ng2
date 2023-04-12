@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 const options = {
-	useMongoClient: true,
 	keepAlive: true,
 	connectTimeoutMS: 30000,
 	socketTimeoutMS: 30000
