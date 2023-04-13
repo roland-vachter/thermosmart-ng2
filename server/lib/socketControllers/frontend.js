@@ -88,7 +88,7 @@ exports.init = function () {
 
 		targetTempService.evts.on('change', data => {
 			socket.io.of('/frontend/' + data.location).emit('update', {
-				targetTempId: data.targetTemp.id
+				targetTempId: data.targetTemp._id
 			})
 		});
 

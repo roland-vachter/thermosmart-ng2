@@ -190,7 +190,10 @@ exports.changeDefaultPlan = function (req, res, next) {
 			});
 		}
 	})
-	.catch(next);
+	.catch((e) => {
+		console.err(e);
+		next();
+	});
 };
 
 exports.listHeatingPlanOverride = async (req, res) => {

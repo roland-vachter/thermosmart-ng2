@@ -104,7 +104,7 @@ export class HeatingStatusComponent implements OnInit {
 	}
 
 	tempAdjust(diff) {
-		if (this.dataStore.targetTempId) {
+		if (typeof this.dataStore.targetTempId === 'number' && !isNaN(this.dataStore.targetTempId)) {
 			const expected = this.dataStore.temperatures[this.dataStore.targetTempId].value + diff;
 			this.serverApiService.tempAdjust(this.dataStore.temperatures[this.dataStore.targetTempId]._id, expected).subscribe(res => {
 				if (res.status === RESPONSE_STATUS.OK) {

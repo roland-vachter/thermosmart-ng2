@@ -76,7 +76,7 @@ async function update () {
 			}
 		});
 
-		if (lastTargetTempByLocation[l._id] !== targetTemp) {
+		if (lastTargetTempByLocation[l._id]?._id !== targetTemp?._id) {
 			lastTargetTempByLocation[l._id] = targetTemp;
 			evts.emit('change', {
 				targetTemp,
