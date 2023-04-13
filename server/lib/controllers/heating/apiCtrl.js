@@ -213,7 +213,8 @@ exports.listHeatingPlanOverride = async (req, res) => {
 			data: heatingPlanOverrides
 		});
 	} catch(e) {
-		res.status(500).json({
+		console.error(e);
+		res.json({
 			status: 'error',
 			reason: e.message
 		})
@@ -241,14 +242,16 @@ exports.addOrUpdateHeatingPlanOverride = (req, res) => {
 	}, {
 		upsert: true,
 		new: true
-	}, function(err, doc) {
-		if (err) {
-			return res.status(500).json({
-				status: 'error',
-				reason: err
-			});
-		}
-
+	})
+	.exec()
+	.catch(err => {
+		console.error(err);
+		return res.json({
+			status: 'error',
+			reason: err.message
+		});
+	})
+	.then(doc => {
 		HeatingPlanOverrides.triggerChange(location);
 		targetTempService.update();
 
@@ -275,14 +278,15 @@ exports.removeHeatingPlanOverride = (req, res) => {
 			date: date.valueOf(),
 			location
 		})
-		.exec(err => {
-			if (err) {
-				return res.status(500).json({
-					status: 'error',
-					reason: err
-				});
-			}
-
+		.exec()
+		.catch(err => {
+			console.error(err);
+			return res.json({
+				status: 'error',
+				reason: err.message
+			});
+		})
+		.then(() => {
 			HeatingPlanOverrides.triggerChange(location);
 			targetTempService.update();
 
@@ -305,7 +309,13 @@ exports.toggleHeatingPower = (req, res) => {
 	heatingService.togglePower(location);
 
 	res.json({
-		status: 'ok'
+		status: 'ok',
+		data: {
+			heatingPower: {
+				status: heatingService.getPowerStatus(location).poweredOn,
+				until: heatingService.getPowerStatus(location).until
+			}
+		}
 	});
 };
 

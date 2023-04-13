@@ -121,7 +121,7 @@ async function update () {
 			}
 		}
 	} catch (e) {
-		console.log(e);
+		console.error(e);
 	};
 }
 setInterval(() => {

@@ -185,7 +185,7 @@ const clearOldMovementHistory = () => {
 			console.log('Security momvent history cleaned up, deleted:', result.deletedCount);
 		})
 		.catch(err => {
-			console.log('Failed to cleanup security movement history with error', err);
+			console.error('Failed to cleanup security movement history with error', err);
 		});
 };
 

@@ -1,3 +1,5 @@
+import { Moment } from "moment";
+
 export enum RESPONSE_STATUS {
 	OK = 'ok',
 	ERROR = 'error'
@@ -38,7 +40,7 @@ export interface HeatingPlan {
 
 export interface HeatingPlanOverride {
 	plan: HeatingPlan;
-	date: Date;
+	date: Moment;
 }
 
 export interface HeatingDefaultPlan {
@@ -80,4 +82,32 @@ export interface Controller {
 	location: number;
 	healthy: boolean;
 	lastHealthUpdate: Date;
+}
+
+interface HeatingPowerBase {
+	status: boolean;
+}
+
+export interface HeatingPowerResponse {
+	heatingPower: HeatingPowerBase & {
+		until: string;
+	}
+}
+
+export interface HeatingPower extends HeatingPowerBase {
+	until: Moment;
+}
+
+export enum ArmingStatus {
+	DISARMED = 'disarmed',
+	ARMING = 'arming',
+	ARMED = 'armed',
+	PREALARM = 'prealarm',
+	ALARM = 'alarm'
+}
+
+export interface ArmingStatusResponse {
+	security: {
+		status: ArmingStatus;
+	};
 }

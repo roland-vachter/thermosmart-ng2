@@ -7,6 +7,7 @@ import { ThermoModalsService } from '../../services/thermo-modals.service';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
 import { HeatingPlan, HeatingPlanOverride } from '../../../types/types';
 import { SharedModalsService } from '../../../shared/shared-modals.service';
+import * as moment from 'moment-timezone';
 
 interface OverrideToAdd {
 	plan: HeatingPlan;
@@ -21,7 +22,6 @@ interface OverrideToAdd {
 export class ThermoConfigModalComponent implements OnInit {
 
 	@Input() temps = [];
-	@Input() heatingDefaultPlans = [];
 	@Input() switchThresholdBelow = {
 		name: '',
 		value: NaN
@@ -30,7 +30,6 @@ export class ThermoConfigModalComponent implements OnInit {
 		name: '',
 		value: NaN
 	};
-	@Input() heatingPlanOverrides: HeatingPlanOverride[] = [];
 	currentDate = new Date().getDay();
 	overrideToAdd: OverrideToAdd = {} as OverrideToAdd;
 
@@ -38,7 +37,7 @@ export class ThermoConfigModalComponent implements OnInit {
 		public bsModalRef: BsModalRef,
 		private serverApiService: ThermoServerApiService,
 		private sharedApiService: SharedServerApiService,
-		private dataStore: ThermoDataStoreService,
+		public dataStore: ThermoDataStoreService,
 		private modalService: ThermoModalsService,
 		private sharedModalsService: SharedModalsService
 	) { }
@@ -57,7 +56,9 @@ export class ThermoConfigModalComponent implements OnInit {
 			.subscribe(planId => {
 				if (typeof planId === 'number') {
 					this.serverApiService.changeDefaultPlan(dayOfWeek, planId).subscribe(() => {
-						this.heatingDefaultPlans[dayOfWeek].plan = this.dataStore.heatingPlans[planId];
+						this.dataStore.defaultHeatingPlans[dayOfWeek].plan = this.dataStore.heatingPlans[planId];
+						this.dataStore.defaultHeatingPlans = [...this.dataStore.defaultHeatingPlans];
+						this.dataStore.updateTodaysPlan();
 					});
 				}
 			});
@@ -83,14 +84,15 @@ export class ThermoConfigModalComponent implements OnInit {
 	}
 
 	addOverride() {
-		this.serverApiService.addPlanOverride(this.overrideToAdd.date, this.overrideToAdd.plan._id)
+		this.serverApiService.addPlanOverride(moment(this.overrideToAdd.date), this.overrideToAdd.plan._id)
 			.subscribe(result => {
 				if (result.status === RESPONSE_STATUS.OK) {
-					this.heatingPlanOverrides.push({
-						date: this.overrideToAdd.date,
+					this.dataStore.heatingPlanOverrides.push({
+						date: moment(this.overrideToAdd.date).tz('Europe/Bucharest').startOf('day'),
 						plan: this.overrideToAdd.plan
 					});
 					this.clearOverrideToAdd();
+					this.dataStore.updateTodaysPlan();
 				} else {
 					this.sharedModalsService.alert(result.reason, ALERT_TYPE.ERROR);
 				}
@@ -101,7 +103,8 @@ export class ThermoConfigModalComponent implements OnInit {
 		this.serverApiService.removePlanOverride(planOverride.date)
 			.subscribe(result => {
 				if (result.status === RESPONSE_STATUS.OK) {
-					this.heatingPlanOverrides.splice(this.heatingPlanOverrides.indexOf(planOverride), 1);
+					this.dataStore.heatingPlanOverrides.splice(this.dataStore.heatingPlanOverrides.indexOf(planOverride), 1);
+					this.dataStore.updateTodaysPlan();
 				} else {
 					this.sharedModalsService.alert(result.reason, ALERT_TYPE.ERROR);
 				}

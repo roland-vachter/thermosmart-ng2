@@ -275,44 +275,33 @@ exports.camera = {
 		}
 	},
 	add: (ip, location) => {
-		return new Promise((resolve, reject) => {
-			new SecurityCameras({
+		return new SecurityCameras({
+			ip,
+			location
+		})
+		.save()
+		.then(() => {
+			securityCamerasByLocations[location].push({
 				ip,
-				location
-			}).save(err => {
-				if (err) {
-					return reject(err);
-				}
-
-				securityCamerasByLocations[location].push({
-					ip,
-					location,
-					healthy: false,
-					lastHealthUpdate: null
-				});
-				updateCameraHealthByLocation(location);
-				resolve();
+				location,
+				healthy: false,
+				lastHealthUpdate: null
 			});
+			updateCameraHealthByLocation(location);
 		});
 	},
 	remove: (ip, location) => {
-		return new Promise((resolve, reject) => {
-			SecurityCameras
-				.deleteOne({
-					ip
-				})
-				.exec(err => {
-					if (err) {
-						return reject(err);
-					}
-
-					if (securityCamerasByLocations[location].find(c => c.ip === ip)) {
-						securityCamerasByLocations[location].splice(securityCamerasByLocations[location].indexOf(ip), 1);
-					}
-					updateCameraHealthByLocation(location);
-					resolve();
-				});
-		});
+		return SecurityCameras
+			.deleteOne({
+				ip
+			})
+			.exec()
+			.then(() => {
+				if (securityCamerasByLocations[location].find(c => c.ip === ip)) {
+					securityCamerasByLocations[location].splice(securityCamerasByLocations[location].indexOf(ip), 1);
+				}
+				updateCameraHealthByLocation(location);
+			});
 	},
 	reportHealth: async (id, ip, health) => {
 		id = parseInt(id, 10);
@@ -421,15 +410,12 @@ exports.controller = {
 	add: (id, location) => {
 		id = parseInt(id, 10);
 
-		return new Promise((resolve, reject) => {
-			new SecurityControllers({
+		return new SecurityControllers({
 				controllerid: id,
 				location
-			}).save(err => {
-				if (err) {
-					return reject(err);
-				}
-
+			})
+			.save()
+			.then(() => {
 				const newController = {
 					id,
 					location,
@@ -439,32 +425,24 @@ exports.controller = {
 				securityControllersByLocations[location].push(newController);
 				evts.emit('controller-added', newController);
 				updateControllerHealthByLocation(location);
-				resolve();
 			});
-		});
 	},
 	remove: (id) => {
 		id = parseInt(id, 10);
 
-		return new Promise((resolve, reject) => {
-			SecurityControllers
-				.deleteOne({
-					controllerid: id
-				})
-				.exec(err => {
-					if (err) {
-						return reject(err);
+		return SecurityControllers
+			.deleteOne({
+				controllerid: id
+			})
+			.exec()
+			.then(() => {
+				Object.keys(securityCamerasByLocations).forEach(l => {
+					if (securityControllersByLocations[l].find(c => c.id === id)) {
+						securityControllersByLocations[l].splice(securityControllersByLocations[l].findIndex(c => c.id === id), 1);
 					}
-
-					Object.keys(securityCamerasByLocations).forEach(l => {
-						if (securityControllersByLocations[l].find(c => c.id === id)) {
-							securityControllersByLocations[l].splice(securityControllersByLocations[l].findIndex(c => c.id === id), 1);
-						}
-						updateControllerHealthByLocation(l);
-					});
-					resolve();
+					updateControllerHealthByLocation(l);
 				});
-		});
+			});
 	},
 	reportHealth: async (id) => {
 		id = parseInt(id, 10);

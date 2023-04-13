@@ -100,7 +100,7 @@ export class AppComponent {
 				this.updateFreshnessStatus();
 				
 				if ((this.updateStatus === 'outdated' || new Date().getTime() - this.lastVisible.getTime() > 10 * 60 * 1000)) {
-					this.reload();
+					this.refresh();
 				}
 
 				this.lastVisible = new Date();

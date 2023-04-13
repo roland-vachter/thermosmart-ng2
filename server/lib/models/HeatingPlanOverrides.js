@@ -45,7 +45,7 @@ function cleanup () {
 			console.log('Successfully cleaned up heating plan overrides, deleted count:', result.deletedCount);
 		})
 		.catch(e => {
-			console.log('Failed to cleanup heating plan overrides with error:', e);
+			console.error('Failed to cleanup heating plan overrides with error:', e);
 		});
 }
 

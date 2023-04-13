@@ -36,7 +36,9 @@ export class HeatingStatusComponent implements OnInit {
 	}
 
 	toggleStatus() {
-		this.serverApiService.toggleHeatingPower();
+		this.serverApiService.toggleHeatingPower().subscribe(res => {
+			this.dataStore.handleServerData(res?.data);
+		});
 	}
 
 	showSettingsModal() {

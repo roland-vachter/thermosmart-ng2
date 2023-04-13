@@ -32,9 +32,10 @@ exports.camera = {
 					status: types.RESPONSE_STATUS.OK
 				});
 			} catch (e) {
+				console.error(e);
 				res.json({
 					status: types.RESPONSE_STATUS.ERROR,
-					reason: e
+					reason: e.message
 				});
 			}
 		}
@@ -62,9 +63,10 @@ exports.camera = {
 				status: types.RESPONSE_STATUS.OK
 			});
 		} catch (e) {
+			console.error(e);
 			res.json({
 				status: types.RESPONSE_STATUS.ERROR,
-				reason: e
+				reason: e.message
 			});
 		}
 	},
@@ -153,9 +155,10 @@ exports.controller = {
 					status: types.RESPONSE_STATUS.OK
 				});
 			} catch (e) {
+				console.error(e);
 				res.json({
 					status: types.RESPONSE_STATUS.ERROR,
-					reason: e
+					reason: e.message
 				});
 			}
 		}
@@ -174,9 +177,10 @@ exports.controller = {
 				status: types.RESPONSE_STATUS.OK
 			});
 		} catch (e) {
+			console.error(e);
 			res.json({
 				status: types.RESPONSE_STATUS.ERROR,
-				reason: e
+				reason: e.message
 			});
 		}
 	},

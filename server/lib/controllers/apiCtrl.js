@@ -81,6 +81,7 @@ exports.changeConfig = async (req, res) => {
 			status: 'ok'
 		});
 	} catch(e) {
+		console.error(e);
 		res.json({
 			status: 'error',
 			error: e.message
@@ -102,6 +103,7 @@ exports.getConfig = async (req, res) => {
 		const configItem = await configService.get(req.query.name, location);
 		res.json(configItem.value);
 	} catch(e) {
+		console.error(e);
 		res.json({
 			status: 'error',
 			error: e.message
@@ -130,6 +132,7 @@ exports.init = async (req, res) => {
 			}
 		});
 	} catch(e) {
+		console.error(e);
 		res.json({
 			status: 'error',
 			error: e.message

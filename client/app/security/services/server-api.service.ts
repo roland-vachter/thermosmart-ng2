@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { ApiResult, Camera, Controller } from '../../types/types';
+import { ApiResult, ArmingStatusResponse, Camera, Controller } from '../../types/types';
 import { LocationService } from '../../services/location.service';
 import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -32,7 +32,7 @@ export class ServerApiService {
 	}
 
 	toggleArm () {
-		return this.http.post('/api/security/togglearm', {
+		return this.http.post<ApiResult<ArmingStatusResponse>>('/api/security/togglearm', {
 			location: this.locationService.getSelectedLocationId()
 		});
 	}

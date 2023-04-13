@@ -15,7 +15,12 @@ exports.toggleArm = async (req, res) => {
 	securityStatus.toggleArm(location);
 
 	res.json({
-		status: 'ok'
+		status: 'ok',
+		data: {
+			security: {
+				status: securityStatus.getStatus(location)
+			}
+		}
 	});
 };
 

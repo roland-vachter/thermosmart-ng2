@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ApiResult } from '../../types/types';
+import { ApiResult, HeatingPowerResponse } from '../../types/types';
 import { LocationService } from '../../services/location.service';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Moment } from 'moment';
 
 @Injectable()
 export class ThermoServerApiService {
@@ -30,10 +31,8 @@ export class ThermoServerApiService {
 		}
 	}
 
-	toggleHeatingPower () {
-		const obs = this.http.post('/api/toggleheatingpower', { location: this.locationService.getSelectedLocationId() });
-		obs.subscribe();
-		return obs;
+	toggleHeatingPower (): Observable<ApiResult<HeatingPowerResponse>> {
+		return this.http.post<ApiResult<HeatingPowerResponse>>('/api/toggleheatingpower', { location: this.locationService.getSelectedLocationId() });
 	}
 
 	toggleSensorStatus (id) {
@@ -99,7 +98,7 @@ export class ThermoServerApiService {
 		return this.http.get<ApiResult>('/api/heating/planoverride/list?location=' + this.locationService.getSelectedLocationId());
 	}
 
-	addPlanOverride(date: Date, planId: number) {
+	addPlanOverride(date: Moment, planId: number) {
 		return this.http.post<ApiResult>('/api/heating/planoverride/add', {
 			date: date.valueOf(),
 			planId,
@@ -107,7 +106,7 @@ export class ThermoServerApiService {
 		});
 	}
 
-	removePlanOverride(date: Date) {
+	removePlanOverride(date: Moment) {
 		return this.http.post<ApiResult>('/api/heating/planoverride/remove', {
 			date: date.valueOf(),
 			location: this.locationService.getSelectedLocationId()

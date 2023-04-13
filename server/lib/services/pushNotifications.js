@@ -19,6 +19,6 @@ exports.send = (interests, title, body) => {
 		console.log('Pusher notification sent:', publishResponse.publishId);
 	})
 	.catch(error => {
-		console.log('Pusher error:', error);
+		console.error('Pusher error:', error);
 	});
 }

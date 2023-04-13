@@ -204,7 +204,7 @@ async function updateHeatingStatusByLocation (locationId) {
 			}
 		}
 	} catch(err) {
-		console.log("Error occured while fetching the heating plan for today", err);
+		console.error("Error occured while fetching the heating plan for today", err);
 	}
 }
 setInterval(updateHeatingStatus, 10000);

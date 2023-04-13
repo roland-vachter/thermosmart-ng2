@@ -2,7 +2,7 @@ import { ApplicationRef, EventEmitter, Injectable, NgZone } from '@angular/core'
 import { Moment } from 'moment-timezone';
 import * as moment from 'moment-timezone';
 import { ServerUpdateService } from '../../shared/server-update.service';
-import { HeatingDefaultPlan, HeatingPlan, HeatingPlanOverride, Sensor, Temperature } from '../../types/types';
+import { HeatingDefaultPlan, HeatingPlan, HeatingPlanOverride, HeatingPower, Sensor, Temperature } from '../../types/types';
 import { ThermoServerApiService } from './thermo-server-api.service';
 import { LocationService } from '../../services/location.service';
 
@@ -46,10 +46,7 @@ export class ThermoDataStoreService {
 	currentTime: string;
 	currentDate: Moment;
 	config: Record<string, Record<string, string | number>> = {};
-	heatingPower: {
-		status: boolean;
-		until: Moment;
-	} = {
+	heatingPower: HeatingPower = {
 		status: false,
 		until: moment(Date.now() + 15 * 60 * 1000)
 	};
@@ -119,7 +116,7 @@ export class ThermoDataStoreService {
 		this.sensorRestartInProgress = false;
 	}
 
-    private handleServerData (data: any) {
+    handleServerData (data: any) {
 		this.lastUpdate = moment();
 
 		if (data.config) {
@@ -158,10 +155,12 @@ export class ThermoDataStoreService {
 		}
 
 		if (data.outside) {
-			this.outsideConditions.temperature = data.outside.temperature;
-			this.outsideConditions.humidity = data.outside.humidity;
-			this.outsideConditions.weatherIconClass = data.outside.weatherIconClass;
-			this.outsideConditions.color = data.outside.color;
+			this.outsideConditions = {
+				temperature: data.outside.temperature,
+				humidity: data.outside.humidity,
+				weatherIconClass: data.outside.weatherIconClass,
+				color: data.outside.color
+			}
 
 			if (data.outside.backgroundImage) {
 				document.body.style.backgroundImage = document.body.style.backgroundImage.substring(0, document.body.style.backgroundImage.lastIndexOf('/') + 1) + data.outside.backgroundImage;
@@ -192,6 +191,8 @@ export class ThermoDataStoreService {
 
 				this.processPlanForDisplay(heatingPlan);
 			});
+
+			this.heatingPlans = { ...this.heatingPlans };
 		}
 
 		if (data.heatingDefaultPlans) {
@@ -209,8 +210,10 @@ export class ThermoDataStoreService {
 		}
 
 		if (data.heatingPower) {
-			this.heatingPower.status = data.heatingPower.status;
-			this.heatingPower.until = moment(data.heatingPower.until);
+			this.heatingPower = {
+				status: data.heatingPower.status,
+				until: moment(data.heatingPower.until)
+			}
 		}
 
 		if (data.heatingPlanOverrides) {
@@ -220,9 +223,7 @@ export class ThermoDataStoreService {
 			}));
 		}
 
-		const todayStartOfDay = moment().tz('Europe/Bucharest').startOf('day');
-		const heatingPlanOverrideToday = this.heatingPlanOverrides.find(po => po.date.valueOf() === todayStartOfDay.valueOf());
-		this.todaysPlan = heatingPlanOverrideToday ? heatingPlanOverrideToday.plan : this.defaultHeatingPlans[moment().day()].plan;
+		this.updateTodaysPlan();
 
 		const tomorrowStartOfDay = moment().tz('Europe/Bucharest').startOf('day').add(1, 'day');
 		const heatingPlanOverrideTomorrow = this.heatingPlanOverrides.find(po => po.date.valueOf() === tomorrowStartOfDay.valueOf());
@@ -231,6 +232,13 @@ export class ThermoDataStoreService {
 		this.update();
 
 		this.evt.next();
+	}
+
+	updateTodaysPlan() {
+		const todayStartOfDay = moment().tz('Europe/Bucharest').startOf('day');
+		const heatingPlanOverrideToday = this.heatingPlanOverrides.find(po => po.date.valueOf() === todayStartOfDay.valueOf());
+		this.todaysPlan = heatingPlanOverrideToday ? heatingPlanOverrideToday.plan : this.defaultHeatingPlans[moment().day()].plan;
+		this.evt.emit();
 	}
 
 	get sensorList() {

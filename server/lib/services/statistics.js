@@ -313,13 +313,13 @@ const saveStatisticsForADay = async () => {
 					console.log('Successfully cleaned up outside condition history, deleted count:', result.deletedCount);
 				})
 				.catch(e => {
-					console.log('Failed to cleanup outside condition history with error:', e);
+					console.error('Failed to cleanup outside condition history with error:', e);
 				});
 		}
 
 		console.log('statistics save complete');
 	} catch (e) {
-		console.log('statistics save failed with error', e);
+		console.error('statistics save failed with error', e);
 	}
 };
 
@@ -399,7 +399,7 @@ const saveStatisticsForADayByLocation = async (location) => {
 				console.log('Successfully cleaned up heating history, deleted count:', result.deletedCount);
 			})
 			.catch(e => {
-				console.log('Failed to cleanup heating history with error:', e);
+				console.error('Failed to cleanup heating history with error:', e);
 			});
 
 		await TargetTempHistory
@@ -414,7 +414,7 @@ const saveStatisticsForADayByLocation = async (location) => {
 				console.log('Successfully cleaned up target temp history, deleted count:', result.deletedCount);
 			})
 			.catch(e => {
-				console.log('Failed to cleanup target temp history with error:', e);
+				console.error('Failed to cleanup target temp history with error:', e);
 			});
 	}
 };
