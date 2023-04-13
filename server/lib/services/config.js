@@ -29,7 +29,7 @@ const set = async (name, value, locationId) => {
 };
 
 const getAll = async (locationId) => {
-	const config = await Config.find().lean().exec();
+	const config = await Config.find().exec();
 	const configObj = {};
 
 	config.forEach(conf => {
@@ -45,7 +45,7 @@ const get = async (name, locationId) => {
 	const configItem = await Config.findOne({
 		name,
 		location: locationId
-	}).lean().exec();
+	}).exec();
 
 	return configItem || null;
 };

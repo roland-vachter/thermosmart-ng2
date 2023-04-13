@@ -19,7 +19,7 @@ exports.update = () => {
 }
 
 async function update () {
-	const locations = await Location.find().lean().exec();
+	const locations = await Location.find().exec();
 
 	return Promise.all(locations.map(async l => {
 		const [defaultPlan, planOverride] = await Promise.all([

@@ -31,7 +31,6 @@ exports.getStatus = (location) => {
 
 Location
 	.find()
-	.lean()
 	.exec()
 	.then(locations => {
 		locations.forEach(l => {
@@ -43,7 +42,6 @@ Location
 				.sort({
 					datetime: -1
 				})
-				.lean()
 				.exec()
 				.then((result) => {
 					if (result && ARMED_STATUSES.indexOf(result.status) !== -1) {
@@ -63,7 +61,6 @@ Location
 					.sort({
 						datetime: -1
 					})
-					.lean()
 					.exec(),
 				SecurityArmingHistory
 					.findOne({
@@ -73,7 +70,6 @@ Location
 					.sort({
 						datetime: -1
 					})
-					.lean()
 					.exec()
 			]).then(([movementHistory, lastArmed]) => {
 				securityByLocation[l._id].lastArmedAt = new Date(lastArmed.datetime);
@@ -87,7 +83,6 @@ Location
 							$gt: lastArmed.datetime
 						}
 					})
-					.lean()
 					.exec()
 					.then(triggeredTimes => {
 						securityByLocation[l._id].alarmTriggeredCount = triggeredTimes;
@@ -185,7 +180,6 @@ const clearOldMovementHistory = () => {
 				$lte: moment().subtract(1, 'month').subtract(1, 'day').toDate()
 			}
 		})
-		.lean()
 		.exec()
 		.then(result => {
 			console.log('Security momvent history cleaned up, deleted:', result.deletedCount);

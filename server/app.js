@@ -97,7 +97,7 @@ passport.use(new FacebookStrategy({
 			Promise.all(profile.emails.map(email => {
 				return UserModel.findOne({
 					email: email.value
-				}).lean().exec().then((user) => {
+				}).exec().then((user) => {
 					if (user) {
 						return true;
 					} else {

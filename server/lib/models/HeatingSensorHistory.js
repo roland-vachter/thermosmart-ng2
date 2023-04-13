@@ -30,7 +30,6 @@ function cleanup () {
 				$lt: moment().subtract(1, 'week').tz("Europe/Bucharest").startOf('day').toDate()
 			}
 		})
-		.lean()
 		.exec()
 		.then(result => {
 			console.log('Successfully cleaned up heating plan overrides, deleted count:', result.deletedCount);

@@ -40,7 +40,6 @@ function cleanup () {
 				$lt: moment().tz("Europe/Bucharest").startOf('day').valueOf()
 			}
 		})
-		.lean()
 		.exec()
 		.then(result => {
 			console.log('Successfully cleaned up heating plan overrides, deleted count:', result.deletedCount);

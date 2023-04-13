@@ -21,7 +21,6 @@ let motionSensorHealthByLocation = {};
 
 SecurityCameras
 	.find()
-	.lean()
 	.exec()
 	.then(result => {
 		securityCamerasByLocations = {};
@@ -44,7 +43,6 @@ SecurityCameras
 
 SecurityControllers
 	.find()
-	.lean()
 	.exec()
 	.then(result => {
 		securityControllersByLocations = {};
@@ -243,7 +241,6 @@ exports.camera = {
 
 		return SecurityCameras
 			.find({ ip, location })
-			.lean()
 			.exec()
 			.then(results => {
 				return !!results.length;
@@ -257,7 +254,6 @@ exports.camera = {
 				.find({
 					location
 				})
-				.lean()
 				.exec()
 				.then(results => {
 					return results;
@@ -272,7 +268,6 @@ exports.camera = {
 				.find({
 					location
 				})
-				.lean()
 				.exec()
 				.then(results => {
 					return results.map(r => r.ip);
@@ -300,7 +295,6 @@ exports.camera = {
 			.deleteOne({
 				ip
 			})
-			.lean()
 			.exec()
 			.then(() => {
 				if (securityCamerasByLocations[location].find(c => c.ip === ip)) {
@@ -314,7 +308,7 @@ exports.camera = {
 
 		const securityControllerData = await SecurityControllers.findOne({
 			controllerid: id
-		}).lean().exec();
+		}).exec();
 
 		if (!securityControllerData) {
 			throw new Error(`Security controller with ID ${id} is not found.`);
@@ -351,7 +345,6 @@ exports.controller = {
 
 		return SecurityControllers
 			.find({ controllerid: id })
-			.lean()
 			.exec()
 			.then(results => {
 				return !!results.length;
@@ -373,7 +366,6 @@ exports.controller = {
 
 		return SecurityControllers
 			.findOne({ controllerid: id })
-			.lean()
 			.exec()
 			.then(result => {
 				return result.location;
@@ -392,7 +384,6 @@ exports.controller = {
 			.find({
 				location
 			})
-			.lean()
 			.exec()
 			.then(result => result.controllerid)
 	},
@@ -404,7 +395,6 @@ exports.controller = {
 				.find({
 					location
 				})
-				.lean()
 				.exec()
 				.then(results => {
 					return results.map(r => ({
@@ -441,7 +431,6 @@ exports.controller = {
 			.deleteOne({
 				controllerid: id
 			})
-			.lean()
 			.exec()
 			.then(() => {
 				Object.keys(securityCamerasByLocations).forEach(l => {
@@ -456,7 +445,7 @@ exports.controller = {
 		id = parseInt(id, 10);
 		const securityControllerData = await SecurityControllers.findOne({
 			controllerid: id
-		}).lean().exec();
+		}).exec();
 
 		const controller = securityControllersByLocations[securityControllerData.location]?.find(c => c.id === id);
 		if (controller) {
@@ -474,7 +463,7 @@ exports.keypad = {
 		id = parseInt(id, 10);
 		const securityControllerData = await SecurityControllers.findOne({
 			controllerid: id
-		}).lean().exec();
+		}).exec();
 
 		if (!motionSensorsByLocations[securityControllerData.location]) {
 			motionSensorsByLocations[securityControllerData.location] = {};
@@ -493,7 +482,7 @@ exports.motionSensor = {
 		const controllerId = id.toString().match('([0-9]+)(\.[0-9]+)?');
 		const securityControllerData = await SecurityControllers.findOne({
 			controllerid: parseInt(controllerId[1], 10)
-		}).lean().exec();
+		}).exec();
 
 		if (!motionSensorsByLocations[securityControllerData.location]) {
 			motionSensorsByLocations[securityControllerData.location] = {};

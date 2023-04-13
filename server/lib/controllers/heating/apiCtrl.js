@@ -116,7 +116,6 @@ exports.tempAdjust = function (req, res, next) {
 	Temperature.findOne({
 		_id: req.body.id
 	})
-	.lean()
 	.exec()
 	.then(async temp => {
 		if (temp) {
@@ -162,7 +161,6 @@ exports.changeDefaultPlan = function (req, res, next) {
 	HeatingDefaultPlan.findOne({
 		dayOfWeek: req.body.dayOfWeek
 	})
-	.lean()
 	.exec()
 	.then(async heatingDefaultPlan => {
 		if (heatingDefaultPlan) {
@@ -178,7 +176,7 @@ exports.changeDefaultPlan = function (req, res, next) {
 
 			await heatingDefaultPlan.save();
 
-			HeatingDefaultPlan.triggerChange(heatingDefaultPlan, location);
+			HeatingDefaultPlan.triggerChange(heatingDefaultPlan.toObject(), location);
 			targetTempService.update();
 
 			res.json({
@@ -208,7 +206,7 @@ exports.listHeatingPlanOverride = async (req, res) => {
 	try {
 		const heatingPlanOverrides = await HeatingPlanOverrides.find({
 			location: location
-		}).lean().exec();
+		}).exec();
 
 		res.json({
 			status: 'ok',
@@ -449,7 +447,6 @@ exports.statistics = async (req, res) => {
 				},
 				location: location
 			})
-			.lean()
 			.exec(),
 		statisticsService
 			.getStatisticsByDay(location, new Date(moment().tz('Europe/Bucharest').subtract(1, 'month')), new Date(moment().tz('Europe/Bucharest'))),
@@ -464,7 +461,6 @@ exports.statistics = async (req, res) => {
 			.populate({
 				path: 'sensor'
 			})
-			.lean()
 			.exec()
 			.then(result => result.filter(r => r.sensor.location === location))
 	]);

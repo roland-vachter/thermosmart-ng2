@@ -124,7 +124,7 @@ exports.init = async (req, res) => {
 			email: req.user.emails[0].value
 		}).populate({
 			path: 'locations'
-		}).lean().exec();
+		}).exec();
 		res.json({
 			status: 'ok',
 			data: {
