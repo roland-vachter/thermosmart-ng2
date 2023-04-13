@@ -7,13 +7,13 @@
 		<div class="col-12">
 			<h2>Temperature settings</h2>
 			<div class="thermo-temps row">
-				<div class="thermo-temps--temp col-xs-6 col-lg-4" *ngFor="let temp of temps">
-					<div class="color-{{temp.color}}">
-						<i class="{{temp.iconClass}}"></i> <span class="thermo-temps--temp-name">{{temp.name}}</span>
-						<div class="thermo-temps--temp-control" data-id="{{temp._id}}">
-							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="tempAdjust(temp, -0.1)">-</button>
-							<span class="thermo-temps--temp-value">{{temp.value | integer}}<span class="decimal">.{{temp.value | decimal}}</span> &deg;C</span>
-							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase" (click)="tempAdjust(temp, 0.1)">+</button>
+				<div class="thermo-temps--temp col-xs-6 col-lg-4" *ngFor="let temp of dataStore.temperatures | keyvalue">
+					<div class="color-{{temp.value.color}}">
+						<i class="{{temp.value.iconClass}}"></i> <span class="thermo-temps--temp-name">{{temp.value.name}}</span>
+						<div class="thermo-temps--temp-control" data-id="{{temp.key}}">
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="tempAdjust(temp.value, -0.1)">-</button>
+							<span class="thermo-temps--temp-value">{{temp.value.value | integer}}<span class="decimal">.{{temp.value.value | decimal}}</span> &deg;C</span>
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase" (click)="tempAdjust(temp.value, 0.1)">+</button>
 						</div>
 					</div>
 				</div>

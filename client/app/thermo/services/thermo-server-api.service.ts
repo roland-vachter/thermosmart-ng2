@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ApiResult, HeatingPowerResponse } from '../../types/types';
+import { ApiResult, HeatingPowerResponse, SensorResponse } from '../../types/types';
 import { LocationService } from '../../services/location.service';
 import { of, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -36,43 +36,34 @@ export class ThermoServerApiService {
 	}
 
 	toggleSensorStatus (id) {
-		const obs = this.http.post('/api/togglesensorstatus', {
+		return this.http.post<ApiResult<SensorResponse>>('/api/togglesensorstatus', {
 			id,
 			location: this.locationService.getSelectedLocationId()
 		});
-
-		obs.subscribe();
-		return obs;
 	}
 
 	disableSensorWindowOpen (id) {
-		return this.http.post('/api/disablesensorwindowopen', {
+		return this.http.post<ApiResult<SensorResponse>>('/api/disablesensorwindowopen', {
 			id,
 			location: this.locationService.getSelectedLocationId()
 		})
 	}
 
 	changeSensorSettings (id, options) {
-		const obs = this.http.post('/api/changesensorsettings', {
+		return this.http.post<ApiResult<SensorResponse>>('/api/changesensorsettings', {
 			id,
 			label: options.label,
 			tempadjust: options.tempAdjust,
 			humidityadjust: options.humidityAdjust
 		});
-
-		obs.subscribe();
-		return obs;
 	}
 
 	tempAdjust (id, value) {
-		const obs = this.http.post('/api/tempadjust', {
+		return this.http.post<ApiResult>('/api/tempadjust', {
 			id,
 			value,
 			location: this.locationService.getSelectedLocationId()
 		});
-
-		obs.subscribe();
-		return obs;
 	}
 
 	restartSensor () {

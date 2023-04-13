@@ -3,6 +3,7 @@ import { ThermoServerApiService } from '../../services/thermo-server-api.service
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { ChangeSensorSettingsModalComponent } from '../change-sensor-settings-modal/change-sensor-settings-modal.component';
 import { Sensor } from '../../../types/types';
+import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 
 @Component({
 	selector: 'thermo-sensor',
@@ -17,18 +18,23 @@ export class SensorComponent implements OnInit {
 
 	constructor(
 		private serverApiService: ThermoServerApiService,
-		private modalService: BsModalService
+		private modalService: BsModalService,
+		private dataStore: ThermoDataStoreService
 	) {	}
 
 	ngOnInit() {
 	}
 
 	toggleSensorStatus () {
-		this.serverApiService.toggleSensorStatus(this.sensor.id);
+		this.serverApiService.toggleSensorStatus(this.sensor.id).subscribe(res => {
+			this.dataStore.handleServerData(res.data);
+		});
 	}
 
 	disableSensorWindowOpen () {
-		this.serverApiService.disableSensorWindowOpen(this.sensor.id).subscribe();
+		this.serverApiService.disableSensorWindowOpen(this.sensor.id).subscribe(res => {
+			this.dataStore.handleServerData(res.data);
+		});
 	}
 
 	changeLabel () {
@@ -44,7 +50,9 @@ export class SensorComponent implements OnInit {
 
 		modalRef.content.onResult.subscribe(result => {
 			if (result) {
-				this.serverApiService.changeSensorSettings(this.sensor.id, result);
+				this.serverApiService.changeSensorSettings(this.sensor.id, result).subscribe(res => {
+					this.dataStore.handleServerData(res.data);
+				});
 			}
 		});
 	}

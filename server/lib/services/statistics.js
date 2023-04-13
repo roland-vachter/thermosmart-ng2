@@ -32,6 +32,7 @@ heatingEvts.on('changeHeating', data => {
 		.sort({
 			datetime: -1
 		})
+		.lean()
 		.exec()
 		.then((result) => {
 			if (!result || result.status !== data.isOn) {
@@ -46,7 +47,7 @@ heatingEvts.on('changeHeating', data => {
 
 
 function monitorTargetTemps () {
-	Location.find().exec().then(locations => {
+	Location.find().lean().exec().then(locations => {
 		locations.forEach(l => monitorTargetTempByLocation(l._id));
 	});
 }
@@ -61,6 +62,7 @@ function monitorTargetTempByLocation (location) {
 			.sort({
 				datetime: -1
 			})
+			.lean()
 			.exec()
 			.then((result) => {
 				if (!result || result.t !== target.value) {
@@ -93,6 +95,7 @@ async function calculateHeatingDuration (location, date) {
 			.sort({
 				datetime: -1
 			})
+			.lean()
 			.exec(),
 		HeatingHistory
 			.find({
@@ -105,6 +108,7 @@ async function calculateHeatingDuration (location, date) {
 			.sort({
 				datetime: 1
 			})
+			.lean()
 			.exec()
 	])
 
@@ -158,6 +162,7 @@ async function calculateAvgTargetTemp (location, date) {
 			.sort({
 				datetime: -1
 			})
+			.lean()
 			.exec(),
 		TargetTempHistory
 			.find({
@@ -170,6 +175,7 @@ async function calculateAvgTargetTemp (location, date) {
 			.sort({
 				datetime: 1
 			})
+			.lean()
 			.exec()
 	]);
 
@@ -226,6 +232,7 @@ async function calculateAvgOutsideCondition (date) {
 			.sort({
 				datetime: -1
 			})
+			.lean()
 			.exec(),
 		OutsideConditionHistory
 			.find({
@@ -237,6 +244,7 @@ async function calculateAvgOutsideCondition (date) {
 			.sort({
 				datetime: 1
 			})
+			.lean()
 			.exec()
 	]);
 
@@ -299,6 +307,7 @@ const saveStatisticsForADay = async () => {
 			.sort({
 				date: -1
 			})
+			.lean()
 			.exec();
 
 		if (lastHeatingStatistic && lastHeatingStatistic.date) {
@@ -308,6 +317,7 @@ const saveStatisticsForADay = async () => {
 						$lt: moment(lastHeatingStatistic.date).subtract(1, 'month').toDate()
 					}
 				})
+				.lean()
 				.exec()
 				.then(result => {
 					console.log('Successfully cleaned up outside condition history, deleted count:', result.deletedCount);
@@ -334,6 +344,7 @@ const saveStatisticsForADayByLocation = async (location) => {
 			.sort({
 				date: -1
 			})
+			.lean()
 			.exec();
 
 		if (lastHeatingStatistic && lastHeatingStatistic.date) {
@@ -346,6 +357,7 @@ const saveStatisticsForADayByLocation = async (location) => {
 				.sort({
 					datetime: 1
 				})
+				.lean()
 				.exec();
 
 			if (lastHeatingHistory && lastHeatingHistory.datetime) {
@@ -394,6 +406,7 @@ const saveStatisticsForADayByLocation = async (location) => {
 					$lt: moment(currentDate).subtract(1, 'month').toDate()
 				}
 			})
+			.lean()
 			.exec()
 			.then(result => {
 				console.log('Successfully cleaned up heating history, deleted count:', result.deletedCount);
@@ -409,6 +422,7 @@ const saveStatisticsForADayByLocation = async (location) => {
 					$lt: moment(currentDate).subtract(1, 'month').toDate()
 				}
 			})
+			.lean()
 			.exec()
 			.then(result => {
 				console.log('Successfully cleaned up target temp history, deleted count:', result.deletedCount);
@@ -438,6 +452,7 @@ exports.getStatisticsByDay = async (location, dateStart, dateEnd) => {
 			},
 			location
 		})
+		.lean()
 		.exec();
 
 	if (new Date(moment(dateEnd).tz("Europe/Bucharest").endOf('day')).getTime() === new Date(moment().tz("Europe/Bucharest").endOf('day')).getTime()) {
@@ -468,6 +483,7 @@ exports.getStatisticsByMonth = async (location, dateStart, dateEnd) => {
 			},
 			location
 		})
+		.lean()
 		.exec();
 
 	const totals = [];

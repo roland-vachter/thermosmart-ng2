@@ -9,7 +9,7 @@
 		
 			<div class="col-12 col-md-8 col-lg-9 col-xl-10">
 				<div class="thermo-current-plan--current-time" [ngClass]="{'thermo-current-plan--last-part': dataStore.percentInDay > 80}" [style.left]="dataStore.percentInDay | percentString">
-					<div class="thermo-current-plan--pointer color-bg-{{ dataStore.targetTemp.color }}" [style.left]="dataStore.percentInDay | percentString"></div>
+					<div class="thermo-current-plan--pointer color-bg-{{ dataStore.temperatures[dataStore.targetTempId]?.color }}" [style.left]="dataStore.percentInDay | percentString"></div>
 					{{ dataStore.currentTime }}
 				</div>
 

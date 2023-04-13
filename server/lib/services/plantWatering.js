@@ -20,6 +20,7 @@ let initialPromise = Promise.all(zones.map(async z => {
 			.findOne({
 				zone: z
 			})
+			.lean()
 			.exec(),
 		PlantWateringStatusHistory
 			.findOne({
@@ -28,6 +29,7 @@ let initialPromise = Promise.all(zones.map(async z => {
 			.sort({
 				datetime: -1
 			})
+			.lean()
 			.exec()
 	]);
 

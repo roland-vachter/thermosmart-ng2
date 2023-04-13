@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
+import { RESPONSE_STATUS } from '../../../types/types';
 import { ThermoActionsService } from '../../services/thermo-actions.service';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 import { ThermoModalsService } from '../../services/thermo-modals.service';
@@ -103,8 +104,13 @@ export class HeatingStatusComponent implements OnInit {
 	}
 
 	tempAdjust(diff) {
-		const expected = this.dataStore.targetTemp.value + diff;
-		this.serverApiService.tempAdjust(this.dataStore.targetTemp._id, this.dataStore.targetTemp.value + diff);
-		this.dataStore.targetTemp.value = expected;
+		if (this.dataStore.targetTempId) {
+			const expected = this.dataStore.temperatures[this.dataStore.targetTempId].value + diff;
+			this.serverApiService.tempAdjust(this.dataStore.temperatures[this.dataStore.targetTempId]._id, expected).subscribe(res => {
+				if (res.status === RESPONSE_STATUS.OK) {
+					this.dataStore.temperatures[this.dataStore.targetTempId].value = expected;
+				}
+			});
+		}
 	}
 }

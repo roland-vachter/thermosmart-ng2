@@ -20,8 +20,6 @@ interface OverrideToAdd {
 	styleUrls: ['./thermo-config-modal.component.scss']
 })
 export class ThermoConfigModalComponent implements OnInit {
-
-	@Input() temps = [];
 	@Input() switchThresholdBelow = {
 		name: '',
 		value: NaN
@@ -47,8 +45,11 @@ export class ThermoConfigModalComponent implements OnInit {
 
 	tempAdjust(temp, diff) {
 		const expected = temp.value + diff;
-		this.serverApiService.tempAdjust(temp._id, temp.value + diff);
-		temp.value = expected;
+		this.serverApiService.tempAdjust(temp._id, expected).subscribe(res => {
+			if (res.status === RESPONSE_STATUS.OK) {
+				temp.value = expected;
+			}
+		});
 	}
 
 	changePlan(dayOfWeek) {

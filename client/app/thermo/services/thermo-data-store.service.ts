@@ -38,10 +38,7 @@ export class ThermoDataStoreService {
 	defaultHeatingPlans: HeatingDefaultPlan[] = [];
 	todaysPlan: HeatingPlan;
 	nextDaysPlan: HeatingPlan;
-	targetTemp: Temperature = {
-		value: 0,
-		color: 'gray'
-	} as Temperature;
+	targetTempId: number;
 	percentInDay: number = 0;
 	currentTime: string;
 	currentDate: Moment;
@@ -86,10 +83,7 @@ export class ThermoDataStoreService {
 		this.defaultHeatingPlans = [];
 		this.todaysPlan = null;
 		this.nextDaysPlan = null;
-		this.targetTemp = {
-			value: 0,
-			color: 'gray'
-		} as Temperature;
+		this.targetTempId = null;
 		this.percentInDay = 0;
 		this.currentTime = null;
 		this.currentDate = null;
@@ -178,7 +172,7 @@ export class ThermoDataStoreService {
 		}
 
 		if (!isNaN(data.targetTempId)) {
-			this.targetTemp = this.temperatures[data.targetTempId];
+			this.targetTempId = data.targetTempId;
 		}
 
 		if (data.heatingPlans) {

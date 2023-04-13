@@ -116,6 +116,7 @@ exports.tempAdjust = function (req, res, next) {
 	Temperature.findOne({
 		_id: req.body.id
 	})
+	.lean()
 	.exec()
 	.then(async temp => {
 		if (temp) {
@@ -161,6 +162,7 @@ exports.changeDefaultPlan = function (req, res, next) {
 	HeatingDefaultPlan.findOne({
 		dayOfWeek: req.body.dayOfWeek
 	})
+	.lean()
 	.exec()
 	.then(async heatingDefaultPlan => {
 		if (heatingDefaultPlan) {
@@ -206,7 +208,7 @@ exports.listHeatingPlanOverride = async (req, res) => {
 	try {
 		const heatingPlanOverrides = await HeatingPlanOverrides.find({
 			location: location
-		}).exec();
+		}).lean().exec();
 
 		res.json({
 			status: 'ok',
@@ -243,6 +245,7 @@ exports.addOrUpdateHeatingPlanOverride = (req, res) => {
 		upsert: true,
 		new: true
 	})
+	.lean()
 	.exec()
 	.catch(err => {
 		console.error(err);
@@ -278,6 +281,7 @@ exports.removeHeatingPlanOverride = (req, res) => {
 			date: date.valueOf(),
 			location
 		})
+		.lean()
 		.exec()
 		.catch(err => {
 			console.error(err);
@@ -332,7 +336,10 @@ exports.disableSensorWindowOpen = (req, res) => {
 	insideConditions.disableSensorWindowOpen(req.body.id);
 
 	res.json({
-		status: 'ok'
+		status: 'ok',
+		data: {
+			sensors: insideConditions.get(insideConditions.getLocationById(req.body.id))
+		}
 	});
 }
 
@@ -356,7 +363,10 @@ exports.toggleSensorStatus = async (req, res, next) => {
 		next();
 	} else {
 		res.json({
-			status: 'ok'
+			status: 'ok',
+			data: {
+				sensors: insideConditions.get(insideConditions.getLocationById(req.body.id))
+			}
 		});
 	}
 };
@@ -380,7 +390,10 @@ exports.changeSensorSettings = async (req, res, next) => {
 			next();
 		} else {
 			res.json({
-				status: 'ok'
+				status: 'ok',
+				data: {
+					sensors: insideConditions.get(insideConditions.getLocationById(req.body.id))
+				}
 			});
 		}
 	} catch (err) {
@@ -398,7 +411,7 @@ exports.sensorPolling = async (req, res) => {
 
 	const sensorSetting = await SensorSetting.findOne({
 		_id: id
-	}).exec();
+	}).lean().exec();
 
 	if (!sensorSetting) {
 		return res.json({
@@ -436,6 +449,7 @@ exports.statistics = async (req, res) => {
 				},
 				location: location
 			})
+			.lean()
 			.exec(),
 		statisticsService
 			.getStatisticsByDay(location, new Date(moment().tz('Europe/Bucharest').subtract(1, 'month')), new Date(moment().tz('Europe/Bucharest'))),

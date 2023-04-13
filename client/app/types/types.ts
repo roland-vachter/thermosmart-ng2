@@ -111,3 +111,7 @@ export interface ArmingStatusResponse {
 		status: ArmingStatus;
 	};
 }
+
+export interface SensorResponse {
+	sensors: Sensor[];
+}

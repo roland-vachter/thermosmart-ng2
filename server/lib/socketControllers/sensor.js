@@ -7,7 +7,7 @@ const SecurityControllers = require('../models/SecurityControllers');
 
 
 websocket.initWssConnection('/sensor/security');
-SecurityControllers.find().exec().then(controllers => {
+SecurityControllers.find().lean().exec().then(controllers => {
 	controllers.forEach(c => {
 		websocket.initWssConnection(`/sensor/security/${c.controllerid}`);
 	});

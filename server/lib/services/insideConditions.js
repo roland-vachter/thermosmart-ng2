@@ -197,6 +197,10 @@ exports.get = (locationId) => {
 	return sensorDataByLocation;
 };
 
+exports.getLocationById = (id) => {
+	return sensorData[id].location;
+}
+
 const activateAllSensors = (locationId) => {
 	Object.keys(sensorData).forEach(id => {
 		const s = sensorData[id];
