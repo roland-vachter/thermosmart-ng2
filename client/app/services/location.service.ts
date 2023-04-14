@@ -13,6 +13,7 @@ export class LocationService {
 	constructor() { }
 
 	updateLocation (location: Location) {
+        localStorage.setItem('selectedLocation', location._id.toString());
 		this.selectedLocation.next(location);
 	}
 

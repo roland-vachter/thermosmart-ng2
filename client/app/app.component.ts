@@ -110,7 +110,9 @@ export class AppComponent {
 		this.serverApiService.init().subscribe((data: { user: User }) => {
 			this.user = data.user;
 
-			this.changeLocation(this.user.locations[0]);
+			this.changeLocation(typeof localStorage.getItem('selectedLocation') === 'string' ?
+				this.user.locations.find(l => l._id === parseInt(localStorage.getItem('selectedLocation'), 10)) || this.user.locations[0] :
+				this.user.locations[0]);
 		});
 	}
 
