@@ -490,7 +490,7 @@ exports.statistics = async (req, res) => {
 
 	lastHistoryBySensor.forEach(history => {
 		sensorTempHistory.push({
-			...history,
+			...history.toObject(),
 			datetime: Date.now()
 		});
 	});
