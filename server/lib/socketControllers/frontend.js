@@ -125,10 +125,11 @@ exports.init = function () {
 
 		HeatingPlanOverrides.evts.on('change', data => {
 			HeatingPlanOverrides
-				.find()
-				.sort({
-					date: 1,
+				.find({
 					location: data.location
+				})
+				.sort({
+					date: 1
 				})
 				.lean()
 				.exec()
