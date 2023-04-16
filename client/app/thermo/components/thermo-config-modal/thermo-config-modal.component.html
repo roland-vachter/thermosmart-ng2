@@ -78,8 +78,9 @@
 				<input type="text"
 					placeholder="Date"
 					class="form-control"
+					[bsConfig]="{ customTodayClass: 'custom-today-class' }"
 					bsDatepicker
-					placement="top" [(ngModel)]="overrideToAdd.date">
+					placement="top left" [(ngModel)]="overrideToAdd.date">
 				<input type="text" value="{{ overrideToAdd.plan?.name }}" class="form-control" placeholder="Select plan" (click)="selectPlan()">
 				<div class="input-group-append">
 					<button class="btn btn-outline-primary" type="button" (click)="addOverride()">Add</button>

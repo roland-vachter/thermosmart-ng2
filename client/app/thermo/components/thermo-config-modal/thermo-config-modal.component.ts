@@ -88,10 +88,15 @@ export class ThermoConfigModalComponent implements OnInit {
 		this.serverApiService.addPlanOverride(moment(this.overrideToAdd.date), this.overrideToAdd.plan._id)
 			.subscribe(result => {
 				if (result.status === RESPONSE_STATUS.OK) {
-					this.dataStore.heatingPlanOverrides.push({
-						date: moment(this.overrideToAdd.date).tz('Europe/Bucharest').startOf('day'),
-						plan: this.overrideToAdd.plan
-					});
+					let foundOverrideForTheDate = this.dataStore.heatingPlanOverrides.find(o => o.date.isSame(moment(this.overrideToAdd.date).tz('Europe/Bucharest').startOf('day')));
+					if (foundOverrideForTheDate) {
+						foundOverrideForTheDate.plan = this.overrideToAdd.plan;
+					} else {
+						this.dataStore.heatingPlanOverrides.push({
+							date: moment(this.overrideToAdd.date).tz('Europe/Bucharest').startOf('day'),
+							plan: this.overrideToAdd.plan
+						});
+					}
 					this.clearOverrideToAdd();
 					this.dataStore.updateTodaysPlan();
 				} else {
