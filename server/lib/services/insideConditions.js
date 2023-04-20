@@ -39,7 +39,7 @@ exports.set = async (data) => {
 				onHoldTempHighest: null,
 				onHoldStatus: null,
 				location: sensorSetting.location,
-				temperatureHistory: []
+				tempHistory: []
 			};
 		}
 
@@ -66,7 +66,7 @@ exports.set = async (data) => {
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
 
 
-		if (!sensorData[id].tempHistory.length || !sensorData[id].tempHistory.includes(sensorData[id].temperature)) {
+		if (!sensorData[id].tempHistory.includes(sensorData[id].temperature)) {
 			sensorData[id].tempHistory.push(sensorData[id].temperature);
 			new HeatingSensorHistory({
 				sensor: id,
