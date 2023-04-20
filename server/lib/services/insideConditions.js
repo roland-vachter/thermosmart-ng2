@@ -39,8 +39,7 @@ exports.set = async (data) => {
 				onHoldTempHighest: null,
 				onHoldStatus: null,
 				location: sensorSetting.location,
-				lastSavedTemperature: null,
-				tempDirection: null
+				temperatureHistory: []
 			};
 		}
 
@@ -67,20 +66,17 @@ exports.set = async (data) => {
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
 
 
-		if (!sensorData[id].lastSavedTemperature || sensorData[id].temperature !== sensorData[id].lastSavedTemperature) {
-			const newDir = !sensorData[id].lastSavedTemperature ? null : sensorData[id].temperature < sensorData[id].lastSavedTemperature ? 'falling' : 'rising';
-			if (!sensorData[id].lastSavedTemperature ||
-				!sensorData[id].tempDirection ||
-				sensorData[id].tempDirection === newDir ||
-				Math.abs(sensorData[id].temperature - sensorData[id].lastSavedTemperature) > 0.15) {
-					new HeatingSensorHistory({
-						sensor: id,
-						t: sensorData[id].temperature,
-						h: sensorData[id].humidity,
-						datetime: new Date()
-					}).save();
-					sensorData[id].lastSavedTemperature = sensorData[id].temperature;
-					sensorData[id].tempDirection = newDir;
+		if (!sensorData[id].tempHistory.length || !sensorData[id].tempHistory.includes(sensorData[id].temperature)) {
+			sensorData[id].tempHistory.push(sensorData[id].temperature);
+			new HeatingSensorHistory({
+				sensor: id,
+				t: sensorData[id].temperature,
+				h: sensorData[id].humidity,
+				datetime: new Date()
+			}).save();
+
+			if (!sensorData[id].tempHistory.includes(sensorData[id].temperature)) {
+				sensorData[id].tempHistory = sensorData[id].tempHistory.filter(t => Math.abs(sensorData[id].temperature - t) < 0.15);
 			}
 		}
 
