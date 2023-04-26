@@ -55,11 +55,8 @@ export class HeatingStatusComponent implements OnInit {
 
 		this.bsModalService.show(ThermoConfigModalComponent, {
 			initialState: {
-				temps: Object.values(this.dataStore.temperatures),
-				heatingDefaultPlans: this.dataStore.defaultHeatingPlans,
-				switchThresholdBelow: this.dataStore.config['switchThresholdBelow'],
-				switchThresholdAbove: this.dataStore.config['switchThresholdAbove'],
-				heatingPlanOverrides: this.dataStore.heatingPlanOverrides
+				switchThresholdBelow: this.dataStore.config['switchThresholdBelow'] as {name: string; value: number},
+				switchThresholdAbove: this.dataStore.config['switchThresholdAbove'] as {name: string; value: number}
 			},
 			class: 'modal-lg'
 		});
