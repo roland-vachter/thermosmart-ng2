@@ -187,7 +187,7 @@ async function updateHeatingStatusByLocation (locationId) {
 		}
 
 		const target = targetTempService.get(locationId);
-		console.log('target', locationId, target);
+		console.log('target', locationId, target.value);
 		if (target) {
 			const sensors = getSensors(locationId);
 			if (!locationStatus.isOn && locationStatus.avgValues.temperature <= target.value - switchThresholdBelow.value) {
