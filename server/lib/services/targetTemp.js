@@ -76,7 +76,7 @@ async function update () {
 			}
 		});
 
-		if (lastTargetTempByLocation[l._id]?._id !== targetTemp?._id) {
+		if (lastTargetTempByLocation[l._id]?._id !== targetTemp?._id || lastTargetTempByLocation[l._id]?.value !== targetTemp?.value) {
 			lastTargetTempByLocation[l._id] = targetTemp;
 			evts.emit('change', {
 				targetTemp,
