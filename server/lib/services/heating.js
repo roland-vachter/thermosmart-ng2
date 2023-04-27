@@ -23,6 +23,7 @@ const statusByLocation = {};
 const initLocation = (locationId) => {
 	if (!statusByLocation[locationId]) {
 		statusByLocation[locationId] = { ...defaultValues, avgValues: { ...defaultValues.avgValues } };
+		statusByLocation[locationId].initialized = true;
 	}
 };
 
@@ -51,10 +52,6 @@ insideConditionsEvts.on('change', (data) => {
 	locationStatus.avgValues.temperature = locationStatus.avgValues.temperature / activeCount;
 
 	console.log('locationStatus', data.location, locationStatus);
-
-	if (!locationStatus.initialized) {
-		locationStatus.initialized = true;
-	}
 
 	updateHeatingStatusByLocation(data.location);
 });
@@ -165,10 +162,6 @@ async function updateHeatingStatus () {
 async function updateHeatingStatusByLocation (locationId) {
 	initLocation(locationId);
 	const locationStatus = statusByLocation[locationId];
-
-	if (!locationStatus.initialized) {
-		return Promise.resolve();
-	}
 
 	try {
 		let [switchThresholdBelow, switchThresholdAbove] = await Promise.all([
