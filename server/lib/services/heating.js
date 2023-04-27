@@ -50,6 +50,8 @@ insideConditionsEvts.on('change', (data) => {
 	locationStatus.hasWindowOpen = hasWindowOpen;
 	locationStatus.avgValues.temperature = locationStatus.avgValues.temperature / activeCount;
 
+	console.log('locationStatus', data.location, locationStatus);
+
 	if (!locationStatus.initialized) {
 		locationStatus.initialized = true;
 	}
@@ -62,6 +64,7 @@ exports.isHeatingOn = (locationId, readFromControllerSensor) => {
 	const locationStatus = statusByLocation[locationId];
 
 	if (readFromControllerSensor) {
+		console.log('read from controller sensor', locationId);
 		locationStatus.lastStatusReadBySensor = true;
 
 		if (locationStatus.lastChangeEventStatus !== locationStatus.isOn) {
@@ -191,14 +194,15 @@ async function updateHeatingStatusByLocation (locationId) {
 		}
 
 		const target = targetTempService.get(locationId);
+		console.log('target', locationId, target);
 		if (target) {
 			const sensors = getSensors(locationId);
 			if (!locationStatus.isOn && locationStatus.avgValues.temperature <= target.value - switchThresholdBelow.value) {
-				console.log('sensor data', JSON.stringify(sensors));
+				console.log('sensor data', locationId, JSON.stringify(sensors));
 				turnHeatingOn(locationId);
 			} else if (locationStatus.avgValues.temperature >= target.value + switchThresholdAbove.value) {
 				if (locationStatus.isOn) {
-					console.log('sensor data', JSON.stringify(sensors));
+					console.log('sensor data', locationId, JSON.stringify(sensors));
 				}
 				turnHeatingOff(locationId);
 			}
