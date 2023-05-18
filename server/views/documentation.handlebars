@@ -1,0 +1,197 @@
+<style>
+    p {
+        font-size: 16px;
+    }
+
+    img {
+        width: 100% !important;
+        max-width: 600px !important;
+        margin-bottom: 20px !important;
+    }
+
+    h2, h3, h4 {
+        text-align: left;
+        margin-top: 20px !important;
+        margin-bottom: 15px !important;
+    }
+
+    ul, li {
+        font-size: 14px;
+        list-style-position: inside;
+    }
+</style>
+
+<div class="component" style="margin: 25px; padding: 20px;">
+    <div class="row">
+        <div class="col">
+            <h1>Thermosmart</h1>
+
+            <h2>Temperatura</h2>
+            <p>În sistem sunt mai multe tipuri de temperaturi predefinite:</p>
+            <p>Temperaturile predefinite sunt urmatoarele:</p>
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <img src="/assets/static/images/documentation/temperatures.jpg" />
+                </div>
+                <div class="col-12 col-lg-6">
+                    <ul>
+                        <li><strong>Home comfort</strong>: temperatura de confort</li>
+                        <li><strong>Night</strong>: temperatura de noapte</li>
+                        <li><strong>Away</strong>: temperatura pentru cand sunteti plecati</li>
+                        <li><strong>Holiday</strong>: temperatura pentru concediu sau cand apartamentul e gol</li>
+                        <li><strong>Manual</strong>: setarea manuala a temperaturii</li>
+                        <li><strong>Home day start early</strong>: temperatura de dimineata dupa trezire si inainte de culcare</li>
+                        <li><strong>Home day start late</strong>: temperatura de dimineata tarzie si pentru pregatire la culcare</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p>Valorile tuturor temperaturilor predefinite pot fi schimbate cu ajutorul butoanelor +/-</p>
+
+            <hr>
+
+            <h2>Programe</h2>
+            <p>
+                In cadrul sistemului sunt predifinite programe standard care pot fi alese pentru o intreaga zi.
+                Acestea aplica valorile temperaturilor predefinite in intervale de timp vizibile in cadrul programului.
+            </p>
+            <p>Aceste programe predefinite sunt urmatoarele:</p>
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <img src="/assets/static/images/documentation/plans.jpg" />
+                </div>
+                <div class="col-12 col-lg-6">
+                    <ul>
+                        <li><strong>Manual</strong>: aplicarea temperaturii "Manual" pentru intreaga zi</li>
+                        <li><strong>Arriving home from holiday - late</strong>: Intoarcerea din concediu mai tarziu, dupa ora 17:00</li>
+                        <li><strong>Arriving home from holiday - early</strong>: Intoarcerea din concediu mai devreme, dupa ora 15:00</li>
+                        <li><strong>On holiday</strong>: In vacanta</li>
+                        <li><strong>Going on holiday</strong>: Plecare in concediu, cu aplicarea temperaturii reduse incepand cu ora 12:00</li>
+                        <li><strong>Sunday</strong>: Program dedicat pentru zi de duminica, in cazul in care inainte de pranz se pleaca de acasa</li>
+                        <li><strong>At home - start late</strong>: Program confort pentru intreaga zi, cu ridicarea temperaturii de dupa noapte treptat, in ritm lent</li>
+                        <li><strong>At home - start early</strong>: Program confort pentru intreaga zi, cu ridicarea temperaturii de dupa noapte treptat, in ritm rapid</li>
+                        <li><strong>Away whole day</strong>: Plecat toata ziua de la ora 9 pana la ora 20:00</li>
+                        <li><strong>Work in office</strong>: Program dedicat pentru zile de lucru</li>
+                    </ul>
+                </div>
+            </div>
+            <p>
+                La majoritatea programelor schimbarile de temperatura intre zi si noapte sunt ajustate treptat,
+                folosind temperaturile "Home day start early" si "Home day start late", astfel e optimizat consumul in zile insorite cand temperatura de dimineata creste pasiv,
+                fara incalzire activa.
+            </p>
+        </div>
+
+        <hr>
+
+        <h2>Asignare programe pentru fiecare zi</h2>
+        <img src="/assets/static/images/documentation/week-plans-overrides.jpg" />
+        <p>
+            Pentru fiecare zi a saptamanii se poate asigna un program din lista de program predefinite,
+            iar aceasta setare a programelor pe o saptamana se va repeta in fiecare saptamana.
+        </p>
+        <p>In cazul in care se doreste o exceptie de la regula setata, se poate alege o data din calendar pentru care se aplica un program.</p>
+
+        <hr>
+
+        <h2>Interfata principala</h2>
+        <img src="/assets/static/images/documentation/main-ui.jpg" />
+        <p>Interfata principala are mai multe sectiuni.</p>
+        <p>
+            In partea de sus, iconita din partea dreapta sus a paginii actualizeaza toate datele afisate pe pagina.<br>
+            In cazul in care pagina nu a fost actualizata recent, iconita va avea o culoare portocalie semnalizand ca datele afisate sunt vechi si s-ar putea sa se fi produs schimbari intre timp.
+        </p>
+        <p>
+            Prima sectiune este o viziune de ansamblu si o interfata de control in acelasi timp.
+            Sub iconita de casa se afiseaza temperatura si umiditatea medie in casa.
+            In partea dreapta se afiseaza o iconita corespunzatoare vremii, temperatura si umiditatea de afara.
+        </p>
+        <p>
+            La mijloc vedem temperatura setata (acesta este una din temperaturile predefinite), sub care timpul total de functionare a incalzirii pentru ziua curenta (de la miezul noptii pana la ora curenta).
+            Butoanele de + si - ajusteaza temperatura setata cu 0.1 grad, dar atentie, acesta seteaza valoare temperaturii predefinite.
+            Iconita de langa valoarea temperaturii ne arata care dintre temperaturile predefinite este activ in acest moment.
+        </p>
+        <p>
+            Deasupra temperaturii este un buton prin care se poate opri incalzirea fortat, pentru 15 minute.
+            Aceasta functie este utila in momentul in care aerisim si nu vrem ca incalzirea sa functioneze inutil.
+        </p>
+        <img src="/assets/static/images/documentation/power-off.jpg" />
+        <p>
+            In momentul in care incalzirea e pornita, suprafata de control din mijloc va avea un fundal verde care pulseaza.
+        </p>
+        <img src="/assets/static/images/documentation/heating-on.jpg" />
+        <p>
+            Meniul din stanga sus are 2 optiuni:
+        </p>
+
+        <div class="row">
+            <div class="col-12 col-lg-6">
+                <img src="/assets/static/images/documentation/menu.jpg" />
+            </div>
+            <div class="col-12 col-lg-6">
+                <ul>
+                    <li>Statistici</li>
+                    <li>Configurari</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Configurari</h2>
+        <p>
+            Cele mentionate mai sus, cum ar temperaturile, programele pot fi modificate in meniul de configurari.
+        </p>
+        <img src="/assets/static/images/documentation/settings.jpg" />
+        <p>
+            Partea ce nu a fost acoperita mai sus este cea de modul de pornire/oprire incalzire.
+            Dat fiind temperatura dorita, putem regla la ce diferenta in jos fata de aceasta temperatura sa se porneasca si la ce diferenta in sus sa se opreasca incalzirea.
+        </p>
+        <p>
+            Acesta e configurabila la sectiunea "Switch thresholds".<br>
+            "Switch on" seteaza diferenta in jos fata de temperatura setata pornirea incalzirii, la trepte de 0.1 grade.<br>
+            "Switch off" seteaza diferenta in sus fata de temperatura setata oprirea incalzirii, la trepte de 0.1 grade.
+        </p>
+
+        <h3>Statistici</h2>
+        <img src="/assets/static/images/documentation/statistics.jpg" />
+        <p>Pe pagina de statistici avem 4 graficuri.</p>
+        
+        <h4>Incalzirea in ultimele 24 de ore</h3>
+        <p>Pe acest grafic se afiseaza intervalele de timp din ultimele 24 de ore cand incalzirea era pornita.</p>
+
+        <h4>Istoric de temperature sensori individuali pentru ultimele 24 de ore</h3>
+        <p>Se afiseaza istoricul de temperatura, schimbari de 0.1 grad pentru fiecare sensor in parte.</p>
+
+        <h4>Istoric pentru ultimele 30 de zile</h4>
+        <p>Se afiseaza media zilnica temperaturii exterioare, media temperaturii setate si media (in minute) de functionare a incalzirii.</p>
+
+        <h4>Istoric lunar</h4>
+        <p>Se afiseaza media lunara de temperaturii exterioare, media temperaturii setate si media (in minute) de functionare a incalzirii.</p>
+
+
+        <h3>Starea senzorilor</h3>
+        <p>In interfata principala, urmatoarea sectiune este cea a senzorilor.</p>
+        <img src="/assets/static/images/documentation/sensors.jpg" />
+        <p>Este o lista de sensori, in care apare ID-ul intern al sensorului, numele sensorului (care este editabil prin click pe acesta), ultima temperatura si umiditate raportata, si statusul senzorului.</p>
+        <img src="/assets/static/images/documentation/sensor-settings.jpg" />
+        <p>Prin meniul senzorului se poate edita numele acestui, precum se pot face ajustari la temperatura si umiditatea raportata. In mod normal, senzorii sunt deja calibrate, si aceste valori nu trebuie modificate.</p>
+        <p>Statusul senzorului are mai multe stari:</p>
+        <ul>
+            <li><strong>Verde</strong>: totul functioneaza normal, statusul trimite actualizari</li>
+            <li><strong>Rosu</strong>: senzorul nu a mai trimis actualizari de cel putin 10 minute. In acest moment nu mai este luat in considerare la calcularea mediei temperaturilor.</li>
+        </ul>
+        <img src="/assets/static/images/documentation/sensors-inactive.jpg" />
+        <p>Dupa 15 minute de inactivitate, senzorul este sters. Daca un senzor dispare din lista sau are statusul rosu, inseamna ca e o problema cu acel senzor.</p>
+        <p>Pentru a remedia problema, in primul rand trebuie restartat senzorul, se scoate din priza si se alimenteaza din nou.</p>
+        <p>Daca nici dupa acest pas nu si-a revenit, s-ar putea ca senzorul sa nu se poate conecta la internet, problema fiind la router, in cazul acesta routerul trebuie restartat sau verificat.</p>
+
+        <img src="/assets/static/images/documentation/sensors-disabled.jpg" />
+        <p>Facand click pe iconita statusului (iconita de wireless), un senzor se poate dezactiva si astfel va trece pe gri si nu va fi luat in considerare la calcularea mediei temperaturilor.</p>
+        <p>
+            Sistemul poate detecta caderi bruste de temperatura intr-o incapere, de exemplu la aerisire iarna, moment in care o iconita de geam va aparea la sensor impiedicand pornirea incalzirii pana la stabilizarea temperaturii in incapare
+            (prin stabilizare se intelege ca temperatura nu mai scade, se asteapta sa se creasca si sa se stabilizeze cateva minute la o anumita valoare).
+        </p>
+        <p>Daca stabilizarea nu s-a finalizat timp de 30 de minute, statusul de "geam deschis" va fi automat sters si incalzirea poate porni din nou, daca este cazul.</p>
+        <p>Este posibil stergerea statusul "geam deschis" manual, prin click pe iconita.</p>
+    </div>
+</div>
+<div>&nbsp;</div>
