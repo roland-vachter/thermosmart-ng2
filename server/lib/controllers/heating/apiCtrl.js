@@ -442,13 +442,24 @@ exports.statistics = async (req, res) => {
 
 	const location = parseInt(req.query.location, 10);
 
-	const [statisticsForToday, statisticsForLastMonth, statisticsByMonth, sensorTempHistory] = await Promise.all([
+	const [lastHeatingHistory, statisticsForToday, statisticsForLastMonth, statisticsByMonth, sensorTempHistory] = await Promise.all([
+		HeatingHistory
+			.findOne({
+				datetime: {
+					$lt: new Date(moment().tz('Europe/Bucharest').subtract(1, 'day'))
+				},
+				location
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec(),
 		HeatingHistory
 			.find({
 				datetime: {
 					$gt: new Date(moment().tz('Europe/Bucharest').subtract(1, 'day'))
 				},
-				location: location
+				location
 			})
 			.exec(),
 		statisticsService
@@ -470,7 +481,7 @@ exports.statistics = async (req, res) => {
 
 	statisticsForToday.unshift({
 		datetime: new Date(moment().tz('Europe/Bucharest').subtract(1, 'day')),
-		status: statisticsForToday[0] ? !statisticsForToday[0].status : false
+		status: lastHeatingHistory ? lastHeatingHistory.status : false
 	});
 	statisticsForToday.push({
 		datetime: new Date(moment().tz('Europe/Bucharest')),
