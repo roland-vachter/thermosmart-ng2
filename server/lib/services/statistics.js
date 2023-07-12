@@ -114,7 +114,7 @@ async function calculateHeatingDuration (location, date) {
 
 	history.unshift({
 		datetime: new Date(moment(date).tz("Europe/Bucharest").startOf('day')),
-		status: lastHistory ? lastHistory.status : (history[0] ? !history[0].status : false)
+		status: lastHistory ? lastHistory.status : false
 	});
 
 	history.push({
@@ -305,7 +305,7 @@ const saveStatisticsForADay = async () => {
 			await OutsideConditionHistory
 				.deleteMany({
 					datetime: {
-						$lt: moment(lastHeatingStatistic.date).subtract(1, 'month').toDate()
+						$lt: moment(lastHeatingStatistic.date).subtract(2, 'month').toDate()
 					}
 				})
 				.exec()
@@ -391,7 +391,7 @@ const saveStatisticsForADayByLocation = async (location) => {
 			.deleteMany({
 				location: location,
 				datetime: {
-					$lt: moment(currentDate).subtract(1, 'month').toDate()
+					$lt: moment(currentDate).subtract(2, 'month').toDate()
 				}
 			})
 			.exec()
@@ -406,7 +406,7 @@ const saveStatisticsForADayByLocation = async (location) => {
 			.deleteMany({
 				location: location,
 				datetime: {
-					$lt: moment(currentDate).subtract(1, 'month').toDate()
+					$lt: moment(currentDate).subtract(2, 'month').toDate()
 				}
 			})
 			.exec()
