@@ -33,22 +33,16 @@ exports.initWssConnection = (path) => {
 					ping(ws);
 
 					ws.on('close', () => {
-						console.log('disconnected');
 						ws.terminate();
 						newWss.connections.splice(newWss.connections.indexOf(ws), 1);
 					});
 				});
 
 				newWss.wss.on('close', () => {
-					console.log('all connections closed');
 					newWss.connections.forEach(ws => {
 						ws.terminate();
 					});
 					newWss.connections = [];
-				});
-
-				newWss.wss.on('wsClientError', error => {
-					console.log('&&&&&&&&& wsClientError', error);
 				});
 			}
 
@@ -119,10 +113,6 @@ exports.init = function (server) {
 				return;
 			}
 
-			socket.on('wsClientError', function () {
-				console.log('$$$$$$$$$$ wsClientError', args);
-			});
-
 			apiKeyAuthorization({ ...request, ...parseUrl(request.url, true) }, null, (err) => {
 				if (err) {
 				  socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
@@ -135,7 +125,6 @@ exports.init = function (server) {
 
 				if (wss) {
 					wss.wss.handleUpgrade(request, socket, head, function done(ws) {
-						console.log('========== handle upgrade', request.url);
 						wss.wss.emit('connection', ws, request);
 					});
 				} else {
@@ -154,7 +143,6 @@ const heartbeat = (wss) => {
 			while (i < wss.children[p].connections.length) {
 				const ws = wss.children[p].connections[i];
 				if (ws.isAlive === false) {
-					console.log('terminate', p);
 					ws.terminate();
 					wss.children[p].connections.splice(i, 1);
 				} else {

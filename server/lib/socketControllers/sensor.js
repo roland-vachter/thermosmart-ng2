@@ -16,7 +16,6 @@ SecurityControllers.find().exec().then(controllers => {
 securityStatus.evts.on('status', data => {
 	securityHealth.controller.getIdsByLocation(data.location).then(ids => {
 		ids.forEach(id => {
-			console.log('send sensor event to', id);
 			websocket.broadcastMessage('/sensor/security/' + id, 'update', JSON.stringify({
 				security: {
 					status: data.status
