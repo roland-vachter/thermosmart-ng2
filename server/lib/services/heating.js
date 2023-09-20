@@ -1,4 +1,5 @@
 const insideConditionsEvts = require('./insideConditions').evts;
+const outsideConditions = require('./outsideConditions');
 const getSensors = require('./insideConditions').get;
 const targetTempService = require('./targetTemp');
 const configService = require('./config');
@@ -9,8 +10,8 @@ const defaultValues = {
 	lastStatusReadBySensor: false,
 	lastChangeEventStatus: null,
 	avgValues: {
-		temperature: 0,
-		humidity: 0
+		temperature: NaN,
+		humidity: NaN
 	},
 	poweredOn: true,
 	hasWindowOpen: false,
@@ -39,7 +40,7 @@ insideConditionsEvts.on('change', (data) => {
 	let activeCount = 0;
 	let hasWindowOpen = false;
 	keys.forEach(key => {
-		if (sensors[key].active && sensors[key].enabled) {
+		if (sensors[key].active && sensors[key].enabled && sensors[key].temperature > outsideConditions.temperature) {
 			locationStatus.avgValues.temperature += sensors[key].temperature;
 			locationStatus.avgValues.humidity += sensors[key].humidity;
 			activeCount++;
@@ -132,7 +133,7 @@ function turnHeatingOn (locationId) {
 			isOn: locationStatus.isOn,
 			location: locationId
 		});
-		console.log(`[${locationId}] heating turn off`);
+		console.log(`[${locationId}] heating turn on`);
 	}
 	locationStatus.lastChangeEventStatus = locationStatus.isOn;
 }
