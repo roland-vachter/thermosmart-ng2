@@ -134,3 +134,4 @@ exports.get = function () {
 };
 
 exports.evts = evts;
+exports.getTemperature = () => lastValues.temperature;

@@ -40,7 +40,7 @@ insideConditionsEvts.on('change', (data) => {
 	let activeCount = 0;
 	let hasWindowOpen = false;
 	keys.forEach(key => {
-		if (sensors[key].active && sensors[key].enabled && sensors[key].temperature > outsideConditions.temperature) {
+		if (sensors[key].active && sensors[key].enabled && sensors[key].temperature > outsideConditions.getTemperature()) {
 			locationStatus.avgValues.temperature += sensors[key].temperature;
 			locationStatus.avgValues.humidity += sensors[key].humidity;
 			activeCount++;
@@ -180,6 +180,8 @@ async function updateHeatingStatusByLocation (locationId) {
 			};
 		}
 
+
+
 		if (Number.isNaN(locationStatus.avgValues.temperature) || !locationStatus.poweredOn || locationStatus.hasWindowOpen) {
 			turnHeatingOff(locationId);
 			return;
@@ -187,15 +189,13 @@ async function updateHeatingStatusByLocation (locationId) {
 
 		const target = targetTempService.get(locationId);
 		if (target) {
-			console.log('target', target, 'locationStatus.isOn', locationStatus.isOn);
 			const sensors = getSensors(locationId);
-			console.log('sensor data', locationId, JSON.stringify(sensors), locationStatus.avgValues.temperature <= target.value - switchThresholdBelow.value);
 			if (!locationStatus.isOn && locationStatus.avgValues.temperature <= target.value - switchThresholdBelow.value) {
-				console.log('turn heating on, sensor data', locationId, JSON.stringify(sensors));
+				console.log('sensor data', locationId, JSON.stringify(sensors));
 				turnHeatingOn(locationId);
 			} else if (locationStatus.avgValues.temperature >= target.value + switchThresholdAbove.value) {
 				if (locationStatus.isOn) {
-					console.log('turn heating off, sensor data', locationId, JSON.stringify(sensors));
+					console.log('sensor data', locationId, JSON.stringify(sensors));
 				}
 				turnHeatingOff(locationId);
 			}
