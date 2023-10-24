@@ -128,13 +128,6 @@ function turnHeatingOn (locationId) {
 	locationStatus.isOn = true;
 	locationStatus.lastStatusReadBySensor = false;
 
-	if (locationStatus.lastChangeEventStatus === false || locationStatus.lastChangeEventStatus === null) {
-		heatingEvts.emit('changeHeating', {
-			isOn: locationStatus.isOn,
-			location: locationId
-		});
-		console.log(`[${locationId}] heating turn on`);
-	}
 	locationStatus.lastChangeEventStatus = locationStatus.isOn;
 }
 
