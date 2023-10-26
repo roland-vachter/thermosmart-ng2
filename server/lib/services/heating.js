@@ -127,8 +127,6 @@ function turnHeatingOn (locationId) {
 
 	locationStatus.isOn = true;
 	locationStatus.lastStatusReadBySensor = false;
-
-	locationStatus.lastChangeEventStatus = locationStatus.isOn;
 }
 
 function turnHeatingOff (locationId) {
