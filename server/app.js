@@ -124,7 +124,7 @@ async function checkAccessByEmail(profile) {
 
 async function checkAccessById(profile) {
 	const user = await UserModel.findOne({
-		id: profile.id
+		facebookid: profile.id
 	}).exec();
 
 	if (user) {

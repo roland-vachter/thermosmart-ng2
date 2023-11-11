@@ -132,7 +132,7 @@ async function getUserByEmail(user) {
 
 function getUserById(user) {
 	return UserModel.findOne({
-		id: user?.id
+		facebookid: user?.id
 	}).populate({
 		path: 'locations'
 	}).exec();
