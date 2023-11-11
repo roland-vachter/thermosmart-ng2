@@ -85,6 +85,57 @@ passport.deserializeUser(function(user, done) {
 	done(null, user);
 });
 
+
+async function checkAccessByEmail(profile) {
+	if (profile && profile.emails && profile.emails.length) {
+		const results = await Promise.all(profile.emails.map(email => {
+			return UserModel.findOne({
+				email: email.value
+			}).exec().then((user) => {
+				if (user) {
+					return true;
+				} else {
+					return false;
+				}
+			}).catch((err) => {
+				console.log(err);
+
+				return false;
+			});
+		}));
+
+		let hasAccess = false;
+
+		results.forEach(result => {
+			if (result) {
+				hasAccess = true;
+			}
+		});
+
+		if (!hasAccess) {
+			console.log(`user with email ${JSON.stringify(profile.emails)} has no access`);
+		}
+
+		return hasAccess;
+	} else {
+		return false;
+	}
+}
+
+async function checkAccessById(profile) {
+	const user = await UserModel.findOne({
+		id: profile.id
+	}).exec();
+
+	if (user) {
+		console.log(`user by id ${profile.id} found`);
+		return true;
+	} else {
+		console.log(`user by id ${profile.id} not found`);
+		return false;
+	}
+}
+
 const FacebookStrategy = require('passport-facebook').Strategy;
 passport.use(new FacebookStrategy({
 		clientID: process.env.FACEBOOK_APP_ID,
@@ -92,39 +143,10 @@ passport.use(new FacebookStrategy({
 		callbackURL: `https://${process.env.OWN_HOST}/login/facebook/callback`,
 		profileFields: ['id', 'emails', 'name']
 	},
-	function(accessToken, refreshToken, profile, done) {
+	async function(accessToken, refreshToken, profile, done) {
 		console.log('user emails', JSON.stringify(profile.emails), 'facebook.id', profile.id);
-		if (profile && profile.emails && profile.emails.length) {
-			Promise.all(profile.emails.map(email => {
-				return UserModel.findOne({
-					email: email.value
-				}).exec().then((user) => {
-					if (user) {
-						return true;
-					} else {
-						return false;
-					}
-				}).catch((err) => {
-					console.log(err);
-
-					return false;
-				});
-			})).then(results => {
-				let hasAccess = false;
-
-				results.forEach(result => {
-					if (result) {
-						hasAccess = true;
-					}
-				});
-
-				if (hasAccess) {
-					done(null, profile);
-				} else {
-					console.log(`user with email ${profile.emails} has no access`);
-					done(new Error("Forbidden."));
-				}
-			});
+		if (await checkAccessByEmail(profile) || await checkAccessById(profile)) {
+			done(null, profile);
 		} else {
 			done(new Error("Forbidden"));
 		}

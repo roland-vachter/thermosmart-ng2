@@ -111,20 +111,51 @@ exports.getConfig = async (req, res) => {
 	}
 }
 
+
+async function getUserByEmail(user) {
+	if (user?.emails?.length) {
+		for (let email of user?.emails) {
+			const dbUser = await UserModel.findOne({
+				email: email.value
+			}).populate({
+				path: 'locations'
+			}).exec();
+
+			if (dbUser) {
+				return dbUser;
+			}
+		}
+	} else {
+		return null;
+	}
+}
+
+function getUserById(user) {
+	return UserModel.findOne({
+		id: user?.id
+	}).populate({
+		path: 'locations'
+	}).exec();
+}
+
 exports.init = async (req, res) => {
-	if (!req.user?.emails?.length) {
+	if (!req.user) {
 		return res.json({
 			status: 'error',
-			error: 'User email not available'
+			error: 'No user found'
 		})
 	}
 
 	try {
-		const user = await UserModel.findOne({
-			email: req.user.emails[0].value
-		}).populate({
-			path: 'locations'
-		}).exec();
+		const user = await getUserByEmail(req.user) ?? await getUserById(req.user);
+
+		if (!user) {
+			return res.json({
+				status: 'error',
+				error: 'No user found'
+			})
+		}
+
 		res.json({
 			status: 'ok',
 			data: {
