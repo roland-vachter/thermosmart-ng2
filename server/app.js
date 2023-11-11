@@ -93,6 +93,7 @@ passport.use(new FacebookStrategy({
 		profileFields: ['id', 'emails', 'name']
 	},
 	function(accessToken, refreshToken, profile, done) {
+		console.log('user emails', JSON.stringify(profile.emails));
 		if (profile && profile.emails && profile.emails.length) {
 			Promise.all(profile.emails.map(email => {
 				return UserModel.findOne({
@@ -120,6 +121,7 @@ passport.use(new FacebookStrategy({
 				if (hasAccess) {
 					done(null, profile);
 				} else {
+					console.log(`user with email ${profile.emails} has no access`);
 					done(new Error("Forbidden."));
 				}
 			});
