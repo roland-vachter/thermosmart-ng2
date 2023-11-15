@@ -17,6 +17,25 @@ heatingEvts.on('changeHeating', data => {
 	}
 });
 
+function getAvgTemp(sensor, newTemperature) {
+	let sum = 0;
+	let count = 0;
+
+	if (newTemperature) {
+		sum = newTemperature;
+		count = 1;
+	}
+
+	for (let i = count, historyIndex = 0; i < 3; i++, historyIndex++) {
+		if (sensor.adjustedTempHistory[historyIndex]) {
+			sum += sensor.adjustedTempHistory[historyIndex];
+			count++;
+		}
+	}
+
+	return parseFloat((sum / count).toFixed(1));
+}
+
 exports.set = async (data) => {
 	try {
 		const id = data.id;
@@ -34,25 +53,27 @@ exports.set = async (data) => {
 				enabled: sensorSetting.enabled,
 				windowOpen: false,
 				windowOpenTimeout: null,
-				tempHistory: [],
+				adjustedTempHistory: [],
+				reportedTempHistory: [],
 				onHoldTempLowest: null,
 				onHoldTempHighest: null,
 				onHoldStatus: null,
 				location: sensorSetting.location,
-				savedTempHistory: []
+				savedTempHistory: [],
+				sensorSetting
 			};
 		}
 
 
 		let changesMade = false;
 
-		if (sensorData[id].temperature !== temp ||
+		if (sensorData[id].temperature !== getAvgTemp(sensorData[id], temp) ||
 				sensorData[id].humidity !== humidity ||
 				sensorData[id].active !== true) {
 			changesMade = true;
 		}
 
-		sensorData[id].temperature = temp;
+		sensorData[id].temperature = getAvgTemp(sensorData[id], temp);
 		sensorData[id].humidity = humidity;
 
 		sensorData[id].reportedTemperature = data.temperature;
@@ -77,26 +98,37 @@ exports.set = async (data) => {
 			sensorData[id].savedTempHistory = sensorData[id].savedTempHistory.filter(t => Math.abs(sensorData[id].temperature - t) < 0.15);
 		}
 
-		if (!heatingOnByLocation[data.location] && sensorSetting.enabled && sensorData[id].tempHistory.length) {
-			const lastTemp = sensorData[id].tempHistory[0];
-			const prevLastTemp = sensorData[id].tempHistory[1];
-			const preprevLastTemp = sensorData[id].tempHistory[1];
+		sensorData[id].reportedTempHistory.unshift(data.temperature);
+		if (sensorData[id].reportedTempHistory.length > 5) {
+			sensorData[id].reportedTempHistory.pop();
+		}
+
+		sensorData[id].adjustedTempHistory.unshift(temp);
+		if (sensorData[id].adjustedTempHistory.length > 3) {
+			sensorData[id].adjustedTempHistory.pop();
+		}
+
+		if (!heatingOnByLocation[data.location] && sensorSetting.enabled && sensorData[id].reportedTempHistory.length) {
+			const currentTemp = sensorData[id].reportedTempHistory[0];
+			const lastTemp = sensorData[id].reportedTempHistory[1];
+			const prevLastTemp = sensorData[id].reportedTempHistory[2];
+			const preprevLastTemp = sensorData[id].reportedTempHistory[3];
 
 			if (!sensorData[id].onHoldStatus) {
-				if (lastTemp - data.temperature >= 0.15 ||
-						(prevLastTemp && prevLastTemp - data.temperature >= 0.25) ||
-						(preprevLastTemp && preprevLastTemp - data.temperature >= 0.35)) {
-					sensorData[id].onHoldTempLowest = data.temperature;
+				if (lastTemp - currentTemp >= 0.15 ||
+						(prevLastTemp && prevLastTemp - currentTemp >= 0.25) ||
+						(preprevLastTemp && preprevLastTemp - currentTemp >= 0.35)) {
+					sensorData[id].onHoldTempLowest = currentTemp;
 					sensorData[id].onHoldTempHighest = null;
 					changesMade = true;
 
 					sensorData[id].onHoldStatus = 'firstDecrease';
 				}
 			} else if (sensorData[id].onHoldStatus === 'firstDecrease') {
-				if (lastTemp - data.temperature >= 0.15 ||
-						(prevLastTemp && prevLastTemp - data.temperature >= 0.25) ||
-						(preprevLastTemp && preprevLastTemp - data.temperature >= 0.35)) {
-					sensorData[id].onHoldTempLowest = data.temperature;
+				if (lastTemp - currentTemp >= 0.15 ||
+						(prevLastTemp && prevLastTemp - currentTemp >= 0.25) ||
+						(preprevLastTemp && preprevLastTemp - currentTemp >= 0.35)) {
+					sensorData[id].onHoldTempLowest = currentTemp;
 					sensorData[id].windowOpen = true;
 
 					clearTimeout(sensorData[id].windowOpenTimeout);
@@ -115,32 +147,32 @@ exports.set = async (data) => {
 					changesMade = true;
 				}
 			} else if (sensorData[id].onHoldStatus === 'decrease') {
-					if (data.temperature <= sensorData[id].onHoldTempLowest) {
-						sensorData[id].onHoldTempLowest = data.temperature;
+					if (currentTemp <= sensorData[id].onHoldTempLowest) {
+						sensorData[id].onHoldTempLowest = currentTemp;
 					} else {
 						sensorData[id].onHoldStatus = 'firstIncrease';
 					}
 			} else if (sensorData[id].onHoldStatus === 'firstIncrease') {
-				if (data.temperature <= sensorData[id].onHoldTempLowest) {
+				if (currentTemp <= sensorData[id].onHoldTempLowest) {
 					sensorData[id].onHoldStatus = 'decrease';
-					sensorData[id].onHoldTempLowest = data.temperature;
-				} else if (data.temperature < lastTemp) {
+					sensorData[id].onHoldTempLowest = currentTemp;
+				} else if (currentTemp < lastTemp) {
 					sensorData[id].onHoldStatus = 'decrease';
-				} else if (data.temperature > lastTemp) {
+				} else if (currentTemp > lastTemp) {
 					sensorData[id].onHoldStatus = 'increase';
-					sensorData[id].onHoldTempHighest = data.temperature;
+					sensorData[id].onHoldTempHighest = currentTemp;
 				}
 			} else if (sensorData[id].onHoldStatus === 'increase') {
-				if (data.temperature > sensorData[id].onHoldTempHighest) {
-					sensorData[id].onHoldTempHighest = data.temperature;
+				if (currentTemp > sensorData[id].onHoldTempHighest) {
+					sensorData[id].onHoldTempHighest = currentTemp;
 				} else {
 					sensorData[id].onHoldStatus = 'firstStabilized';
 				}
 			} else if (sensorData[id].onHoldStatus === 'firstStabilized') {
-				if (data.temperature > sensorData[id].onHoldTempHighest) {
-					sensorData[id].onHoldTempHighest = data.temperature;
+				if (currentTemp > sensorData[id].onHoldTempHighest) {
+					sensorData[id].onHoldTempHighest = currentTemp;
 					sensorData[id].onHoldStatus = 'increase';
-				} else if (data.temperature > lastTemp) {
+				} else if (currentTemp > lastTemp) {
 					sensorData[id].onHoldStatus = 'increase';
 				} else {
 					sensorData[id].windowOpen = false;
@@ -152,16 +184,11 @@ exports.set = async (data) => {
 				}
 			}
 
-			if (data.temperature <= 10) {
+			if (currentTemp <= 10) {
 				sensorData[id].onHoldStatus = null;
 				sensorData[id].windowOpen = false;
 				clearTimeout(sensorData[id].windowOpenTimeout);
 			}
-		}
-
-		sensorData[id].tempHistory.unshift(data.temperature);
-		if (sensorData[id].tempHistory.length > 5) {
-			sensorData[id].tempHistory.pop();
 		}
 
 		if (changesMade) {

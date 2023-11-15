@@ -15,7 +15,8 @@ const userSchema = new Schema({
 	locations: [{
 		type: Number,
 		ref: 'Location'
-	}]
+	}],
+	permissions: [String]
 });
 
 userSchema.index({email: 1});

@@ -4,15 +4,10 @@ import { SecurityComponent } from './security/security.component';
 import { LoginStatusService } from './shared/login-status.service';
 import { ThermoDataStoreService } from './thermo/services/thermo-data-store.service';
 import moment from 'moment';
-import { ServerApiService } from './services/server-api.service';
+import { User, UserService } from './services/user.service';
 import { RefreshEventService } from './services/refresh-event.service';
 import { LocationService } from './services/location.service';
 import { Location } from './types/types';
-
-interface User {
-	email: string;
-	locations: Location[];
-}
 
 @Component({
 	selector: 'app-root',
@@ -39,7 +34,7 @@ export class AppComponent {
 	constructor(
 		private loginStatusService: LoginStatusService,
 		private thermoDataStore: ThermoDataStoreService,
-		private serverApiService: ServerApiService,
+		private userService: UserService,
 		private refreshEventService: RefreshEventService,
 		public locationService: LocationService
 	) {
@@ -107,12 +102,16 @@ export class AppComponent {
 			}
 		}).bind(this));
 
-		this.serverApiService.init().subscribe((data: { user: User }) => {
-			this.user = data.user;
+		this.userService.getUser().subscribe(user => {
+			this.user = user;
 
-			this.changeLocation(typeof localStorage.getItem('selectedLocation') === 'string' ?
-				this.user.locations.find(l => l._id === parseInt(localStorage.getItem('selectedLocation'), 10)) || this.user.locations[0] :
-				this.user.locations[0]);
+			if (this.user?.locations) {
+				this.changeLocation(typeof localStorage.getItem('selectedLocation') === 'string' ?
+					this.user.locations.find(l => l._id === parseInt(localStorage.getItem('selectedLocation'), 10)) || this.user.locations[0] :
+					this.user.locations[0]);
+			} else {
+				console.warn('User has no locations');
+			}
 		});
 	}
 

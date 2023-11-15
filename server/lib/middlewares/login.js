@@ -1,14 +1,67 @@
 "use strict";
 
+const UserModel = require('../models/User');
+
 //const AuthToken = require('../models/AuthToken');
 //const generateRandomString = require('../utils/generateRandomString');
 
-function login (req, res, next) {
-	if (req.isAuthenticated()) {
-		return next();
-	}
+async function getUserByEmail(user) {
+	if (user?.emails?.length) {
+		for (let email of user?.emails) {
+			const dbUser = await UserModel.findOne({
+				email: email.value
+			}).populate({
+				path: 'locations'
+			}).exec();
 
-	res.redirect('/login/facebook');
+			if (dbUser) {
+				return dbUser;
+			}
+		}
+	} else {
+		return null;
+	}
+}
+
+function getUserById(user) {
+	return UserModel.findOne({
+		facebookid: user?.id
+	}).populate({
+		path: 'locations'
+	}).exec();
+}
+
+async function login (req, res, next) {
+	if (req.isAuthenticated()) {
+		if (!req.user) {
+			return res.json({
+				status: 'error',
+				error: 'No user found'
+			})
+		}
+
+		try {
+			const user = await getUserByEmail(req.user) ?? await getUserById(req.user);
+
+			if (!user) {
+				return res.json({
+					status: 'error',
+					error: 'No user found'
+				})
+			}
+
+			req.userModel = user;
+			return next();
+		} catch(e) {
+			console.error(e);
+			res.json({
+				status: 'error',
+				error: e.message
+			})
+		}
+	} else {
+		res.redirect('/login/facebook');
+	}
 }
 
 /*function login (req, res, next) {

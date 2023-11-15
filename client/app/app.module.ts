@@ -9,7 +9,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { AppComponent } from './app.component';
 import { LoginStatusService } from './shared/login-status.service';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { ServerApiService } from './services/server-api.service';
+import { UserService } from './services/user.service';
 import { RefreshEventService } from './services/refresh-event.service';
 import { LocationService } from './services/location.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -31,7 +31,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 	],
 	providers: [
 		LoginStatusService,
-		ServerApiService,
+		UserService,
 		RefreshEventService,
 		LocationService
 	],
