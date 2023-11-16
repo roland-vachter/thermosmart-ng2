@@ -98,7 +98,6 @@ exports.set = async (data) => {
 		if (sensorData[id].savedTempHistory[0] !== sensorData[id].temperature) {
 		// if (!sensorData[id].savedTempHistory.includes(sensorData[id].temperature)) {
 			// sensorData[id].savedTempHistory.push(sensorData[id].temperature);
-			console.log('save history');
 			new HeatingSensorHistory({
 				sensor: id,
 				t: sensorData[id].temperature,
