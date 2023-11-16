@@ -64,6 +64,15 @@ exports.set = async (data) => {
 			};
 		}
 
+		const sensorHistory = await HeatingSensorHistory
+			.findOne({ sensor: id })
+			.sort({ datetime: -1 })
+			.lean()
+			.exec();
+
+		if (sensorHistory) {
+			sensorData[id].savedTempHistory[0] = sensorHistory.t;
+		}
 
 		let changesMade = false;
 
@@ -86,16 +95,19 @@ exports.set = async (data) => {
 		sensorData[id].tempAdjust = sensorSetting.tempAdjust;
 		sensorData[id].humidityAdjust = sensorSetting.humidityAdjust;
 
-		if (!sensorData[id].savedTempHistory.includes(sensorData[id].temperature)) {
-			sensorData[id].savedTempHistory.push(sensorData[id].temperature);
+		if (sensorData[id].savedTempHistory[0] !== sensorData[id].temperature) {
+		// if (!sensorData[id].savedTempHistory.includes(sensorData[id].temperature)) {
+			// sensorData[id].savedTempHistory.push(sensorData[id].temperature);
+			console.log('save history');
 			new HeatingSensorHistory({
 				sensor: id,
 				t: sensorData[id].temperature,
 				h: sensorData[id].humidity,
 				datetime: new Date()
 			}).save();
+			sensorData[id].savedTempHistory[0] = sensorData[id].temperature;
 
-			sensorData[id].savedTempHistory = sensorData[id].savedTempHistory.filter(t => Math.abs(sensorData[id].temperature - t) < 0.15);
+		// 	sensorData[id].savedTempHistory = sensorData[id].savedTempHistory.filter(t => Math.abs(sensorData[id].temperature - t) < 0.15);
 		}
 
 		sensorData[id].reportedTempHistory.unshift(data.temperature);

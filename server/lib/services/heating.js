@@ -180,14 +180,14 @@ async function updateHeatingStatusByLocation (locationId) {
 
 		const target = targetTempService.get(locationId);
 		if (target) {
-			const sensors = getSensors(locationId);
+			// const sensors = getSensors(locationId);
 			if (!locationStatus.isOn && locationStatus.avgValues.temperature <= target.value - switchThresholdBelow.value) {
-				console.log('sensor data', locationId, JSON.stringify(sensors));
+				// console.log('sensor data', locationId, JSON.stringify(sensors));
 				turnHeatingOn(locationId);
 			} else if (locationStatus.avgValues.temperature >= target.value + switchThresholdAbove.value) {
-				if (locationStatus.isOn) {
-					console.log('sensor data', locationId, JSON.stringify(sensors));
-				}
+				// if (locationStatus.isOn) {
+				// 	console.log('sensor data', locationId, JSON.stringify(sensors));
+				// }
 				turnHeatingOff(locationId);
 			}
 		}
