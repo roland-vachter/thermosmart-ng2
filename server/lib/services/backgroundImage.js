@@ -1,7 +1,7 @@
 const arrayShuffle = require('../utils/arrayShuffle');
 
 const images = {
-	'night': {
+	'night.jpg': {
 		seasons: ['all'],
 		conditions: ['clear', 'cloudy'],
 		daytime: ['night']
