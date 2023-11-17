@@ -1,5 +1,6 @@
 "use strict";
 
+const db = require('./lib/services/db');
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
@@ -12,16 +13,16 @@ const _ = require('lodash');
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const passportAuth = require('./lib/services/passportAuth');
+const outsideConditions = require('./lib/services/outsideConditions');
+const mongoose = require('mongoose');
 
 var store = new MongoStore({
-	url: process.env.DATABASE_URL || process.env.MONGODB_URI || process.env.MONGO_URL,
+	mongooseConnection: mongoose.connection,
 	collection: 'sessions',
-	fallbackMemory: true
+	fallbackMemory: false,
+	autoRemove: 'native'
 });
-
-const UserModel = require('./lib/models/User');
-
-const fingerprint = require('./build_config/js/fingerprint');
 
 const prodEnv = process.env.ENV === 'prod' ? true : false;
 
@@ -31,7 +32,7 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 
 
-const alphavilleHbs = exphbs.create({
+const hbs = exphbs.create({
 	defaultLayout: path.join(__dirname, 'views/layout'),
 	extname: '.handlebars',
 	partialsDir: [
@@ -56,7 +57,7 @@ const alphavilleHbs = exphbs.create({
 });
 
 
-app.engine('handlebars', alphavilleHbs.engine);
+app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
 
@@ -76,82 +77,9 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(passport.authenticate('session'));
 
-passport.serializeUser(function(user, done) {
-	done(null, user);
-});
-
-passport.deserializeUser(function(user, done) {
-	done(null, user);
-});
-
-
-async function checkAccessByEmail(profile) {
-	if (profile && profile.emails && profile.emails.length) {
-		const results = await Promise.all(profile.emails.map(email => {
-			return UserModel.findOne({
-				email: email.value
-			}).exec().then((user) => {
-				if (user) {
-					return true;
-				} else {
-					return false;
-				}
-			}).catch((err) => {
-				console.log(err);
-
-				return false;
-			});
-		}));
-
-		let hasAccess = false;
-
-		results.forEach(result => {
-			if (result) {
-				hasAccess = true;
-			}
-		});
-
-		if (!hasAccess) {
-			console.log(`user with email ${JSON.stringify(profile.emails)} has no access`);
-		}
-
-		return hasAccess;
-	} else {
-		return false;
-	}
-}
-
-async function checkAccessById(profile) {
-	const user = await UserModel.findOne({
-		facebookid: profile.id
-	}).exec();
-
-	if (user) {
-		console.log(`user by id ${profile.id} found`);
-		return true;
-	} else {
-		console.log(`user by id ${profile.id} not found`);
-		return false;
-	}
-}
-
-const FacebookStrategy = require('passport-facebook').Strategy;
-passport.use(new FacebookStrategy({
-		clientID: process.env.FACEBOOK_APP_ID,
-		clientSecret: process.env.FACEBOOK_APP_SECRET,
-		callbackURL: `https://${process.env.OWN_HOST}/login/facebook/callback`,
-		profileFields: ['id', 'emails', 'name']
-	},
-	async function(accessToken, refreshToken, profile, done) {
-		console.log('user emails', JSON.stringify(profile.emails), 'facebook.id', profile.id);
-		if (await checkAccessByEmail(profile) || await checkAccessById(profile)) {
-			done(null, profile);
-		} else {
-			done(new Error("Forbidden"));
-		}
-	})
-);
+passportAuth.init();
 
 app.use(compression());
 
@@ -167,7 +95,7 @@ app.use( function( req, res, next ) {
 	const _render = res.render;
 
 	res.render = function( view, viewOptions, fn ) {
-		const viewModel = _.merge({}, viewOptions, defaultOptions);
+		const viewModel = _.merge({}, viewOptions, defaultOptions, { backgroundImage: outsideConditions.get().backgroundImage });
 
 		_render.call( this, view, viewModel, fn );
 	};
@@ -207,14 +135,22 @@ const errorHandler = (err, req, res, next) => {
 
 	const isNotProdEnv = app.get('env') === 'development' || !prodEnv;
 
+	console.log(err);
+
 	if (err.status === 404) {
 		res.status(404);
 		res.render('error_404');
+	} else if (err.type === 'OAuthException') {
+		res.status(err.status || 503);
+		res.render('error_login', {
+			message: err.errMsg || err.message,
+			error: isNotProdEnv ? err : { status: err?.status }
+		});
 	} else {
 		res.status(err.status || 503);
 		res.render('error', {
 			message: err.errMsg || err.message,
-			error: isNotProdEnv ? err : {}
+			error: isNotProdEnv ? err : { status: err?.status }
 		});
 	}
 };

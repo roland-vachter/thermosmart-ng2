@@ -1,12 +1,12 @@
 "use strict";
 
 module.exports = function (req, res) {
-	if (!req.isAuthenticated()) {
-		res.redirect('/login');
+	if (req.isAuthenticated()) {
+		res.redirect('/');
 		return;
 	}
 
-	res.render('index', {
+	res.render('login', {
 		title: "SmartHome"
 	});
 };

@@ -7,8 +7,8 @@ exports.auth = passport.authenticate('facebook', {
 });
 
 exports.callback = passport.authenticate('facebook', {
-	successRedirect : '/',
-	failureRedirect : '/login/facebook/forbidden'
+	successRedirect: '/',
+	failureRedirect: '/login/facebook/forbidden'
 });
 
 exports.forbidden = function (req, res) {

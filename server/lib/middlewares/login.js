@@ -1,8 +1,6 @@
 "use strict";
 
 const UserModel = require('../models/User');
-
-//const AuthToken = require('../models/AuthToken');
 //const generateRandomString = require('../utils/generateRandomString');
 
 async function getUserByEmail(user) {
@@ -60,7 +58,11 @@ async function login (req, res, next) {
 			})
 		}
 	} else {
-		res.redirect('/login/facebook');
+		if (req.apiCall) {
+			res.sendStatus(401);
+		} else {
+			res.redirect('/login');
+		}
 	}
 }
 
