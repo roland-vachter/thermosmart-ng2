@@ -29,11 +29,15 @@ function getUserByFacebookId(profile) {
 
 exports.init = () => {
 	passport.serializeUser(async function(user, done) {
+		console.log('serialize user', user);
 		done(null, user.email);
 	});
 
 	passport.deserializeUser(async function(userEmail, done) {
-		const userModel = await UserModel.findOne({ email: userEmail });
+		const userModel = await UserModel.findOne({ email: userEmail }).populate({
+			path: 'locations'
+		}).exec();
+		console.log('deserialize', userEmail, userModel);
 		done(null, userModel);
 	});
 
@@ -50,6 +54,7 @@ exports.init = () => {
 			const user = await getUserByEmail(profile) || await getUserByFacebookId(profile);
 
 			if (user) {
+				console.log('user found', user);
 				done(null, user);
 			} else {
 				done({

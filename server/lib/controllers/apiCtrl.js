@@ -114,17 +114,17 @@ exports.getConfig = async (req, res) => {
 
 
 exports.init = async (req, res) => {
-	if (!req.userModel) {
+	if (!req.user) {
 		return res.json({
 			status: 'error',
-			error: 'No user found'
+			error: 'No saved user found.'
 		})
 	}
 
 	res.json({
 		status: 'ok',
 		data: {
-			user: req.userModel
+			user: req.user
 		}
 	});
 }

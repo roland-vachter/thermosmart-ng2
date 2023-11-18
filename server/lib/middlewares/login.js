@@ -1,62 +1,21 @@
 "use strict";
 
-const UserModel = require('../models/User');
 //const generateRandomString = require('../utils/generateRandomString');
-
-async function getUserByEmail(user) {
-	if (user?.emails?.length) {
-		for (let email of user?.emails) {
-			const dbUser = await UserModel.findOne({
-				email: email.value
-			}).populate({
-				path: 'locations'
-			}).exec();
-
-			if (dbUser) {
-				return dbUser;
-			}
-		}
-	} else {
-		return null;
-	}
-}
-
-function getUserById(user) {
-	return UserModel.findOne({
-		facebookid: user?.id
-	}).populate({
-		path: 'locations'
-	}).exec();
-}
 
 async function login (req, res, next) {
 	if (req.isAuthenticated()) {
 		if (!req.user) {
-			return res.json({
-				status: 'error',
-				error: 'No user found'
-			})
-		}
-
-		try {
-			const user = await getUserByEmail(req.user) ?? await getUserById(req.user);
-
-			if (!user) {
+			if (req.apiCall) {
 				return res.json({
 					status: 'error',
-					error: 'No user found'
-				})
+					error: 'No facebook user found'
+				});
+			} else {
+				throw new Error('No facebook user found');
 			}
-
-			req.userModel = user;
-			return next();
-		} catch(e) {
-			console.error(e);
-			res.json({
-				status: 'error',
-				error: e.message
-			})
 		}
+
+		return next();
 	} else {
 		if (req.apiCall) {
 			res.sendStatus(401);
