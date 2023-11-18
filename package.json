@@ -6,13 +6,13 @@
     "ng": "ng",
     "start": "node ./server/bin/www",
     "start-dev": "nodemon ./server/bin/www",
-    "build": "ng build",
-    "build-prod": "ng build --prod",
+    "build": "ng build --prod",
+    "build-dev": "ng build",
     "build-watch": "ng build --watch",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "postinstall": "npm run build-prod"
+    "postinstall": "npm build"
   },
   "private": true,
   "dependencies": {

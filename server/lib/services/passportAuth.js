@@ -29,7 +29,6 @@ function getUserByFacebookId(profile) {
 
 exports.init = () => {
 	passport.serializeUser(async function(user, done) {
-		console.log('serialize user', user);
 		done(null, user.email);
 	});
 
@@ -37,7 +36,6 @@ exports.init = () => {
 		const userModel = await UserModel.findOne({ email: userEmail }).populate({
 			path: 'locations'
 		}).exec();
-		console.log('deserialize', userEmail, userModel);
 		done(null, userModel);
 	});
 
