@@ -11,6 +11,4 @@ router.get('/callback', facebookLoginCtrl.callback);
 
 router.get('/forbidden', facebookLoginCtrl.forbidden);
 
-router.get('/checkstatus', facebookLoginCtrl.checkStatus);
-
 module.exports = router;

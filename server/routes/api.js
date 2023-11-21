@@ -60,4 +60,12 @@ router.get('/plantwatering/sensor', apiKeyMiddleware, cors(), apiCtrl.plantWater
 
 router.post('/log', apiKeyMiddleware, cors(), apiCtrl.log);
 
+router.get('/checkloginstatus', (req, res) => {
+	if (req.isAuthenticated()) {
+		return res.sendStatus(200);
+	}
+
+	res.sendStatus(403);
+});
+
 module.exports = router;

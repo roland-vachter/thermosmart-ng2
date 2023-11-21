@@ -14,11 +14,3 @@ exports.callback = passport.authenticate('facebook', {
 exports.forbidden = function (req, res) {
 	res.sendStatus(403);
 };
-
-exports.checkStatus = function (req, res) {
-	if (req.isAuthenticated()) {
-		return res.sendStatus(200);
-	}
-
-	res.sendStatus(403);
-};

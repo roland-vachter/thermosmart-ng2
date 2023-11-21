@@ -13,4 +13,16 @@ router.get('/', loginMiddleware, indexCtrl);
 router.get('/login', loginCtrl);
 router.get('/documentation', documentationCtrl);
 
+router.get('/privacy-policy', (req, res) => {
+	res.render('privacy-policy');
+});
+
+router.get('/data-deletion', (req, res) => {
+	res.render('data-deletion');
+});
+
+router.get('/terms-of-service', (req, res) => {
+	res.render('terms-of-service');
+});
+
 module.exports = router;

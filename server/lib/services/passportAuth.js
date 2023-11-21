@@ -47,7 +47,7 @@ exports.init = () => {
 			profileFields: ['id', 'emails', 'name']
 		},
 		async function(accessToken, refreshToken, profile, done) {
-			console.log('user emails', JSON.stringify(profile.emails), 'facebook.id', profile.id, typeof profile.id);
+			console.log('facebook user emails', JSON.stringify(profile.emails), 'facebook.id', profile.id, typeof profile.id);
 
 			const user = await getUserByEmail(profile) || await getUserByFacebookId(profile);
 
@@ -62,4 +62,27 @@ exports.init = () => {
 			}
 		})
 	);
+
+	const GoogleStrategy = require('passport-google-oidc');
+	passport.use(new GoogleStrategy({
+			clientID: process.env.GOOGLE_APP_ID,
+			clientSecret: process.env.GOOGLE_APP_SECRET,
+			callbackURL: `https://${process.env.OWN_HOST}/login/google/callback`
+		},
+		async function(issuer, profile, done) {
+			console.log('google user emails', JSON.stringify(profile.emails));
+
+			const user = await getUserByEmail(profile);
+
+			if (user) {
+				console.log('user found', user);
+				done(null, user);
+			} else {
+				done({
+					message: 'Forbidden',
+					type: 'OAuthException'
+				});
+			}
+		}
+	));
 }

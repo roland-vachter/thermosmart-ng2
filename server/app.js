@@ -88,7 +88,8 @@ const defaultOptions = {
 	assetsStaticBasePath: `/assets/static`,
 	basePath: '/',
 	isTest: !prodEnv,
-	isProd: prodEnv
+	isProd: prodEnv,
+	isAngularPage: false
 };
 
 app.use( function( req, res, next ) {
@@ -96,6 +97,10 @@ app.use( function( req, res, next ) {
 
 	res.render = function( view, viewOptions, fn ) {
 		const viewModel = _.merge({}, viewOptions, defaultOptions, { backgroundImage: outsideConditions.get().backgroundImage });
+
+		if (view === 'index') {
+			viewModel.isAngularPage = true;
+		}
 
 		_render.call( this, view, viewModel, fn );
 	};
@@ -110,14 +115,6 @@ app.use(`/assets/static/`, express.static(path.join(__dirname, 'public'), {
 app.use(`/assets/`, express.static(path.join(__dirname, '../dist'), {
 	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
 }));
-
-app.use('/privacy-policy', (req, res) => {
-	res.render('privacy-policy');
-});
-
-app.use('/data-deletion', (req, res) => {
-	res.render('data-deletion');
-});
 
 app.use('/', require('./router'));
 
@@ -149,7 +146,7 @@ const errorHandler = (err, req, res, next) => {
 	} else {
 		res.status(err.status || 503);
 		res.render('error', {
-			message: err.errMsg || err.message,
+			message: isNotProdEnv ? err.errMsg || err.message : 'There was an error.',
 			error: isNotProdEnv ? err : { status: err?.status }
 		});
 	}
