@@ -5,7 +5,7 @@ async function getUserByEmail(profile) {
 	if (profile?.emails?.length) {
 		for (let email of profile?.emails) {
 			const dbUser = await UserModel.findOne({
-				email: email.value
+				emails: email.value
 			}).populate({
 				path: 'locations'
 			}).exec();
@@ -29,14 +29,21 @@ function getUserByFacebookId(profile) {
 
 exports.init = () => {
 	passport.serializeUser(async function(user, done) {
-		done(null, user.email);
+		done(null, user._id);
 	});
 
-	passport.deserializeUser(async function(userEmail, done) {
-		const userModel = await UserModel.findOne({ email: userEmail }).populate({
-			path: 'locations'
-		}).exec();
-		done(null, userModel);
+	passport.deserializeUser(async function(userId, done) {
+		try {
+			const userModel = await UserModel.findById(userId).populate({
+				path: 'locations'
+			}).exec();
+			done(null, userModel);
+		} catch (e) {
+			console.log(e);
+			done({
+				invalidSession: true
+			});
+		}
 	});
 
 	const FacebookStrategy = require('passport-facebook').Strategy;

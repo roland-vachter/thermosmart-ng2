@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-	email: {
-		type: String,
+	emails: {
+		type: [String],
 		index: true
 	},
 	facebookid: {
@@ -19,7 +19,6 @@ const userSchema = new Schema({
 	permissions: [String]
 });
 
-userSchema.index({email: 1});
 userSchema.set('versionKey', false);
 
 module.exports = mongoose.model('User', userSchema);

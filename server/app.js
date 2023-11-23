@@ -28,6 +28,30 @@ const prodEnv = process.env.ENV === 'prod' ? true : false;
 
 const app = express();
 
+app.use( function( req, res, next ) {
+	const _render = res.render;
+
+	res.render = function( view, viewOptions, fn ) {
+		const viewModel = _.merge({}, viewOptions, defaultOptions, { backgroundImage: outsideConditions.get().backgroundImage });
+
+		if (view === 'index') {
+			viewModel.isAngularPage = true;
+		}
+
+		_render.call( this, view, viewModel, fn );
+	};
+	next();
+});
+
+const ayear = 365 * 24 * 60 * 60 * 1000;
+
+app.use(`/assets/static/`, express.static(path.join(__dirname, 'public'), {
+	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
+}));
+app.use(`/assets/`, express.static(path.join(__dirname, '../dist'), {
+	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
+}));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 
@@ -92,30 +116,6 @@ const defaultOptions = {
 	isAngularPage: false
 };
 
-app.use( function( req, res, next ) {
-	const _render = res.render;
-
-	res.render = function( view, viewOptions, fn ) {
-		const viewModel = _.merge({}, viewOptions, defaultOptions, { backgroundImage: outsideConditions.get().backgroundImage });
-
-		if (view === 'index') {
-			viewModel.isAngularPage = true;
-		}
-
-		_render.call( this, view, viewModel, fn );
-	};
-	next();
-});
-
-const ayear = 365 * 24 * 60 * 60 * 1000;
-
-app.use(`/assets/static/`, express.static(path.join(__dirname, 'public'), {
-	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
-}));
-app.use(`/assets/`, express.static(path.join(__dirname, '../dist'), {
-	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
-}));
-
 app.use('/', require('./router'));
 
 // catch 404 and forward to error handler
@@ -132,14 +132,20 @@ const errorHandler = (err, req, res, next) => {
 
 	const isNotProdEnv = app.get('env') === 'development' || !prodEnv;
 
-	console.log(err);
+	if (err.invalidSession) {
+		res.clearCookie("sess");
+		res.redirect('/login');
+		return;
+	}
+
+	console.log('ERROR', err);
 
 	if (err.status === 404) {
 		res.status(404);
 		res.render('error_404');
 	} else if (err.type === 'OAuthException') {
-		res.status(err.status || 503);
-		res.render('error_login', {
+		res.status(err.status || 403);
+		res.render('error_403', {
 			message: err.errMsg || err.message,
 			error: isNotProdEnv ? err : { status: err?.status }
 		});
