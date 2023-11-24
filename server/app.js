@@ -28,15 +28,21 @@ const prodEnv = process.env.ENV === 'prod' ? true : false;
 
 const app = express();
 
+const defaultOptions = {
+	assetsBasePath: `/assets`,
+	assetsStaticBasePath: `/assets/static`,
+	assetsStaticLibBasePath: `/assets/lib`,
+	basePath: '/',
+	isTest: !prodEnv,
+	isProd: prodEnv
+};
+
+app.use(compression());
 app.use( function( req, res, next ) {
 	const _render = res.render;
 
 	res.render = function( view, viewOptions, fn ) {
 		const viewModel = _.merge({}, viewOptions, defaultOptions, { backgroundImage: outsideConditions.get().backgroundImage });
-
-		if (view === 'index') {
-			viewModel.isAngularPage = true;
-		}
 
 		_render.call( this, view, viewModel, fn );
 	};
@@ -51,6 +57,9 @@ app.use(`/assets/static/`, express.static(path.join(__dirname, 'public'), {
 app.use(`/assets/`, express.static(path.join(__dirname, '../dist'), {
 	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
 }));
+app.use(`/assets/lib/`, express.static(path.join(__dirname, '../node_modules'), {
+	maxage: process.env.CACHE_ENABLED === 'true' ? ayear : 0
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -60,8 +69,7 @@ const hbs = exphbs.create({
 	defaultLayout: path.join(__dirname, 'views/layout'),
 	extname: '.handlebars',
 	partialsDir: [
-		path.join(__dirname, 'views', 'partials'),
-		path.join(__dirname, 'bower_components')
+		path.join(__dirname, 'views', 'partials')
 	],
 	helpers: {
 		block: function (name) {
@@ -104,17 +112,6 @@ app.use(passport.session());
 app.use(passport.authenticate('session'));
 
 passportAuth.init();
-
-app.use(compression());
-
-const defaultOptions = {
-	assetsBasePath: `/assets`,
-	assetsStaticBasePath: `/assets/static`,
-	basePath: '/',
-	isTest: !prodEnv,
-	isProd: prodEnv,
-	isAngularPage: false
-};
 
 app.use('/', require('./router'));
 

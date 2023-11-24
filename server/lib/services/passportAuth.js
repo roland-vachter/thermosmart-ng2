@@ -1,6 +1,8 @@
 const UserModel = require('../models/User');
 const passport = require('passport');
 
+const userCache = {};
+
 async function getUserByEmail(profile) {
 	if (profile?.emails?.length) {
 		for (let email of profile?.emails) {
@@ -34,9 +36,15 @@ exports.init = () => {
 
 	passport.deserializeUser(async function(userId, done) {
 		try {
+			if (userCache[userId]) {
+				done(null, userCache[userId]);
+				return;
+			}
+
 			const userModel = await UserModel.findById(userId).populate({
 				path: 'locations'
 			}).exec();
+			userCache[userId] = userModel;
 			done(null, userModel);
 		} catch (e) {
 			console.log(e);
@@ -59,7 +67,6 @@ exports.init = () => {
 			const user = await getUserByEmail(profile) || await getUserByFacebookId(profile);
 
 			if (user) {
-				console.log('user found', user);
 				done(null, user);
 			} else {
 				done({
@@ -82,7 +89,6 @@ exports.init = () => {
 			const user = await getUserByEmail(profile);
 
 			if (user) {
-				console.log('user found', user);
 				done(null, user);
 			} else {
 				done({
