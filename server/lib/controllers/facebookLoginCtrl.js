@@ -12,5 +12,7 @@ exports.callback = passport.authenticate('facebook', {
 });
 
 exports.forbidden = function (req, res) {
-	res.sendStatus(403);
+	throw {
+		status: 403
+	}
 };

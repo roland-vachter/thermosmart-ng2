@@ -140,7 +140,7 @@ const errorHandler = (err, req, res, next) => {
 	if (err.status === 404) {
 		res.status(404);
 		res.render('error_404');
-	} else if (err.type === 'OAuthException') {
+	} else if (err.type === 'OAuthException' || err.status === 403) {
 		res.status(err.status || 403);
 		res.render('error_403', {
 			message: err.errMsg || err.message,
