@@ -56,46 +56,45 @@ exports.init = function (req, res, next) {
 		targetTempService.get(location),
 		configService.getAll(location)
 	]).then(([
-				temps,
-				heatingDefaultPlans,
-				heatingPlans,
-				heatingPlanOverrides,
-				statisticsForToday,
-				targetTemp,
-				config
-			]) => {
-
-		res.json({
-			status: 'ok',
-			data: {
-				outside: outsideConditions.get(),
-				sensors: insideConditions.get(location),
-				isHeatingOn: heatingService.isHeatingOn(location),
-				heatingPower: {
-					status: heatingService.getPowerStatus(location).poweredOn,
-					until: heatingService.getPowerStatus(location).until
-				},
-				targetTempId: targetTemp ? targetTemp._id : null,
-				temperatures: (temps || []).map(t => ({
-					...t,
-					value: t.values?.find(v => v.location === location)?.value || t.defaultValue,
-					values: null
-				})),
-				heatingPlans: heatingPlans || [],
-				heatingDefaultPlans: (heatingDefaultPlans || []).map(hdp => ({
-					...hdp,
-					plan: hdp.plans?.find(p => p.location === location)?.plan || hdp.defaultPlan,
-					plans: null
-				})),
-				heatingPlanOverrides: heatingPlanOverrides.map(hp => {
-					hp.date = moment(hp.date).tz('Europe/Bucharest').startOf('day').valueOf();
-					return hp;
-				}),
-				statisticsForToday: statisticsForToday,
-				restartInProgress: restartSensorService.getStatus(),
-				config: config
-			}
-		});
+			temps,
+			heatingDefaultPlans,
+			heatingPlans,
+			heatingPlanOverrides,
+			statisticsForToday,
+			targetTemp,
+			config
+		]) => {
+			res.json({
+				status: 'ok',
+				data: {
+					outside: outsideConditions.get(),
+					sensors: insideConditions.get(location),
+					isHeatingOn: heatingService.isHeatingOn(location),
+					heatingPower: {
+						status: heatingService.getPowerStatus(location).poweredOn,
+						until: heatingService.getPowerStatus(location).until
+					},
+					targetTempId: targetTemp ? targetTemp._id : null,
+					temperatures: (temps || []).map(t => ({
+						...t,
+						value: t.values?.find(v => v.location === location)?.value || t.defaultValue,
+						values: null
+					})),
+					heatingPlans: heatingPlans || [],
+					heatingDefaultPlans: (heatingDefaultPlans || []).map(hdp => ({
+						...hdp,
+						plan: hdp.plans?.find(p => p.location === location)?.plan || hdp.defaultPlan,
+						plans: null
+					})),
+					heatingPlanOverrides: heatingPlanOverrides.map(hp => {
+						hp.date = moment(hp.date).tz('Europe/Bucharest').startOf('day').valueOf();
+						return hp;
+					}),
+					statisticsForToday: statisticsForToday,
+					restartInProgress: restartSensorService.getStatus(),
+					config: config
+				}
+			});
 	}).catch((err) => {
 		console.error(err);
 		next(err);

@@ -108,7 +108,7 @@ async function calculateHeatingDuration (location, date) {
 			.exec()
 	])
 
-	if (!history || !history.length) {
+	if (!history?.length && !lastHistory?.status) {
 		return 0;
 	}
 
