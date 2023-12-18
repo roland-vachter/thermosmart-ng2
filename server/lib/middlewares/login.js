@@ -6,10 +6,10 @@ async function login (req, res, next) {
 			if (req.apiCall) {
 				return res.json({
 					status: 'error',
-					error: 'No facebook user found'
+					error: 'No user found'
 				});
 			} else {
-				throw new Error('No facebook user found');
+				throw new Error('No user found');
 			}
 		}
 

@@ -4,12 +4,7 @@
             <div class="login-logo"><img src="{{assetsStaticBasePath}}/favicon-32x32.png" /> SmartHome</div>
         </a>
 
-        <h4>Please log in using one of the following providers:</h4>
-        
-        <a href="/login/facebook" class="facebook-login">
-            <img src="{{assetsStaticBasePath}}/images/facebook-logo.svg" />
-            Facebook
-        </a>
+        <h4>Log in by:</h4>
 
         <a href="/login/google" class="google-login">
             <img src="{{assetsStaticBasePath}}/images/google-logo.svg" />
@@ -17,6 +12,22 @@
         </a>
 
         <br/><br/>
+
+        <hr/>
+
+        <form action="/login/password" method="POST" class="sign-in">
+            <div class="form-group">
+                <label for="username">Username / Email address</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="">
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Sign in</button>
+            </div>
+        </form>
 
         <a href="/data-deletion">Data deletion</a> |
         <a href="/privacy-policy">Privacy policy</a> |

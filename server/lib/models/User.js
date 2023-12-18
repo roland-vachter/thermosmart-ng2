@@ -8,10 +8,11 @@ const userSchema = new Schema({
 		type: [String],
 		index: true
 	},
-	facebookid: {
+	username: {
 		type: String,
 		index: true
 	},
+	password: String,
 	locations: [{
 		type: Number,
 		ref: 'Location'

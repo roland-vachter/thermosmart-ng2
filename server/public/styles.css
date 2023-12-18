@@ -114,3 +114,13 @@ h6 {
 .login-logo img {
     margin-right: 15px;
 }
+
+
+.sign-in button {
+    margin: 10px 0;
+    padding: 4px 15px;
+}
+
+.sign-in label {
+    font-size: 16px;
+}

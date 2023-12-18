@@ -3,7 +3,7 @@
 const Router = require('express').Router;
 const router = new Router();
 
-router.use('/login/facebook', require('./routes/facebookLogin'));
+router.use('/login/password', require('./routes/passwordLogin'));
 router.use('/login/google', require('./routes/googleLogin'));
 
 router.use('/api', require('./routes/api'));

@@ -1,5 +1,6 @@
 const UserModel = require('../models/User');
 const passport = require('passport');
+const crypto = require('crypto');
 
 const userCache = {};
 
@@ -21,9 +22,9 @@ async function getUserByEmail(profile) {
 	}
 }
 
-function getUserByFacebookId(profile) {
+function getUserByUsername(username) {
 	return UserModel.findOne({
-		facebookid: profile?.id
+		username: username
 	}).populate({
 		path: 'locations'
 	}).exec();
@@ -41,7 +42,7 @@ exports.init = () => {
 				return;
 			}
 
-			const userModel = await UserModel.findById(userId).populate({
+			const userModel = await UserModel.findById(userId, { password: 0 }).populate({
 				path: 'locations'
 			}).exec();
 			userCache[userId] = userModel;
@@ -54,28 +55,33 @@ exports.init = () => {
 		}
 	});
 
-	const FacebookStrategy = require('passport-facebook').Strategy;
-	passport.use(new FacebookStrategy({
-			clientID: process.env.FACEBOOK_APP_ID,
-			clientSecret: process.env.FACEBOOK_APP_SECRET,
-			callbackURL: `https://${process.env.OWN_HOST}/login/facebook/callback`,
-			profileFields: ['id', 'emails', 'name']
-		},
-		async function(accessToken, refreshToken, profile, done) {
-			console.log('facebook user emails', JSON.stringify(profile.emails), 'facebook.id', profile.id, typeof profile.id);
+	const LocalStrategy = require('passport-local');
+	passport.use(new LocalStrategy(async (username, password, done) => {
+		const user = await getUserByEmail({ emails: [{ value: username }] }) || await getUserByUsername(username);
 
-			const user = await getUserByEmail(profile) || await getUserByFacebookId(profile);
+		if (user) {
+			crypto.pbkdf2(password, process.env.SALT, 1000, 32, 'sha256', (err, hashedPassword) => {
+				if (err) {
+					return done(err);
+				}
 
-			if (user) {
+				if (hashedPassword.toString('hex') !== user.password) {
+					return done({
+						message: 'Forbidden',
+						type: 'OAuthException'
+					});
+				}
+
+				delete user.password;
 				done(null, user);
-			} else {
-				done({
-					message: 'Forbidden',
-					type: 'OAuthException'
-				});
-			}
-		})
-	);
+			});
+		} else {
+			done({
+				message: 'Forbidden',
+				type: 'OAuthException'
+			});
+		}
+	}));
 
 	const GoogleStrategy = require('passport-google-oidc');
 	passport.use(new GoogleStrategy({
@@ -89,6 +95,7 @@ exports.init = () => {
 			const user = await getUserByEmail(profile);
 
 			if (user) {
+				delete user.password;
 				done(null, user);
 			} else {
 				done({
