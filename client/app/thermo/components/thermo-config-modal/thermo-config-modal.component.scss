@@ -121,3 +121,15 @@
 	border-radius: 50%;
 	background-color: $light-gray;
 }
+
+.input-group {
+	margin-top: 10px;
+	
+	input {
+		margin-right: 10px;
+	}
+}
+
+.input-group-append button:first-child {
+	margin-right: 10px;
+}

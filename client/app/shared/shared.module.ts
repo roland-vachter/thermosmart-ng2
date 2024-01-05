@@ -14,6 +14,7 @@ import { AlertWrapperComponent } from './components/alert.component';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { DateTimezonePipe } from './date-timezone.pipe';
 
 @NgModule({
 	imports: [
@@ -28,7 +29,8 @@ import { NgModule } from '@angular/core';
 		ObjectKeysPipe,
 		PercentStringPipe,
 		DayOfWeekNamePipe,
-		AlertWrapperComponent
+		AlertWrapperComponent,
+		DateTimezonePipe
 	],
 	exports: [
 		DurationPipe,
@@ -36,7 +38,8 @@ import { NgModule } from '@angular/core';
 		IntegerPipe,
 		ObjectKeysPipe,
 		PercentStringPipe,
-		DayOfWeekNamePipe
+		DayOfWeekNamePipe,
+		DateTimezonePipe
 	],
 	providers: [
 		LoginStatusService,

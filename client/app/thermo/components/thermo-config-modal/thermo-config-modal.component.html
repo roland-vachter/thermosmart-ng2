@@ -66,7 +66,7 @@
 			<h2>Plan overrides</h2>
 			<ul class="list-group">
 				<li class="list-group-item" *ngFor="let planOverride of dataStore.heatingPlanOverrides">
-					<strong>{{ planOverride.date | date:'yyyy/MM/dd' }}:</strong>
+					<strong>{{ planOverride.date | dateTimezone:'yyyy/MM/DD' }}:</strong>
 					<i class="icon-{{ planOverride.plan?.iconClass }}"></i>
 					{{ planOverride.plan?.name }}
 
@@ -78,7 +78,7 @@
 				<input type="text"
 					placeholder="Date"
 					class="form-control"
-					[bsConfig]="{ customTodayClass: 'custom-today-class' }"
+					[bsConfig]="{ customTodayClass: 'custom-today-class', showWeekNumbers: false }"
 					bsDatepicker
 					placement="top left" [(ngModel)]="overrideToAdd.date">
 				<input type="text" value="{{ overrideToAdd.plan?.name }}" class="form-control" placeholder="Select plan" (click)="selectPlan()">
