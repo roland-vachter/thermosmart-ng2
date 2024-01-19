@@ -34,11 +34,11 @@ export class HumidityComponent implements OnInit, OnChanges {
                 } else if (changes.value.currentValue < 40) {
                     this.color = 'gold';
                 } else if (changes.value.currentValue < 45) {
-                    this.color = 'mint';
-                } else if (changes.value.currentValue <= 55) {
                     this.color = 'olive';
+                } else if (changes.value.currentValue <= 55) {
+                    this.color = 'dark-olive';
                 } else if (changes.value.currentValue <= 60) {
-                    this.color = 'mint';
+                    this.color = 'olive';
                 } else if (changes.value.currentValue < 70) {
                     this.color = 'gold';
                 } else if (changes.value.currentValue < 80) {

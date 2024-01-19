@@ -36,9 +36,9 @@ export class TemperatureComponent implements OnInit, OnChanges {
                     } else if (changes.value.currentValue < 15) {
                         this.color = 'teal';
                     } else if (changes.value.currentValue < 20) {
-                        this.color = 'mint';
-                    } else if (changes.value.currentValue < 25) {
                         this.color = 'olive';
+                    } else if (changes.value.currentValue < 25) {
+                        this.color = 'dark-olive';
                     } else if (changes.value.currentValue < 30) {
                         this.color = 'orange';
                     } else {
@@ -51,16 +51,14 @@ export class TemperatureComponent implements OnInit, OnChanges {
                         this.color = 'cadet-blue';
                     } else if (changes.value.currentValue < 20) {
                         this.color = 'teal';
-                    } else if (changes.value.currentValue < 21) {
-                        this.color = 'mint';
                     } else if (changes.value.currentValue < 21.5) {
-                        this.color = 'green';
-                    } else if (changes.value.currentValue < 23) {
                         this.color = 'olive';
-                    } else if (changes.value.currentValue < 25) {
+                    } else if (changes.value.currentValue < 23) {
                         this.color = 'dark-olive';
-                    } else if (changes.value.currentValue < 27) {
+                    } else if (changes.value.currentValue < 25) {
                         this.color = 'gold';
+                    } else if (changes.value.currentValue < 27) {
+                        this.color = 'vermillion';
                     } else if (changes.value.currentValue < 29) {
                         this.color = 'orange';
                     } else {
