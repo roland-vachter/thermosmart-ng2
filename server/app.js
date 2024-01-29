@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const exphbs = require('express-handlebars');
 const compression = require('compression');
 const cacheHeaders = require('./lib/utils/cacheHeaders');
-const _ = require('lodash');
+const utils = require('./lib/utils/utils');
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
@@ -42,7 +42,7 @@ app.use( function( req, res, next ) {
 	const _render = res.render;
 
 	res.render = function( view, viewOptions, fn ) {
-		const viewModel = _.merge({}, viewOptions, defaultOptions, { backgroundImage: outsideConditions.get().backgroundImage });
+		const viewModel = utils.deepMerge({}, viewOptions, defaultOptions, { backgroundImage: outsideConditions.get().backgroundImage });
 
 		_render.call( this, view, viewModel, fn );
 	};
