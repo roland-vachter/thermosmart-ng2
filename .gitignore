@@ -2,3 +2,4 @@ client/dist
 dist
 node_modules
 *.env*
+.angular
