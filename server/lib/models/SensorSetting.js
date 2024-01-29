@@ -1,7 +1,6 @@
 "use strict";
 
 const mongoose = require('mongoose');
-const Float = require('mongoose-float').loadType(mongoose);
 const Schema = mongoose.Schema;
 
 const EventEmitter = require('events');
@@ -15,7 +14,7 @@ const sensorSettingSchema = new Schema({
 		type: Boolean,
 		default: true
 	},
-	tempAdjust: Float,
+	tempAdjust: Number,
 	humidityAdjust: Number,
 	location: {
 		type: Number,

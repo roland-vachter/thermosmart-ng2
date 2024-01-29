@@ -122,5 +122,8 @@
       }
     }
   },
-  "defaultProject": "thermosmart-ng2"
+  "defaultProject": "thermosmart-ng2",
+  "cli": {
+    "analytics": false
+  }
 }
