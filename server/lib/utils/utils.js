@@ -1,25 +1,25 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-exports.isNumber = (n) => {
+const isNumber = (n) => {
 	return typeof n === 'number' && !isNaN(n);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-exports.isPrimitive = (obj) => {
+const isPrimitive = (obj) => {
 	return ['undefined', 'number', 'string'].includes(typeof obj) || obj === null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-exports.isObject = (item) => {
+const isObject = (item) => {
 	return (item && typeof item === 'object' && !Array.isArray(item) && item.constructor.name === 'Object');
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-exports.deepEqual = (obj1, obj2) => {
+const deepEqual = (obj1, obj2) => {
 	if (obj1 === obj2) {
 		return true;
 	} else if (typeof obj1 !== typeof obj2) {
 		return false;
-	} else if (exports.isPrimitive(obj1) || exports.isPrimitive(obj2)) {
+	} else if (isPrimitive(obj1) || isPrimitive(obj2)) {
 		return false;
 	} else if (obj1 && obj2 && moment.isMoment(obj1) && moment.isMoment(obj2)) {
 		return obj1.isSame(obj2);
@@ -32,14 +32,14 @@ exports.deepEqual = (obj1, obj2) => {
 			return false;
 		} else {
 			for (const cell of obj1) {
-				if (!obj2.find(c2 => exports.deepEqual(cell, c2))) {
+				if (!obj2.find(c2 => deepEqual(cell, c2))) {
 					return false;
 				}
 			}
 		}
 	} else {
 		for (const key in obj1) {
-			if (!(key in obj2) || !exports.deepEqual(obj1[key], obj2[key])) {
+			if (!(key in obj2) || !deepEqual(obj1[key], obj2[key])) {
 				return false;
 			}
 		}
@@ -48,21 +48,21 @@ exports.deepEqual = (obj1, obj2) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-exports.isEmpty = (obj) => {
+const isEmpty = (obj) => {
 	return obj === null || typeof obj === 'undefined' || (
-		!exports.isNumber(obj) && (!exports.isPrimitive(obj) || !obj) && (!Array.isArray(obj) || !obj.length) && (!exports.isObject(obj) || !Object.keys(obj).length)
+		!isNumber(obj) && (!isPrimitive(obj) || !obj) && (!Array.isArray(obj) || !obj.length) && (!isObject(obj) || !Object.keys(obj).length)
 	);
 }
 
-exports.unique = (array, mapper) => {
+const unique = (array, mapper) => {
 	return array.filter((e, i, a) => e && (mapper ? a.map(mapper) : a).indexOf(mapper ? mapper(e) : e) === i);
 }
 
-exports.uniqueDeep = (array, mapper) => {
-	return array.filter((e, i, a) => e && (mapper ? a.map(mapper) : a).findIndex(ae => exports.deepEqual(ae, (mapper ? mapper(e) : e))) === i);
+const uniqueDeep = (array, mapper) => {
+	return array.filter((e, i, a) => e && (mapper ? a.map(mapper) : a).findIndex(ae => deepEqual(ae, (mapper ? mapper(e) : e))) === i);
 }
 
-exports.groupBy = (array, prop) => {
+const groupBy = (array, prop) => {
 	return array.reduce((acc, v) => {
 		if (!acc[v[prop]]) {
 			acc[v[prop]] = [];
@@ -74,7 +74,7 @@ exports.groupBy = (array, prop) => {
 	}, {});
 }
 
-exports.deepClone = (item) => {
+const deepClone = (item) => {
 	if (!item) {
 		return item;
 	} // null, undefined values check
@@ -93,10 +93,10 @@ exports.deepClone = (item) => {
 		if (Array.isArray(item)) {
 			result = [];
 			item.forEach((child, index) => {
-				result[index] = exports.deepClone(child);
+				result[index] = deepClone(child);
 			});
 			return result;
-		} else if (exports.isObject(item)) {
+		} else if (isObject(item)) {
 			// testing that this is DOM
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			if (item.nodeType && typeof item.cloneNode == 'function') {
@@ -113,7 +113,7 @@ exports.deepClone = (item) => {
 					result = {};
 					for (const i in item) {
 						if (item.hasOwnProperty(i)) {
-							result[i] = exports.deepClone(item[i]);
+							result[i] = deepClone(item[i]);
 						}
 					}
 				}
@@ -129,26 +129,37 @@ exports.deepClone = (item) => {
 }
 
 
-exports.deepMerge = (target, ...sources) => {
+const deepMerge = (target, ...sources) => {
 	if (!sources.length) {
 		return target;
 	}
 
   const source = sources.shift();
 
-  if (exports.isObject(target) && exports.isObject(source)) {
+  if (isObject(target) && isObject(source)) {
     for (const key in source) {
       if (isObject(source[key])) {
         if (!target[key]) {
 					Object.assign(target, { [key]: {} });
 				}
 
-        exports.deepMerge(target[key], source[key]);
+        deepMerge(target[key], source[key]);
       } else {
         Object.assign(target, { [key]: source[key] });
       }
     }
   }
 
-  return exports.deepMerge(target, ...sources);
+  return deepMerge(target, ...sources);
 };
+
+exports.isNumber = isNumber;
+exports.isPrimitive = isPrimitive;
+exports.isObject = isObject;
+exports.deepEqual = deepEqual;
+exports.isEmpty = isEmpty;
+exports.unique = unique;
+exports.uniqueDeep = uniqueDeep;
+exports.groupBy = groupBy;
+exports.deepClone = deepClone;
+exports.deepMerge = deepMerge;
