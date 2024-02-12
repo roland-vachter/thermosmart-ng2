@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { HeatingPlan } from '../../../types/types';
+import { HeatingPlan } from '../../types/types';
 
 @Component({
 	selector: 'thermo-change-heating-plan-modal',
@@ -11,7 +11,7 @@ export class ChangeHeatingPlanModalComponent implements OnInit, OnChanges {
 
 	@Input() planSelected: HeatingPlan;
 	@Input() heatingPlans: Record<string, HeatingPlan>;
-	@Output() onResult: EventEmitter<any> = new EventEmitter();
+	@Output() result: EventEmitter<string> = new EventEmitter();
 
 	heatingPlanList: HeatingPlan[];
 
@@ -27,8 +27,8 @@ export class ChangeHeatingPlanModalComponent implements OnInit, OnChanges {
 		}
 	}
 
-	selectPlan (planId) {
-		this.onResult.emit(planId);
+	selectPlan(planId: string) {
+		this.result.emit(planId);
 		this.bsModalRef.hide();
 	}
 

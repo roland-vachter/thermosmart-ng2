@@ -1,20 +1,16 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
 	selector: 'thermo-outside',
 	templateUrl: './outside.component.html',
 	styleUrls: ['./outside.component.scss']
 })
-export class OutsideComponent implements OnInit {
+export class OutsideComponent {
 
-	@Input() temperature = null;
-	@Input() humidity = null;
-	@Input() weatherIconClass = null;
+	@Input() temperature: number;
+	@Input() humidity: number;
+	@Input() weatherIconClass: string;
 
 	constructor() { }
-
-	ngOnInit() {
-		
-	}
 
 }

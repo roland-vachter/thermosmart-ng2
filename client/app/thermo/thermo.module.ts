@@ -79,6 +79,6 @@ export class ThermoModule {
 
 		this.locationService.subscribe(() => {
 			this.thermoDataStore.init();
-		})
+		});
 	}
 }

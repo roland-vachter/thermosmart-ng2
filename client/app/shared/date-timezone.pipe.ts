@@ -6,8 +6,8 @@ import moment, { Moment } from 'moment';
 })
 export class DateTimezonePipe implements PipeTransform {
 
-	transform(date: Moment | Date | string, format: string): any {
-		return moment(date).tz('Europe/Bucharest').format(format);
+	transform(date: Moment | Date | string, timezone: string, format: string): string {
+		return moment(date).tz(timezone).format(format);
 	}
 
 }

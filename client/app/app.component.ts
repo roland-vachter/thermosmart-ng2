@@ -1,10 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ThermoComponent }  from './thermo/thermo.component';
 import { SecurityComponent } from './security/security.component';
 import { LoginStatusService } from './shared/login-status.service';
 import { ThermoDataStoreService } from './thermo/services/thermo-data-store.service';
 import moment from 'moment';
-import { User, UserService } from './services/user.service';
+import { UserService } from './services/user.service';
+import { User } from './types/types';
 import { RefreshEventService } from './services/refresh-event.service';
 import { LocationService } from './services/location.service';
 import { Location } from './types/types';
@@ -14,7 +15,7 @@ import { Location } from './types/types';
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 	title = 'app';
 	refreshInProgress = false;
 	currentTimestamp: number = moment().valueOf();
@@ -57,16 +58,16 @@ export class AppComponent {
 		if (onDemand || !this.lastLoginStatusCheck || new Date().getTime() - this.lastLoginStatusCheck.getTime() > 10 * 60 * 1000) {
 			this.lastLoginStatusCheck = new Date();
 
-			this.loginStatusService.check().subscribe(
-				res => {
+			this.loginStatusService.check().subscribe({
+				next: res => {
 					if (res.status !== 200) {
 						window.location.href = '';
 					}
 				},
-				err => {
+				error: () => {
 					window.location.href = '';
 				}
-			);
+			});
 		}
 	}
 

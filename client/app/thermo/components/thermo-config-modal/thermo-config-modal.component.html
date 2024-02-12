@@ -48,13 +48,13 @@
 		<div class="col-12">
 			<h2>Plan for the week</h2>
 			<div class="thermo-default-plans clearfix">
-				<div class="thermo-default-plans--plan" [ngClass]="{ 'thermo-default-plans--current-date': currentDate === i + 1 }" *ngFor="let defaultPlan of dataStore.defaultHeatingPlans | slice:1; let i = index" (click)="changePlan(defaultPlan.dayOfWeek)">
+				<div class="thermo-default-plans--plan" [ngClass]="{ 'thermo-default-plans--current-date': currentDayOfWeek === i + 1 }" *ngFor="let defaultPlan of dataStore.defaultHeatingPlans | slice:1; let i = index" (click)="changePlan(defaultPlan.dayOfWeek)">
 					<div class="thermo-default-plans--day-name">{{ defaultPlan?.nameOfDay }}</div>
 
 					<i class="{{defaultPlan.plan.iconClass}}"></i>
 				</div>
 
-				<div class="thermo-default-plans--plan" [ngClass]="{ 'thermo-default-plans--current-date': currentDate === 0 }" (click)="changePlan(0)">
+				<div class="thermo-default-plans--plan" [ngClass]="{ 'thermo-default-plans--current-date': currentDayOfWeek === 0 }" (click)="changePlan(0)">
 					<div class="thermo-default-plans--day-name">{{dataStore.defaultHeatingPlans[0]?.nameOfDay}}</div>
 
 					<i class="{{dataStore.defaultHeatingPlans[0]?.plan?.iconClass}}"></i>

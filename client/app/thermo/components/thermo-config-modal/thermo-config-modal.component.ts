@@ -1,13 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { SharedServerApiService } from '../../../shared/shared-server-api.service';
 import { ALERT_TYPE, RESPONSE_STATUS } from '../../../types/types';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 import { ThermoModalsService } from '../../services/thermo-modals.service';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
-import { HeatingPlan, HeatingPlanOverride } from '../../../types/types';
 import { SharedModalsService } from '../../../shared/shared-modals.service';
 import * as moment from 'moment-timezone';
+import { HeatingPlan, HeatingPlanOverride, Temperature } from '../../types/types';
+import { TimezoneService } from '../../../shared/services/timezone.service';
+import { LocationService } from '../../../services/location.service';
 
 interface OverrideToAdd {
 	plan: HeatingPlan;
@@ -19,7 +21,7 @@ interface OverrideToAdd {
 	templateUrl: './thermo-config-modal.component.html',
 	styleUrls: ['./thermo-config-modal.component.scss']
 })
-export class ThermoConfigModalComponent implements OnInit {
+export class ThermoConfigModalComponent {
 	@Input() switchThresholdBelow = {
 		name: '',
 		value: NaN
@@ -28,8 +30,11 @@ export class ThermoConfigModalComponent implements OnInit {
 		name: '',
 		value: NaN
 	};
-	currentDate = new Date().getDay();
-	overrideToAdd: OverrideToAdd = {} as OverrideToAdd;
+	timezone: string = this.locationService.getSelectedLocationTimezone();
+	currentDayOfWeek: number = moment().tz(this.timezone).day();
+	overrideToAdd: OverrideToAdd = {
+		date: this.timezoneService.toSameDateInCurrentTimezone(moment(), this.timezone).toDate()
+	} as OverrideToAdd;;
 
 	constructor(
 		public bsModalRef: BsModalRef,
@@ -37,13 +42,14 @@ export class ThermoConfigModalComponent implements OnInit {
 		private sharedApiService: SharedServerApiService,
 		public dataStore: ThermoDataStoreService,
 		private modalService: ThermoModalsService,
-		private sharedModalsService: SharedModalsService
-	) { }
-
-	ngOnInit() {
+		private sharedModalsService: SharedModalsService,
+		private timezoneService: TimezoneService,
+		private locationService: LocationService
+	) {
+		
 	}
 
-	tempAdjust(temp, diff) {
+	tempAdjust(temp: Temperature, diff: number) {
 		const expected = temp.value + diff;
 		this.serverApiService.tempAdjust(temp._id, expected).subscribe(res => {
 			if (res.status === RESPONSE_STATUS.OK) {
@@ -52,7 +58,7 @@ export class ThermoConfigModalComponent implements OnInit {
 		});
 	}
 
-	changePlan(dayOfWeek) {
+	changePlan(dayOfWeek: number) {
 		this.modalService.selectPlanModal(this.dataStore.defaultHeatingPlans[dayOfWeek].plan)
 			.subscribe(planId => {
 				if (typeof planId === 'number') {
@@ -65,7 +71,7 @@ export class ThermoConfigModalComponent implements OnInit {
 			});
 	}
 
-	switchAdjust(switchConfig, diff) {
+	switchAdjust(switchConfig, diff: number) {
 		const expected = switchConfig.value + diff;
 		this.sharedApiService.changeConfig(switchConfig.name, switchConfig.value + diff).subscribe();
 		switchConfig.value = expected;
@@ -81,19 +87,24 @@ export class ThermoConfigModalComponent implements OnInit {
 	}
 
 	clearOverrideToAdd() {
-		this.overrideToAdd = {} as OverrideToAdd;
+		this.overrideToAdd = {
+			date: this.timezoneService.toSameDateInCurrentTimezone(new Date(), this.timezone).toDate()
+		} as OverrideToAdd;
 	}
 
 	addOverride() {
-		this.serverApiService.addPlanOverride(moment(this.overrideToAdd.date).tz('Europe/Bucharest').startOf('day'), this.overrideToAdd.plan._id)
-			.subscribe(result => {
+		const overrideDate = this.timezoneService.toSameDateInTimezone(this.overrideToAdd.date, this.timezone).startOf('day');
+		this.serverApiService.addPlanOverride(
+			overrideDate, this.overrideToAdd.plan._id
+		).subscribe(result => {
 				if (result.status === RESPONSE_STATUS.OK) {
-					let foundOverrideForTheDate = this.dataStore.heatingPlanOverrides.find(o => o.date.isSame(moment(this.overrideToAdd.date).tz('Europe/Bucharest').startOf('day')));
+					const foundOverrideForTheDate = this.dataStore.heatingPlanOverrides
+						.find(o => o.date.isSame(overrideDate));
 					if (foundOverrideForTheDate) {
 						foundOverrideForTheDate.plan = this.overrideToAdd.plan;
 					} else {
 						this.dataStore.heatingPlanOverrides.push({
-							date: moment(this.overrideToAdd.date).tz('Europe/Bucharest').startOf('day'),
+							date: overrideDate,
 							plan: this.overrideToAdd.plan
 						});
 					}

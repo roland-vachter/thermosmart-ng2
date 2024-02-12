@@ -1,8 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { ChangeSensorSettingsModalComponent } from '../change-sensor-settings-modal/change-sensor-settings-modal.component';
-import { Sensor } from '../../../types/types';
+import { Sensor } from "../../types/types";
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 
 @Component({
@@ -10,7 +10,7 @@ import { ThermoDataStoreService } from '../../services/thermo-data-store.service
 	templateUrl: './sensor.component.html',
 	styleUrls: ['./sensor.component.scss']
 })
-export class SensorComponent implements OnInit {
+export class SensorComponent {
 
 	@Input() restartSensorInProgress;
 	@Input() sensor: Sensor;
@@ -21,9 +21,6 @@ export class SensorComponent implements OnInit {
 		private modalService: BsModalService,
 		private dataStore: ThermoDataStoreService
 	) {	}
-
-	ngOnInit() {
-	}
 
 	toggleSensorStatus () {
 		this.serverApiService.toggleSensorStatus(this.sensor.id).subscribe(res => {
@@ -48,7 +45,7 @@ export class SensorComponent implements OnInit {
 			initialState
 		});
 
-		modalRef.content.onResult.subscribe(result => {
+		modalRef.content.result.subscribe(result => {
 			if (result) {
 				this.serverApiService.changeSensorSettings(this.sensor.id, result).subscribe(res => {
 					this.dataStore.handleServerData(res.data);

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ApiResult, HeatingPowerResponse, SensorResponse } from '../../types/types';
+import { ApiResult, RESPONSE_STATUS } from '../../types/types';
+import { SensorResponse, SensorSetting, Statistics, ThermoInitUpdateData } from "../types/types";
+import { HeatingPowerResponse } from "../types/types";
 import { LocationService } from '../../services/location.service';
 import { of, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -14,12 +16,12 @@ export class ThermoServerApiService {
 		private locationService: LocationService
 	) { }
 
-	init (force = false) {
+	init () {
 		if (this.locationService.getSelectedLocationId()) {
 			return this.http.get('/api/heating/init?location=' + this.locationService.getSelectedLocationId())
 				.pipe(
-					map((res: any) => {
-						if (res.status === 'ok') {
+					map((res: ApiResult<ThermoInitUpdateData>) => {
+						if (res.status === RESPONSE_STATUS.OK) {
 							return res.data;
 						} else {
 							return {};
@@ -35,21 +37,21 @@ export class ThermoServerApiService {
 		return this.http.post<ApiResult<HeatingPowerResponse>>('/api/toggleheatingpower', { location: this.locationService.getSelectedLocationId() });
 	}
 
-	toggleSensorStatus (id) {
+	toggleSensorStatus (id: number) {
 		return this.http.post<ApiResult<SensorResponse>>('/api/togglesensorstatus', {
 			id,
 			location: this.locationService.getSelectedLocationId()
 		});
 	}
 
-	disableSensorWindowOpen (id) {
+	disableSensorWindowOpen (id: number) {
 		return this.http.post<ApiResult<SensorResponse>>('/api/disablesensorwindowopen', {
 			id,
 			location: this.locationService.getSelectedLocationId()
 		})
 	}
 
-	changeSensorSettings (id, options) {
+	changeSensorSettings (id: number, options: SensorSetting) {
 		return this.http.post<ApiResult<SensorResponse>>('/api/changesensorsettings', {
 			id,
 			label: options.label,
@@ -58,7 +60,7 @@ export class ThermoServerApiService {
 		});
 	}
 
-	tempAdjust (id, value) {
+	tempAdjust (id: number, value: number) {
 		return this.http.post<ApiResult>('/api/tempadjust', {
 			id,
 			value,
@@ -82,7 +84,7 @@ export class ThermoServerApiService {
 	}
 
 	statistics () {
-		return this.http.get('/api/statistics?location=' + this.locationService.getSelectedLocationId());
+		return this.http.get<ApiResult<Statistics>>('/api/statistics?location=' + this.locationService.getSelectedLocationId());
 	}
 
 	listPlanOverrides() {

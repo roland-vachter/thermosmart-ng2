@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { ThermoModule } from './thermo/thermo.module';
 import { SecurityModule } from './security/security.module';
-import { PlantwateringModule } from './plantwatering/plantwatering.module';
+import { PlantWateringModule } from './plantwatering/plant-watering.module';
 import { SharedModule } from './shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -27,7 +27,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 		SharedModule,
 		ThermoModule,
 		SecurityModule,
-		PlantwateringModule
+		PlantWateringModule
 	],
 	providers: [
 		LoginStatusService,

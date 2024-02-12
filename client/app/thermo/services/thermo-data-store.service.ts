@@ -1,15 +1,19 @@
-import { ApplicationRef, EventEmitter, Injectable, NgZone } from '@angular/core';
+import { ApplicationRef, EventEmitter, Injectable } from '@angular/core';
 import { Moment } from 'moment-timezone';
 import * as moment from 'moment-timezone';
 import { ServerUpdateService } from '../../shared/server-update.service';
-import { HeatingDefaultPlan, HeatingPlan, HeatingPlanOverride, HeatingPower, Sensor, Temperature } from '../../types/types';
+import { HeatingPlan, HeatingPower, ThermoInitUpdateData } from "../types/types";
+import { Temperature } from "../types/types";
+import { HeatingDefaultPlan } from "../types/types";
+import { HeatingPlanOverride } from "../types/types";
+import { Sensor } from "../types/types";
 import { ThermoServerApiService } from './thermo-server-api.service';
 import { LocationService } from '../../services/location.service';
 
 @Injectable()
 export class ThermoDataStoreService {
 
-    private dayNameByIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	private dayNameByIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 	lastUpdate: Moment = moment();
 	insideConditions: {
@@ -50,18 +54,19 @@ export class ThermoDataStoreService {
 	sensorRestartInProgress: boolean = false;
 	heatingPlanOverrides: HeatingPlanOverride[] = [];
 
-    evt: EventEmitter<string> = new EventEmitter();
+	evt: EventEmitter<string> = new EventEmitter();
 
 	constructor(
-        private serverApiService: ThermoServerApiService,
-        private serverUpdateService: ServerUpdateService,
-        private appRef: ApplicationRef
-    ) {
-        this.serverUpdateService.onUpdate()
+		private serverApiService: ThermoServerApiService,
+		private serverUpdateService: ServerUpdateService,
+		private locationService: LocationService,
+		private appRef: ApplicationRef
+	) {
+		this.serverUpdateService.onUpdate()
 			.subscribe(this.handleServerData.bind(this));
 
-        setInterval(this.update.bind(this), 60000);
-    }
+		setInterval(this.update.bind(this), 60000);
+	}
 
 	reset() {
 		this.lastUpdate = moment();
@@ -96,7 +101,7 @@ export class ThermoDataStoreService {
 		this.heatingPlanOverrides = [];
 	}
 
-    init() {
+  init() {
 		this.reset();
         this.serverApiService.init()
 			.subscribe(this.handleServerData.bind(this));
@@ -110,7 +115,9 @@ export class ThermoDataStoreService {
 		this.sensorRestartInProgress = false;
 	}
 
-    handleServerData (data: any) {
+	handleServerData (data: ThermoInitUpdateData) {
+		const locationTimezone = this.locationService.getSelectedLocationTimezone();
+
 		this.lastUpdate = moment();
 
 		if (data.config) {
@@ -157,7 +164,8 @@ export class ThermoDataStoreService {
 			}
 
 			if (data.outside.backgroundImage) {
-				document.body.style.backgroundImage = document.body.style.backgroundImage.substring(0, document.body.style.backgroundImage.lastIndexOf('/') + 1) + data.outside.backgroundImage;
+				document.body.style.backgroundImage =
+					document.body.style.backgroundImage.substring(0, document.body.style.backgroundImage.lastIndexOf('/') + 1) + data.outside.backgroundImage;
 			}
 		}
 
@@ -177,13 +185,15 @@ export class ThermoDataStoreService {
 
 		if (data.heatingPlans) {
 			data.heatingPlans.forEach(heatingPlan => {
-				this.heatingPlans[heatingPlan._id] = Object.assign({}, heatingPlan);
-
-				heatingPlan.intervals.forEach(override => {
-					override.temp = this.temperatures[override.temp];
-				});
-
-				this.processPlanForDisplay(heatingPlan);
+				this.heatingPlans[heatingPlan._id] = this.processPlanForDisplay(
+					{
+						...heatingPlan,
+						intervals: heatingPlan.intervals.map(interval => ({
+							...interval,
+							temp: this.temperatures[interval.temp]
+						}))
+					}
+				);
 			});
 
 			this.heatingPlans = { ...this.heatingPlans };
@@ -191,10 +201,11 @@ export class ThermoDataStoreService {
 
 		if (data.heatingDefaultPlans) {
 			data.heatingDefaultPlans.forEach(heatingPlan => {
-				this.defaultHeatingPlans[heatingPlan.dayOfWeek] = Object.assign({}, heatingPlan);
-
-				this.defaultHeatingPlans[heatingPlan.dayOfWeek].plan = this.heatingPlans[heatingPlan.plan];
-				this.defaultHeatingPlans[heatingPlan.dayOfWeek].nameOfDay = this.dayNameByIndex[heatingPlan.dayOfWeek];
+				this.defaultHeatingPlans[heatingPlan.dayOfWeek] = Object.assign({}, {
+					...heatingPlan,
+					plan: this.heatingPlans[heatingPlan.plan],
+					nameOfDay: this.dayNameByIndex[heatingPlan.dayOfWeek]
+				});
 			});
 			this.defaultHeatingPlans = [...this.defaultHeatingPlans];
 		}
@@ -213,15 +224,15 @@ export class ThermoDataStoreService {
 		if (data.heatingPlanOverrides) {
 			this.heatingPlanOverrides = data.heatingPlanOverrides.map(p => ({
 				date: moment(p.date),
-				plan: this.heatingPlans[p.plan]
+				plan: this.heatingPlans[p.plan as number]
 			}));
 		}
 
 		this.updateTodaysPlan();
 
-		const tomorrowStartOfDay = moment().tz('Europe/Bucharest').startOf('day').add(1, 'day');
+		const tomorrowStartOfDay = moment().tz(locationTimezone).startOf('day').add(1, 'day');
 		const heatingPlanOverrideTomorrow = this.heatingPlanOverrides.find(po => po.date.valueOf() === tomorrowStartOfDay.valueOf());
-		this.nextDaysPlan = heatingPlanOverrideTomorrow ? heatingPlanOverrideTomorrow.plan : this.defaultHeatingPlans[moment().add(1, 'day').day()].plan;
+		this.nextDaysPlan = heatingPlanOverrideTomorrow ? heatingPlanOverrideTomorrow.plan as HeatingPlan : this.defaultHeatingPlans[moment().add(1, 'day').day()].plan;
 
 		this.update();
 
@@ -229,9 +240,10 @@ export class ThermoDataStoreService {
 	}
 
 	updateTodaysPlan() {
-		const todayStartOfDay = moment().tz('Europe/Bucharest').startOf('day');
+		const locationTimezone = this.locationService.getSelectedLocationTimezone();
+		const todayStartOfDay = moment().tz(locationTimezone).startOf('day');
 		const heatingPlanOverrideToday = this.heatingPlanOverrides.find(po => po.date.valueOf() === todayStartOfDay.valueOf());
-		this.todaysPlan = heatingPlanOverrideToday ? heatingPlanOverrideToday.plan : this.defaultHeatingPlans[moment().day()].plan;
+		this.todaysPlan = heatingPlanOverrideToday ? heatingPlanOverrideToday.plan as HeatingPlan : this.defaultHeatingPlans[moment().day()].plan;
 		this.evt.emit();
 	}
 
@@ -239,7 +251,7 @@ export class ThermoDataStoreService {
 		return Object.values(this.sensorsById);
 	}
 
-    private update () {
+	private update () {
 		const d = moment();
 		this.percentInDay = this.getPercentInDay();
 		this.currentTime = `${this.pad(d.hours(), 2)}:${this.pad(d.minutes(), 2)}`;
@@ -248,7 +260,7 @@ export class ThermoDataStoreService {
         this.appRef.tick();
 	}
 
-    private processPlanForDisplay (heatingPlan: HeatingPlan) {
+	private processPlanForDisplay (heatingPlan: HeatingPlan) {
 		let lastPercent = 0;
 
 		heatingPlan.intervals.forEach((interval, index) => {
@@ -271,15 +283,17 @@ export class ThermoDataStoreService {
 		if (heatingPlan.intervals.length) {
 			heatingPlan.intervals[heatingPlan.intervals.length - 1].blockPosition = 100 - lastPercent;
 		}
+
+		return heatingPlan;
 	}
 
-	private pad (num, size) {
-		let s = num+"";
+	private pad (num: number, size: number) {
+		let s = num + "";
 		while (s.length < size) s = "0" + s;
 		return s;
 	}
 
-	private getPercentInDay (hour = undefined, minute = undefined) {
+	private getPercentInDay (hour?: number, minute?: number) {
 		if (hour === undefined || minute === undefined) {
 			const now = new Date();
 			hour = now.getHours();

@@ -13,8 +13,8 @@ import { ThermoConfigModalComponent } from '../thermo-config-modal/thermo-config
   styleUrls: ['./heating-status.component.scss']
 })
 export class HeatingStatusComponent implements OnInit {
-	public timerString;
-	private heatingPowerOffInterval;
+	public timerString: string;
+	private heatingPowerOffInterval: number;
 	private lastHeatingPowerStatus = false;
 	
 	constructor(
@@ -92,7 +92,8 @@ export class HeatingStatusComponent implements OnInit {
 				const seconds = Math.floor((untilTime - nowTime) / 1000 % 60);
 				const secondsPad2 = ('0' + seconds).slice(-2);
 
-				this.timerString = `${hours ? hoursPad2 + ':' : ''}${seconds || minutes || hours ? minutesPad2 + ':' : ''}${seconds || minutes || hours ? secondsPad2 : ''}`;
+				this.timerString =
+					`${hours ? hoursPad2 + ':' : ''}${seconds || minutes || hours ? minutesPad2 + ':' : ''}${seconds || minutes || hours ? secondsPad2 : ''}`;
 			}, 1000);
 		} else {
 			clearInterval(this.heatingPowerOffInterval);
@@ -100,7 +101,7 @@ export class HeatingStatusComponent implements OnInit {
 		}
 	}
 
-	tempAdjust(diff) {
+	tempAdjust(diff: number) {
 		if (typeof this.dataStore.targetTempId === 'number' && !isNaN(this.dataStore.targetTempId)) {
 			const expected = this.dataStore.temperatures[this.dataStore.targetTempId].value + diff;
 			this.serverApiService.tempAdjust(this.dataStore.temperatures[this.dataStore.targetTempId]._id, expected).subscribe(res => {

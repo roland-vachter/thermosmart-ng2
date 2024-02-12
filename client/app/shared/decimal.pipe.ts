@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class DecimalPipe implements PipeTransform {
 
-	transform(value: number):any {
+	transform(value: number): string | number {
 		const absValue = Math.abs(value);
 		const decimal = parseInt(((absValue - Math.floor(absValue)) * 10).toFixed(0), 10);
 

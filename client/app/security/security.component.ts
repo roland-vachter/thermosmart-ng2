@@ -5,7 +5,6 @@ import { SecuritySettingsModalComponent } from './components/security-settings-m
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { RefreshEventService } from '../services/refresh-event.service';
 import { LocationService } from '../services/location.service';
-import { ArmingStatus } from '../types/types';
 
 enum HEALTH {
 	OK = 'OK',

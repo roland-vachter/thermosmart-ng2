@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { User, UserService } from '../../../services/user.service';
+import { UserService } from '../../../services/user.service';
+import { User } from '../../../types/types';
+import { SensorSetting } from '../../types/types';
 
 @Component({
 	selector: 'thermo-change-sensor-settings-modal',
@@ -11,7 +13,7 @@ export class ChangeSensorSettingsModalComponent implements OnInit {
 	@Input() label:string = '';
 	@Input() tempAdjust:number = 0;
 	@Input() humidityAdjust:number = 0;
-	@Output() onResult: EventEmitter<any> = new EventEmitter();
+	@Output() result: EventEmitter<SensorSetting> = new EventEmitter();
 
 	private user: User;
 
@@ -25,7 +27,7 @@ export class ChangeSensorSettingsModalComponent implements OnInit {
 	}
 
 	onSubmit () {
-		this.onResult.emit({
+		this.result.emit({
 			label: this.label,
 			tempAdjust: this.tempAdjust,
 			humidityAdjust: this.humidityAdjust

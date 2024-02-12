@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 
 @Component({
@@ -6,12 +6,9 @@ import { Component, OnInit } from '@angular/core';
 	templateUrl: './thermo.component.html',
 	styleUrls: ['./thermo.component.scss']
 })
-export class ThermoComponent implements OnInit {
+export class ThermoComponent {
 	
 	constructor(
 	) {}
-
-	ngOnInit() {
-	}
 
 }

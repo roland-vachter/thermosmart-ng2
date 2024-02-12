@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
-import { ThermoModalsService } from '../../services/thermo-modals.service';
 
 @Component({
 	selector: 'thermo-heating-current-plan',

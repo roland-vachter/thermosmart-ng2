@@ -1,18 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
 	selector: 'thermo-inside',
 	templateUrl: './inside.component.html',
 	styleUrls: ['./inside.component.scss']
 })
-export class InsideComponent implements OnInit {
+export class InsideComponent {
 
-	@Input() temperature = null;
-	@Input() humidity = null;
+	@Input() temperature: number;
+	@Input() humidity: number;
 
 	constructor() { }
-
-	ngOnInit() {
-	}
 
 }

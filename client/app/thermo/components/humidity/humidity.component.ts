@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'humidity',
   templateUrl: './humidity.component.html',
   styleUrls: ['./humidity.component.scss']
 })
-export class HumidityComponent implements OnInit, OnChanges {
+export class HumidityComponent implements OnChanges {
     @Input() value: number;
     @Input() color: string;
     @Input() withIcon: boolean = false;
@@ -13,8 +13,6 @@ export class HumidityComponent implements OnInit, OnChanges {
     private predefinedColor = false;
 
     constructor() {}
-
-    ngOnInit() {}
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes.color) {

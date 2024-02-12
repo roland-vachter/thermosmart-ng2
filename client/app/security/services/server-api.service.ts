@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { ApiResult, ArmingStatusResponse, Camera, Controller } from '../../types/types';
+import { ApiResult, RESPONSE_STATUS, StatusApiResult } from '../../types/types';
+import { ArmingStatusResponse, Camera, Controller, SecurityInitResponse } from '../types/types';
 import { LocationService } from '../../services/location.service';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable()
@@ -14,15 +15,15 @@ export class ServerApiService {
 		private locationService: LocationService
 	) { }
 
-	init (force = false) {
+	init(): Observable<SecurityInitResponse> {
 		if (this.locationService.getSelectedLocationId()) {
 			return this.http.get('/api/security/init?location=' + this.locationService.getSelectedLocationId())
 				.pipe(
-					map((res: any) => {
-						if (res.status === 'ok') {
+					map((res: ApiResult<SecurityInitResponse>) => {
+						if (res.status === RESPONSE_STATUS.OK) {
 							return res.data;
 						} else {
-							return {};
+							return {} as SecurityInitResponse;
 						}
 					})
 				);
@@ -37,48 +38,48 @@ export class ServerApiService {
 		});
 	}
 
-	getSecurityCameras() {
+	getSecurityCameras(): Observable<Camera[]> {
 		return this.http.get<Camera[]>('/api/security/camera/list?location=' + this.locationService.getSelectedLocationId())
 			.pipe(
-				map((res: any) => {
+				map((res) => {
 					return res || [];
 				})
 			)
 	}
 
 	addSecurityCamera(ip: string) {
-		return this.http.post<ApiResult>('/api/security/camera/add', {
+		return this.http.post<StatusApiResult>('/api/security/camera/add', {
 			ip,
 			location: this.locationService.getSelectedLocationId()
 		});
 	}
 
 	removeSecurityCamera(ip: string) {
-		return this.http.post<ApiResult>('/api/security/camera/remove', {
+		return this.http.post<StatusApiResult>('/api/security/camera/remove', {
 			ip,
 			location: this.locationService.getSelectedLocationId()
 		});
 	}
 
 
-	getSecurityControllers() {
+	getSecurityControllers(): Observable<Controller[]> {
 		return this.http.get<Controller[]>('/api/security/controller/list?location=' + this.locationService.getSelectedLocationId())
 			.pipe(
-				map((res: any) => {
+				map(res => {
 					return res || [];
 				})
 			)
 	}
 
 	addSecurityController(id: string) {
-		return this.http.post<ApiResult>('/api/security/controller/add', {
+		return this.http.post<StatusApiResult>('/api/security/controller/add', {
 			id,
 			location: this.locationService.getSelectedLocationId()
 		});
 	}
 
 	removeSecurityController(id: string) {
-		return this.http.post<ApiResult>('/api/security/controller/remove', {
+		return this.http.post<StatusApiResult>('/api/security/controller/remove', {
 			id
 		});
 	}

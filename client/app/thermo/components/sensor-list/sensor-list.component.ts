@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { ResponsivityService } from '../../../shared/reponsivity.service';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 
@@ -7,14 +7,11 @@ import { ThermoDataStoreService } from '../../services/thermo-data-store.service
 	templateUrl: './sensor-list.component.html',
 	styleUrls: ['./sensor-list.component.scss']
 })
-export class SensorListComponent implements OnInit {
+export class SensorListComponent {
 
 	constructor(
 		public dataStore: ThermoDataStoreService,
 		protected responsivityService: ResponsivityService
 	) {	}
-
-	ngOnInit() {
-	}
 
 }

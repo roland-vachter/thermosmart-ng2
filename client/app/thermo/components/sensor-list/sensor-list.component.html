@@ -8,7 +8,7 @@
 
 			<div class="vertical-separator"
 				*ngIf="i < dataStore.sensorList.length - 1 &&
-					!(responsivityService.isLtSm | async) &&
+					(responsivityService.isLtSm | async) === false &&
 					(
 						((responsivityService.isLtXl | async) && i % 2 === 0) ||
 						((responsivityService.isXl | async) && i % 3 !== 2)

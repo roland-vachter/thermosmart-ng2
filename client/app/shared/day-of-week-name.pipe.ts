@@ -7,7 +7,7 @@ export class DayOfWeekNamePipe implements PipeTransform {
 
 	private dayNameByIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-	transform(dayOfWeekNumber: any): any {
+	transform(dayOfWeekNumber: number): string {
 		return this.dayNameByIndex[dayOfWeekNumber];
 	}
 
