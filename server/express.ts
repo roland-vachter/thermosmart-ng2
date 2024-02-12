@@ -56,19 +56,23 @@ function initExpress(): Server {
     next();
   });
 
-  app.use(`/assets/static/`, express.static(path.join(__dirname, 'public'), {
+  app.use(`/assets/static/`, express.static(path.join(__dirname, (__dirname.includes('dist') ? '../' : ''), 'public'), {
     maxAge: process.env.CACHE_ENABLED === 'true' ? ayear : 0
   }));
-  app.use(`/assets/`, express.static(path.join(__dirname, '../dist'), {
+  app.use(`/assets/`, express.static(path.join(__dirname, (__dirname.includes('dist') ? '../' : ''), '../dist'), {
     maxAge: process.env.CACHE_ENABLED === 'true' ? ayear : 0
   }));
-  app.use(`/assets/lib/`, express.static(path.join(__dirname, '../node_modules'), {
+  app.use(`/assets/lib/`, express.static(path.join(__dirname, (__dirname.includes('dist') ? '../' : ''), '../node_modules'), {
     maxAge: process.env.CACHE_ENABLED === 'true' ? ayear : 0
   }));
 
   // Set Template engine to handlebars
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  app.engine('handlebars', engine());
+  app.engine('handlebars', engine({
+    defaultLayout: 'main',
+    extname: '.handlebars'
+  }));
+  app.set('views', path.join(__dirname, (__dirname.includes('dist') ? '../' : '') + 'views'));
   app.set('view engine', 'handlebars');
 
   // Middleware
