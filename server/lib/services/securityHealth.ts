@@ -3,7 +3,6 @@ import TypedEventEmitter from 'typed-emitter';
 import SecurityCameras from '../models/SecurityCameras';
 import SecurityControllers from '../models/SecurityControllers';
 import { getConfig } from './config';
-import { isNumber } from '../utils/utils';
 import { LocationBasedEvent } from '../types/generic';
 
 enum HEALTH {
@@ -46,7 +45,7 @@ export const securityHealthEvents = new EventEmitter() as TypedEventEmitter<{
 
 let securityCamerasByLocations: Record<number, SecurityCamera[]> = {};
 let securityControllersByLocations: Record<number, Controller[]> = {};
-const motionSensorsByLocations: Record<number, Record<number, MotionSensor>> = {};
+const motionSensorsByLocations: Record<number, Record<string, MotionSensor>> = {};
 
 const cameraHealthByLocation: Record<number, HEALTH> = {};
 const controllerHealthByLocation: Record<number, HEALTH> = {};
@@ -165,7 +164,7 @@ const updateMotionSensorHealth = async (locationId: number) => {
 	let allHealthy = true;
 	let noneHealthy = true;
 
-	Object.keys(motionSensorsByLocations[locationId]).map(Number).forEach(id => {
+	Object.keys(motionSensorsByLocations[locationId]).forEach(id => {
 		if (motionSensorsByLocations[locationId][id].healthy) {
 			noneHealthy = false;
 		} else {
@@ -494,9 +493,9 @@ export const securityKeypad = {
 
 export const motionSensor = {
 	reportHealth: async (id: string, health: boolean) => {
-		const controllerId = id.toString().match('([0-9]+)(\.[0-9]+)?');
+		const controllerId = id.toString().match('([0-9]+)\.([0-9]+)?');
 
-		if (controllerId !== null && isNumber(controllerId)) {
+		if (controllerId?.length) {
 			const securityControllerData = await SecurityControllers.findOne({
 				controllerid: parseInt(controllerId[1], 10)
 			}).exec();
@@ -506,7 +505,7 @@ export const motionSensor = {
 					motionSensorsByLocations[securityControllerData.location] = {};
 				}
 
-				motionSensorsByLocations[securityControllerData.location][controllerId[1] as unknown as number] = {
+				motionSensorsByLocations[securityControllerData.location][id] = {
 					healthy: health,
 					lastHealthUpdate: Date.now()
 				};
