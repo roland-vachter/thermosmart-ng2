@@ -20,7 +20,6 @@ export class TimezoneService {
   }
 
   private getTimezoneOffset(date: Date | Moment | string, targetTimezone: string, originTimezone: string) {
-    console.log(originTimezone, targetTimezone, moment.tz(date, originTimezone).utcOffset() - moment.tz(date, targetTimezone).utcOffset())
     return moment.tz(date, originTimezone).utcOffset() - moment.tz(date, targetTimezone).utcOffset();
   }
 }
