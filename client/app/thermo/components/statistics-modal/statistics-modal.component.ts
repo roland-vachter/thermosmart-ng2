@@ -541,8 +541,8 @@ export class StatisticsModalComponent implements OnInit {
 								xAxes: [{
 									type: 'time',
 									time: {
-										unit: 'month',
-										tooltipFormat: 'YYYY MMM',
+										unit: 'year',
+										tooltipFormat: 'YYYY',
 										unitStepSize: 1,
 										displayFormats: {
 											millisecond: 'SSS [ms]',

@@ -585,10 +585,10 @@ export const getStatisticsByYear = async (locationId: number, dateStart: Date, d
 
 		return {
 			year: y,
-			avgRunningMinutes: byMonths.reduce((acc, v) => acc + v.avgRunningMinutes, 0) / (y < currentYear ? 12 : moment().tz(location.timezone).month()),
-			avgTargetTemp: byMonths.reduce((acc, v) => acc + v.avgTargetTemp, 0) / (y < currentYear ? 12 : moment().tz(location.timezone).month()),
-			avgOutsideTemp: byMonths.reduce((acc, v) => acc + v.avgOutsideTemp, 0) / (y < currentYear ? 12 : moment().tz(location.timezone).month()),
-			avgOutsideHumi: byMonths.reduce((acc, v) => acc + v.avgOutsideHumi, 0) / (y < currentYear ? 12 : moment().tz(location.timezone).month())
+			avgRunningMinutes: byMonths.reduce((acc, v) => acc + v.avgRunningMinutes, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
+			avgTargetTemp: byMonths.reduce((acc, v) => acc + v.avgTargetTemp, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
+			avgOutsideTemp: byMonths.reduce((acc, v) => acc + v.avgOutsideTemp, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
+			avgOutsideHumi: byMonths.reduce((acc, v) => acc + v.avgOutsideHumi, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1))
 		};
 	}));
 }
