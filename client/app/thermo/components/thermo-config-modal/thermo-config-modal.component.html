@@ -66,7 +66,7 @@
 			<h2>Plan overrides</h2>
 			<ul class="list-group">
 				<li class="list-group-item" *ngFor="let planOverride of dataStore.heatingPlanOverrides">
-					<strong>{{ planOverride.date | dateTimezone:'yyyy/MM/DD' }}:</strong>
+					<strong>{{ planOverride.date | dateTimezone:timezone:'yyyy/MM/DD' }}:</strong>
 					<i class="icon-{{ planOverride.plan?.iconClass }}"></i>
 					{{ planOverride.plan?.name }}
 

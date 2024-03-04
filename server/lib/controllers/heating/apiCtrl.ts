@@ -238,7 +238,7 @@ export const addOrUpdateHeatingPlanOverride = async (req: Request, res: Response
 
 	const location = await Location
 		.findOne({
-			_id: parseInt(req.query.location as string, 10)
+			_id: parseInt(req.body.location as string, 10)
 		})
 		.exec();
 
@@ -282,7 +282,7 @@ export const removeHeatingPlanOverride = async (req: Request, res: Response) => 
 
 	const location = await Location
 		.findOne({
-			_id: parseInt(req.query.location as string, 10)
+			_id: parseInt(req.body.location as string, 10)
 		})
 		.exec();
 

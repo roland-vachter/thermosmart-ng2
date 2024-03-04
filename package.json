@@ -6,7 +6,7 @@
   "scripts": {
     "ng": "ng",
     "start": "node .",
-    "start-dev": "cd server && nodemon app.ts",
+    "start:dev": "cd server && nodemon app.ts",
     "prebuild": "npm run lint",
     "build": "npm run build-server && npm run build-client:prod",
     "build-client": "ng build --configuration production",
