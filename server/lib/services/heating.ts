@@ -200,6 +200,9 @@ async function updateHeatingStatusByLocation (locationId: number) {
 		const target = getTargetTempByLocation(locationId);
 		if (target) {
 			const sensors = getSensors(locationId);
+			console.log('locationStatus.avgValues.temperature', locationStatus.avgValues.temperature);
+			console.log('target.value + treshold', target.value + (switchThresholdAbove.value as number));
+
 			if (!locationStatus.isOn && locationStatus.avgValues.temperature <= target.value - (switchThresholdBelow.value as number)) {
 				if (!locationStatus.isOn) {
 					console.log('sensor data', locationId, JSON.stringify(sensors));
@@ -207,12 +210,12 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				turnHeatingOn(locationId);
 			} else if (locationStatus.avgValues.temperature >= target.value + (switchThresholdAbove.value as number)) {
 				if (locationStatus.isOn) {
-					console.log('locationStatus.avgValues.temperature', locationStatus.avgValues.temperature);
-					console.log('target.value + treshold', target.value + (switchThresholdAbove.value as number));
 					console.log('sensor data', locationId, JSON.stringify(sensors));
 				}
 				turnHeatingOff(locationId);
 			}
+		} else {
+			console.log('no target temperature!');
 		}
 	} catch(err) {
 		console.error("Error occured while fetching the heating plan for today", err);
