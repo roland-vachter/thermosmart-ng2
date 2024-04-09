@@ -55,8 +55,11 @@ insideConditionsEvts.on('change', async (data) => {
 	const keys = Object.keys(sensors).map(Number);
 	let activeCount = 0;
 	let hasWindowOpen = false;
+
+	let debug = '';
 	keys.forEach(key => {
 		if (sensors[key].active && sensors[key].enabled && (sensors[key].temperature || 0) > getOutsideTemperature()) {
+			debug += `${key}(${sensors[key].temperature}) + `;
 			locationStatus.avgValues.temperature += sensors[key].temperature;
 			locationStatus.avgValues.humidity += sensors[key].humidity;
 			activeCount++;
@@ -67,6 +70,10 @@ insideConditionsEvts.on('change', async (data) => {
 
 	locationStatus.hasWindowOpen = hasWindowOpen;
 	locationStatus.avgValues.temperature = locationStatus.avgValues.temperature / activeCount;
+
+	debug += ` = ${locationStatus.avgValues.temperature}`;
+
+	console.log(`[${location}] temps: ` + debug);
 
 	await updateHeatingStatusByLocation(location);
 });
