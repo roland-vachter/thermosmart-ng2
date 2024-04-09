@@ -44,6 +44,7 @@ const initLocation = (locationId: number) => {
 };
 
 insideConditionsEvts.on('change', async (data) => {
+	console.log(`[${data.location}].${data.id}=${data.temperature} inside condition event got`);
 	const location = data.location;
 	initLocation(location);
 	const locationStatus = statusByLocation[location];
