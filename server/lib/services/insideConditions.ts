@@ -251,7 +251,6 @@ export const setSensorInput = async (data: SensorInput) => {
 			sensorData[id] = sensor;
 
 			if (changesMade) {
-				console.log(`[${sensorSetting?.location}].${sensor.id} inside conditions emit`);
 				insideConditionsEvts.emit('change', {
 					...sensor,
 					windowOpenTimeout: undefined

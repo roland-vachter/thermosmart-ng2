@@ -44,7 +44,6 @@ const initLocation = (locationId: number) => {
 };
 
 insideConditionsEvts.on('change', async (data) => {
-	console.log(`[${data.location}].${data.id}=${data.temperature} inside condition event got`);
 	const location = data.location;
 	initLocation(location);
 	const locationStatus = statusByLocation[location];
@@ -57,7 +56,6 @@ insideConditionsEvts.on('change', async (data) => {
 	let activeCount = 0;
 	let hasWindowOpen = false;
 
-	let debug = '';
 	keys.forEach(key => {
 		if (sensors[key].active && sensors[key].enabled && (sensors[key].temperature || 0) > getOutsideTemperature()) {
 			debug += `${key}(${sensors[key].temperature}) + `;
@@ -71,10 +69,6 @@ insideConditionsEvts.on('change', async (data) => {
 
 	locationStatus.hasWindowOpen = hasWindowOpen;
 	locationStatus.avgValues.temperature = locationStatus.avgValues.temperature / activeCount;
-
-	debug += ` = ${locationStatus.avgValues.temperature}`;
-
-	console.log(`[${location}] temps: ` + debug);
 
 	await updateHeatingStatusByLocation(location);
 });
@@ -208,8 +202,6 @@ async function updateHeatingStatusByLocation (locationId: number) {
 		const target = getTargetTempByLocation(locationId);
 		if (target) {
 			const sensors = getSensors(locationId);
-			console.log(`[${locationId}] locationStatus.avgValues.temperature`, locationStatus.avgValues.temperature);
-			console.log(`[${locationId}] target.value + treshold`, target.value + (switchThresholdAbove.value as number));
 
 			if (!locationStatus.isOn && locationStatus.avgValues.temperature <= target.value - (switchThresholdBelow.value as number)) {
 				if (!locationStatus.isOn) {
