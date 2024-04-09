@@ -190,20 +190,27 @@ async function updateHeatingStatusByLocation (locationId: number) {
 		}
 
 		if (Number.isNaN(locationStatus.avgValues.temperature) || !locationStatus.poweredOn || locationStatus.hasWindowOpen) {
+			console.log('power because of ' +
+				(Number.isNaN(locationStatus.avgValues.temperature) ? 'avgTemp NaN' :
+				(!locationStatus.poweredOn ? 'not power on' : 'has window open')));
 			turnHeatingOff(locationId);
 			return;
 		}
 
 		const target = getTargetTempByLocation(locationId);
 		if (target) {
-			// const sensors = getSensors(locationId);
+			const sensors = getSensors(locationId);
 			if (!locationStatus.isOn && locationStatus.avgValues.temperature <= target.value - (switchThresholdBelow.value as number)) {
-				// console.log('sensor data', locationId, JSON.stringify(sensors));
+				if (!locationStatus.isOn) {
+					console.log('sensor data', locationId, JSON.stringify(sensors));
+				}
 				turnHeatingOn(locationId);
 			} else if (locationStatus.avgValues.temperature >= target.value + (switchThresholdAbove.value as number)) {
-				// if (locationStatus.isOn) {
-				// 	console.log('sensor data', locationId, JSON.stringify(sensors));
-				// }
+				if (locationStatus.isOn) {
+					console.log('locationStatus.avgValues.temperature', locationStatus.avgValues.temperature);
+					console.log('target.value + treshold', target.value + (switchThresholdAbove.value as number));
+					console.log('sensor data', locationId, JSON.stringify(sensors));
+				}
 				turnHeatingOff(locationId);
 			}
 		}
