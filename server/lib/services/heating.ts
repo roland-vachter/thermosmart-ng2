@@ -58,7 +58,6 @@ insideConditionsEvts.on('change', async (data) => {
 
 	keys.forEach(key => {
 		if (sensors[key].active && sensors[key].enabled && (sensors[key].temperature || 0) > getOutsideTemperature()) {
-			debug += `${key}(${sensors[key].temperature}) + `;
 			locationStatus.avgValues.temperature += sensors[key].temperature;
 			locationStatus.avgValues.humidity += sensors[key].humidity;
 			activeCount++;
