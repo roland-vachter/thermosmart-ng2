@@ -86,7 +86,7 @@ const weatherColorMapping: Record<DAYTIME, Record<WEATHER_TYPE, string>> = {
 
 async function update () {
 	try {
-		const resWeather = await fetch(`${process.env.WEATHER_API_URL}?appid=${process.env.WEATHER_API_KEY}&lat=${process.env.LOCATION_LAT}&lon=${process.env.LOCATION_LNG}&units=metric`);
+		const resWeather = await fetch(`${process.env.WEATHER_API_URL}?appid=${process.env.WEATHER_API_KEY}&lat=${process.env.LOCATION_LAT}&lon=${process.env.LOCATION_LNG}&units=metric&exclude=minutely,hourly,daily,alerts`);
 
 		if (!resWeather.ok) {
 			const err = new ErrorWithResponse(resWeather.status.toString(), resWeather);
