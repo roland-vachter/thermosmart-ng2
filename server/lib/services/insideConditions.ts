@@ -85,7 +85,7 @@ function getAvgTemp(sensor: Sensor, newTemperature: number) {
 		}
 	}
 
-	return parseFloat((sum / count).toFixed(1));
+	return Math.round(sum * 10 / count) / 10;
 }
 
 export const setSensorInput = async (data: SensorInput) => {
@@ -97,7 +97,7 @@ export const setSensorInput = async (data: SensorInput) => {
 		});
 
 		if (sensorSetting) {
-			const temp = parseFloat((data.temperature + sensorSetting.tempAdjust).toFixed(1));
+			const temp = Math.round((data.temperature + sensorSetting.tempAdjust) * 10) / 10;
 			const humidity = Math.round(data.humidity + sensorSetting.humidityAdjust);
 
 			let sensor: Sensor = sensorData[id];
