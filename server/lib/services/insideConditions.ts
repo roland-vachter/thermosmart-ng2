@@ -6,12 +6,17 @@ import HeatingSensorHistory from '../models/HeatingSensorHistory';
 import { HydratedDocument } from 'mongoose';
 import { sendPushNotification } from './pushNotifications';
 
-enum OnHoldStatus {
+enum SensorDirectionChange {
 	'firstDecrease' = 'firstDecrease',
 	'decrease' = 'decrease',
 	'firstIncrease' = 'firstIncrease',
 	'increase' = 'increase',
 	'firstStabilized' = 'firstStabilized'
+}
+
+enum SensorDirection {
+	'increasing' = 'increasing',
+	'decreasing' = 'decreasing'
 }
 
 interface Sensor {
@@ -30,13 +35,20 @@ interface Sensor {
   deleted?: boolean;
 	adjustedTempHistory: number[];
 	reportedTempHistory: number[];
-	savedTempHistory: number[];
+	avgTempHistory: {
+		t: number;
+		h?: number;
+		date?: Date;
+		saved: boolean;
+	}[];
 	location?: number;
 	onHoldTempLowest?: number;
 	onHoldTempHighest?: number;
-	onHoldStatus?: OnHoldStatus | null;
+	directionChange?: SensorDirectionChange | null;
 	sensorSetting: HydratedDocument<ISensorSetting>;
 	lastUpdate?: Date;
+	direction?: SensorDirection;
+	lastSavedTemperature?: number;
 }
 
 export interface SensorSetting {
@@ -110,19 +122,25 @@ export const setSensorInput = async (data: SensorInput) => {
 					adjustedTempHistory: [],
 					reportedTempHistory: [],
 					location: sensorSetting?.location,
-					savedTempHistory: [],
+					avgTempHistory: [],
 					sensorSetting
 				} as unknown as Sensor;
 			}
 
-			const sensorHistory = await HeatingSensorHistory
-				.findOne({ sensor: id })
-				.sort({ datetime: -1 })
-				.lean()
-				.exec();
+			if (!sensor.avgTempHistory?.length) {
+				const sensorHistory = await HeatingSensorHistory
+					.findOne({ sensor: id })
+					.sort({ datetime: -1 })
+					.lean()
+					.exec();
 
-			if (sensorHistory) {
-				sensor.savedTempHistory[0] = sensorHistory.t;
+				if (sensorHistory) {
+					sensor.avgTempHistory[0] = {
+						t: sensorHistory.t,
+						saved: true
+					}
+					sensor.lastSavedTemperature = sensorHistory.t;
+				}
 			}
 
 			let changesMade = false;
@@ -146,14 +164,113 @@ export const setSensorInput = async (data: SensorInput) => {
 			sensor.tempAdjust = sensorSetting?.tempAdjust;
 			sensor.humidityAdjust = sensorSetting?.humidityAdjust;
 
-			if (sensor.savedTempHistory[0] !== sensor.temperature) {
-				await new HeatingSensorHistory({
-					sensor: id,
+			if (!sensor.direction || !sensor.avgTempHistory?.length ||
+				(sensor.direction === SensorDirection.increasing && sensor.temperature > sensor.avgTempHistory[0].t) ||
+				(sensor.direction === SensorDirection.decreasing && sensor.temperature < sensor.avgTempHistory[0].t)
+			) {
+				if (sensor.temperature !== sensor.lastSavedTemperature) {
+					sensor.direction = sensor.temperature < sensor.avgTempHistory[0].t ? SensorDirection.decreasing : SensorDirection.increasing;
+				}
+
+				sensor.avgTempHistory.unshift({
 					t: sensor.temperature,
-					h: sensor.humidity,
-					datetime: new Date()
-				}).save();
-				sensor.savedTempHistory[0] = sensor.temperature;
+					saved: sensor.temperature === sensor.lastSavedTemperature ? false : true
+				});
+
+				if (sensor.avgTempHistory.length > 5) {
+					sensor.avgTempHistory.pop();
+				}
+
+				if (sensor.temperature !== sensor.lastSavedTemperature) {
+					await new HeatingSensorHistory({
+						sensor: id,
+						t: sensor.temperature,
+						h: sensor.humidity,
+						datetime: new Date()
+					}).save();
+					sensor.lastSavedTemperature = sensor.temperature;
+				}
+			} else if ((sensor.direction === SensorDirection.increasing && sensor.temperature < sensor.avgTempHistory[0].t) ||
+				(sensor.direction === SensorDirection.decreasing && sensor.temperature > sensor.avgTempHistory[0].t)) {
+					if (!sensor.avgTempHistory[0].saved && sensor.avgTempHistory[1] &&
+						(
+							(sensor.direction === SensorDirection.increasing && sensor.avgTempHistory[1].t < sensor.avgTempHistory[0].t) ||
+							(sensor.direction === SensorDirection.decreasing && sensor.avgTempHistory[1].t > sensor.avgTempHistory[0].t)
+						)
+					) {
+						sensor.direction = sensor.temperature < sensor.avgTempHistory[0].t ? SensorDirection.decreasing : SensorDirection.increasing;
+						await new HeatingSensorHistory({
+							sensor: id,
+							t: sensor.avgTempHistory[0].t,
+							h: sensor.avgTempHistory[0].h,
+							datetime: sensor.avgTempHistory[0].date
+						}).save();
+						sensor.avgTempHistory[0].saved = true;
+
+						await new HeatingSensorHistory({
+							sensor: id,
+							t: sensor.temperature,
+							h: sensor.humidity,
+							datetime: new Date()
+						}).save();
+
+						sensor.avgTempHistory.unshift({
+							t: sensor.temperature,
+							h: sensor.humidity,
+							date: new Date(),
+							saved: true
+						});
+						sensor.lastSavedTemperature = sensor.temperature;
+
+						if (sensor.avgTempHistory.length > 5) {
+							sensor.avgTempHistory.pop();
+						}
+					} else {
+						sensor.avgTempHistory.unshift({
+							t: sensor.temperature,
+							h: sensor.humidity,
+							date: new Date(),
+							saved: false
+						});
+					}
+			} else if (sensor.temperature === sensor.avgTempHistory[0].t) {
+				if (!sensor.avgTempHistory[0].saved && sensor.temperature !== sensor.lastSavedTemperature) {
+					await new HeatingSensorHistory({
+						sensor: id,
+						t: sensor.avgTempHistory[0].t,
+						h: sensor.avgTempHistory[0].h,
+						datetime: sensor.avgTempHistory[0].date
+					}).save();
+					sensor.avgTempHistory[0].saved = true;
+
+					sensor.avgTempHistory.unshift({
+						t: sensor.temperature,
+						h: sensor.humidity,
+						date: sensor.avgTempHistory[0].date,
+						saved: false
+					});
+				} else {
+					sensor.avgTempHistory.unshift({
+						t: sensor.temperature,
+						h: sensor.humidity,
+						date: sensor.avgTempHistory[0].date,
+						saved: false
+					});
+				}
+
+				let i = 1;
+				while (i < sensor.avgTempHistory.length && sensor.avgTempHistory[i].t !== sensor.temperature) {
+					i++;
+				}
+				const lastTempNotEqual = sensor.avgTempHistory[i].t;
+
+				if (sensor.temperature !== lastTempNotEqual) {
+					sensor.direction = sensor.temperature < lastTempNotEqual ? SensorDirection.decreasing : SensorDirection.increasing;
+				}
+			}
+
+			if (sensor.avgTempHistory.length > 5) {
+				sensor.avgTempHistory.pop();
 			}
 
 			sensor.reportedTempHistory.unshift(data.temperature);
@@ -166,87 +283,7 @@ export const setSensorInput = async (data: SensorInput) => {
 				sensor.adjustedTempHistory.pop();
 			}
 
-			if (!heatingOnByLocation[sensorSetting.location] && sensorSetting?.enabled && sensor.reportedTempHistory.length) {
-				const currentTemp = sensor.reportedTempHistory[0];
-				const lastTemp = sensor.reportedTempHistory[1];
-				const prevLastTemp = sensor.reportedTempHistory[2];
-				const preprevLastTemp = sensor.reportedTempHistory[3];
-
-				if (!sensor.onHoldStatus) {
-					if (lastTemp - currentTemp >= 0.15 ||
-							(prevLastTemp && prevLastTemp - currentTemp >= 0.25) ||
-							(preprevLastTemp && preprevLastTemp - currentTemp >= 0.35)) {
-						sensor.onHoldTempLowest = currentTemp;
-						changesMade = true;
-
-						sensor.onHoldStatus = OnHoldStatus.firstDecrease;
-					}
-				} else if (sensor.onHoldStatus === OnHoldStatus.firstDecrease) {
-					if (lastTemp - currentTemp >= 0.15 ||
-							(prevLastTemp && prevLastTemp - currentTemp >= 0.25) ||
-							(preprevLastTemp && preprevLastTemp - currentTemp >= 0.35)) {
-						sensor.onHoldTempLowest = currentTemp;
-						sensor.windowOpen = true;
-
-						clearTimeout(sensor.windowOpenTimeout);
-						sensor.windowOpenTimeout = setTimeout(() => {
-							sensor.windowOpen = false;
-						}, 20 * 60 * 1000);
-
-						changesMade = true;
-						sensor.onHoldStatus = OnHoldStatus.decrease;
-					} else {
-						sensor.onHoldStatus = null;
-						sensor.onHoldTempLowest = currentTemp;
-						sensor.onHoldTempHighest = currentTemp;
-						sensor.windowOpen = false;
-						clearTimeout(sensor.windowOpenTimeout);
-						changesMade = true;
-					}
-				} else if (sensor.onHoldStatus === OnHoldStatus.decrease) {
-						if (currentTemp <= sensor.onHoldTempLowest) {
-							sensor.onHoldTempLowest = currentTemp;
-						} else {
-							sensor.onHoldStatus = OnHoldStatus.firstIncrease;
-						}
-				} else if (sensor.onHoldStatus === OnHoldStatus.firstIncrease) {
-					if (currentTemp <= sensor.onHoldTempLowest) {
-						sensor.onHoldStatus = OnHoldStatus.decrease;
-						sensor.onHoldTempLowest = currentTemp;
-					} else if (currentTemp < lastTemp) {
-						sensor.onHoldStatus = OnHoldStatus.decrease;
-					} else if (currentTemp > lastTemp) {
-						sensor.onHoldStatus = OnHoldStatus.increase;
-						sensor.onHoldTempHighest = currentTemp;
-					}
-				} else if (sensor.onHoldStatus === OnHoldStatus.increase) {
-					if (currentTemp > sensor.onHoldTempHighest) {
-						sensor.onHoldTempHighest = currentTemp;
-					} else {
-						sensor.onHoldStatus = OnHoldStatus.firstStabilized;
-					}
-				} else if (sensor.onHoldStatus === OnHoldStatus.firstStabilized) {
-					if (currentTemp > sensor.onHoldTempHighest) {
-						sensor.onHoldTempHighest = currentTemp;
-						sensor.onHoldStatus = OnHoldStatus.increase;
-					} else if (currentTemp > lastTemp) {
-						sensor.onHoldStatus = OnHoldStatus.increase;
-					} else {
-						sensor.windowOpen = false;
-						clearTimeout(sensor.windowOpenTimeout);
-						sensor.onHoldStatus = null;
-						sensor.onHoldTempHighest = currentTemp;
-						sensor.onHoldTempLowest = currentTemp;
-						changesMade = true;
-					}
-				}
-
-				if (currentTemp <= 10) {
-					sensor.onHoldStatus = null;
-					sensor.windowOpen = false;
-					clearTimeout(sensor.windowOpenTimeout);
-				}
-			}
+			changesMade = changesMade || windowOpenDetection(sensor, sensorSetting);
 
 			sensorData[id] = sensor;
 
@@ -286,7 +323,7 @@ const activateAllSensors = (locationId: number) => {
 		const s = sensorData[id];
 		if (s.location === locationId && s.windowOpen) {
 			s.windowOpen = false;
-			s.onHoldStatus = null;
+			s.directionChange = null;
 		}
 	});
 }
@@ -304,7 +341,7 @@ export const toggleSensorStatus = async (id: number) => {
 
 		if (sensorData[id]) {
 			sensorData[id].enabled = sensorSetting.enabled;
-			sensorData[id].onHoldStatus = null;
+			sensorData[id].directionChange = null;
 			sensorData[id].windowOpen = false;
 			insideConditionsEvts.emit('change', {
 				...sensorData[id],
@@ -373,7 +410,7 @@ setInterval(() => {
 				sensorData[id].enabled = sensorSetting?.enabled || false;
 				sensorData[id].windowOpen = false;
 				clearTimeout(sensorData[id].windowOpenTimeout);
-				sensorData[id].onHoldStatus = null;
+				sensorData[id].directionChange = null;
 
 				insideConditionsEvts.emit('change', {
 					...sensorData[id],
@@ -398,3 +435,92 @@ setInterval(() => {
 		}
 	});
 }, 10 * 1000);
+
+
+function windowOpenDetection(sensor: Sensor, sensorSetting: ISensorSetting) {
+	let changesMade = false;
+
+	if (!heatingOnByLocation[sensorSetting.location] && sensorSetting?.enabled && sensor.reportedTempHistory.length) {
+		const currentTemp = sensor.reportedTempHistory[0];
+		const lastTemp = sensor.reportedTempHistory[1];
+		const prevLastTemp = sensor.reportedTempHistory[2];
+		const preprevLastTemp = sensor.reportedTempHistory[3];
+
+		if (!sensor.directionChange) {
+			if (lastTemp - currentTemp >= 0.15 ||
+					(prevLastTemp && prevLastTemp - currentTemp >= 0.25) ||
+					(preprevLastTemp && preprevLastTemp - currentTemp >= 0.35)) {
+				sensor.onHoldTempLowest = currentTemp;
+				changesMade = true;
+
+				sensor.directionChange = SensorDirectionChange.firstDecrease;
+			}
+		} else if (sensor.directionChange === SensorDirectionChange.firstDecrease) {
+			if (lastTemp - currentTemp >= 0.15 ||
+					(prevLastTemp && prevLastTemp - currentTemp >= 0.25) ||
+					(preprevLastTemp && preprevLastTemp - currentTemp >= 0.35)) {
+				sensor.onHoldTempLowest = currentTemp;
+				sensor.windowOpen = true;
+
+				clearTimeout(sensor.windowOpenTimeout);
+				sensor.windowOpenTimeout = setTimeout(() => {
+					sensor.windowOpen = false;
+				}, 20 * 60 * 1000);
+
+				changesMade = true;
+				sensor.directionChange = SensorDirectionChange.decrease;
+			} else {
+				sensor.directionChange = null;
+				sensor.onHoldTempLowest = currentTemp;
+				sensor.onHoldTempHighest = currentTemp;
+				sensor.windowOpen = false;
+				clearTimeout(sensor.windowOpenTimeout);
+				changesMade = true;
+			}
+		} else if (sensor.directionChange === SensorDirectionChange.decrease) {
+				if (currentTemp <= sensor.onHoldTempLowest) {
+					sensor.onHoldTempLowest = currentTemp;
+				} else {
+					sensor.directionChange = SensorDirectionChange.firstIncrease;
+				}
+		} else if (sensor.directionChange === SensorDirectionChange.firstIncrease) {
+			if (currentTemp <= sensor.onHoldTempLowest) {
+				sensor.directionChange = SensorDirectionChange.decrease;
+				sensor.onHoldTempLowest = currentTemp;
+			} else if (currentTemp < lastTemp) {
+				sensor.directionChange = SensorDirectionChange.decrease;
+			} else if (currentTemp > lastTemp) {
+				sensor.directionChange = SensorDirectionChange.increase;
+				sensor.onHoldTempHighest = currentTemp;
+			}
+		} else if (sensor.directionChange === SensorDirectionChange.increase) {
+			if (currentTemp > sensor.onHoldTempHighest) {
+				sensor.onHoldTempHighest = currentTemp;
+			} else {
+				sensor.directionChange = SensorDirectionChange.firstStabilized;
+			}
+		} else if (sensor.directionChange === SensorDirectionChange.firstStabilized) {
+			if (currentTemp > sensor.onHoldTempHighest) {
+				sensor.onHoldTempHighest = currentTemp;
+				sensor.directionChange = SensorDirectionChange.increase;
+			} else if (currentTemp > lastTemp) {
+				sensor.directionChange = SensorDirectionChange.increase;
+			} else {
+				sensor.windowOpen = false;
+				clearTimeout(sensor.windowOpenTimeout);
+				sensor.directionChange = null;
+				sensor.onHoldTempHighest = currentTemp;
+				sensor.onHoldTempLowest = currentTemp;
+				changesMade = true;
+			}
+		}
+
+		if (currentTemp <= 10) {
+			sensor.directionChange = null;
+			sensor.windowOpen = false;
+			clearTimeout(sensor.windowOpenTimeout);
+		}
+	}
+
+	return changesMade;
+}
