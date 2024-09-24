@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ApiResult, RESPONSE_STATUS } from '../../types/types';
-import { SensorResponse, SensorSetting, Statistics, ThermoInitUpdateData } from "../types/types";
+import { HeatingConditionsResponse, SensorResponse, SensorSetting, Statistics, ThermoInitUpdateData } from "../types/types";
 import { HeatingPowerResponse } from "../types/types";
 import { LocationService } from '../../services/location.service';
 import { of, Observable } from 'rxjs';
@@ -35,6 +35,10 @@ export class ThermoServerApiService {
 
 	toggleHeatingPower (): Observable<ApiResult<HeatingPowerResponse>> {
 		return this.http.post<ApiResult<HeatingPowerResponse>>('/api/toggleheatingpower', { location: this.locationService.getSelectedLocationId() });
+	}
+
+	ignoreHoldConditions(): Observable<ApiResult<HeatingConditionsResponse>> {
+		return this.http.post<ApiResult<HeatingConditionsResponse>>('/api/ignoreholdconditions', { location: this.locationService.getSelectedLocationId() });
 	}
 
 	toggleSensorStatus (id: number) {

@@ -30,6 +30,7 @@ router.get('/sensorpolling', apiKeyMiddleware, cors(), handleErrors(heatingApiCt
 router.get('/statistics', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.statistics));
 router.post('/toggleheatingpower', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.toggleHeatingPower));
 router.post('/disablesensorwindowopen', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.disableSensorWindowOpen));
+router.post('/ignoreholdconditions', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.ignoreHeatingHoldConditions));
 
 
 // security UI

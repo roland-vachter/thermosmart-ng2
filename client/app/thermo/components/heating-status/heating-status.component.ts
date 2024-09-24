@@ -14,6 +14,7 @@ import { ThermoConfigModalComponent } from '../thermo-config-modal/thermo-config
 })
 export class HeatingStatusComponent implements OnInit {
 	public timerString: string;
+	onHold: boolean = true;
 	private heatingPowerOffInterval: number;
 	private lastHeatingPowerStatus = false;
 	
@@ -31,15 +32,29 @@ export class HeatingStatusComponent implements OnInit {
 			if (this.lastHeatingPowerStatus !== this.dataStore.heatingPower.status) {
 				this.updateHeatingPower();
 			}
+
+			if (this.dataStore.heatingConditions.hasFavorableWeatherForecast ||
+				this.dataStore.heatingConditions.hasIncreasingTrend ||
+				this.dataStore.heatingConditions.hasWindowOpen) {
+				this.onHold = true;
+			} else {
+				this.onHold = false;
+			}
 			this.cdRef.detectChanges();
 		});
 		this.updateHeatingPower();
 	}
 
 	toggleStatus() {
-		this.serverApiService.toggleHeatingPower().subscribe(res => {
-			this.dataStore.handleServerData(res?.data);
-		});
+		if (this.onHold) {
+			this.serverApiService.ignoreHoldConditions().subscribe(res => {
+				this.dataStore.handleServerData(res?.data);
+			});
+		} else {
+			this.serverApiService.toggleHeatingPower().subscribe(res => {
+				this.dataStore.handleServerData(res?.data);
+			});
+		}
 	}
 
 	showSettingsModal() {
@@ -56,7 +71,9 @@ export class HeatingStatusComponent implements OnInit {
 		this.bsModalService.show(ThermoConfigModalComponent, {
 			initialState: {
 				switchThresholdBelow: this.dataStore.config['switchThresholdBelow'] as {name: string; value: number},
-				switchThresholdAbove: this.dataStore.config['switchThresholdAbove'] as {name: string; value: number}
+				switchThresholdAbove: this.dataStore.config['switchThresholdAbove'] as {name: string; value: number},
+				temperatureTrendsFeature: this.dataStore.config['temperatureTrendsFeature']?.value as boolean,
+				weatherForecastFeature: this.dataStore.config['weatherForecastFeature']?.value as boolean,
 			},
 			class: 'modal-lg'
 		});

@@ -56,6 +56,16 @@ export const init = async () => {
 			void recalculateHeatingDuration(data.location);
 		});
 
+		heatingEvts.on('conditionStatusChange', data => {
+			socketIo.of('/frontend/' + data.location).emit('update', {
+				heatingConditions: {
+					hasIncreasingTrend: data.hasIncreasingTrend,
+					hasFavorableWeatherForecast: data.hasFavorableWeatherForecast,
+					hasWindowOpen: data.hasWindowOpen
+				}
+			});
+		});
+
 		heatingEvts.on('changeHeatingPower', data => {
 			socketIo.of('/frontend/' + data.location).emit('update', {
 				heatingPower: {

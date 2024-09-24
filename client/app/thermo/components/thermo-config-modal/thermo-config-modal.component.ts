@@ -30,6 +30,9 @@ export class ThermoConfigModalComponent {
 		name: '',
 		value: NaN
 	};
+	@Input() temperatureTrendsFeature: boolean;
+	@Input() weatherForecastFeature: boolean;
+
 	timezone: string = this.locationService.getSelectedLocationTimezone();
 	currentDayOfWeek: number = moment().tz(this.timezone).day();
 	overrideToAdd: OverrideToAdd = {
@@ -126,5 +129,27 @@ export class ThermoConfigModalComponent {
 					this.sharedModalsService.alert(result.reason, ALERT_TYPE.ERROR);
 				}
 			});
+	}
+
+	toggleTemperatureTrendsFeature(evt: InputEvent) {
+		this.temperatureTrendsFeature = (evt.target as HTMLInputElement).checked;
+
+		this.sharedApiService.changeConfig('temperatureTrendsFeature', (evt.target as HTMLInputElement).checked).subscribe({
+			next: () => {},
+			error: () => {
+				setTimeout(() => this.temperatureTrendsFeature = !(evt.target as HTMLInputElement).checked);
+			}
+		});
+	}
+
+	toggleWeatherForecastFeature(evt: InputEvent) {
+		this.weatherForecastFeature = (evt.target as HTMLInputElement).checked;
+
+		this.sharedApiService.changeConfig('weatherForecastFeature', (evt.target as HTMLInputElement).checked).subscribe({
+			next: () => {},
+			error: () => {
+				setTimeout(() => this.weatherForecastFeature = !(evt.target as HTMLInputElement).checked);
+			}
+		});
 	}
 }

@@ -14,6 +14,11 @@ enum OnHoldStatus {
 	'firstStabilized' = 'firstStabilized'
 }
 
+export enum TemperatureDirection {
+	'increase' = 'increase',
+	'decrease' = 'decrease'
+}
+
 interface Sensor {
 	id: number;
 	temperature: number;
@@ -37,6 +42,7 @@ interface Sensor {
 	onHoldStatus?: OnHoldStatus | null;
 	sensorSetting: HydratedDocument<ISensorSetting>;
 	lastUpdate?: Date;
+	temperatureDirection: TemperatureDirection;
 }
 
 export interface SensorSetting {
@@ -146,7 +152,14 @@ export const setSensorInput = async (data: SensorInput) => {
 			sensor.tempAdjust = sensorSetting?.tempAdjust;
 			sensor.humidityAdjust = sensorSetting?.humidityAdjust;
 
-			if (sensor.savedTempHistory[0] !== sensor.temperature) {
+			if (sensor.savedTempHistory.length) {
+				const avgPreviousTemps = sensor.savedTempHistory.reduce((acc, v) => acc + v, 0) / sensor.savedTempHistory.length;
+				if (avgPreviousTemps !== sensor.temperature) {
+					sensor.temperatureDirection = sensor.temperature < avgPreviousTemps ? TemperatureDirection.decrease : TemperatureDirection.increase;
+				}
+			}
+
+			if (!sensor.savedTempHistory.length || sensor.savedTempHistory[0] !== sensor.temperature) {
 				await new HeatingSensorHistory({
 					sensor: id,
 					t: sensor.temperature,
@@ -318,13 +331,23 @@ export const toggleSensorStatus = async (id: number) => {
 	return false;
 };
 
-export const disableSensorWindowOpen = (id: number) => {
-	if (sensorData[id]) {
+const disableSensorWindowOpenForSensor = (id: number) => {
+	if (sensorData[id] && sensorData[id].windowOpen) {
 		sensorData[id].windowOpen = false;
 		clearTimeout(sensorData[id].windowOpenTimeout);
 		insideConditionsEvts.emit('change', {
 			...sensorData[id],
 			windowOpenTimeout: undefined
+		});
+	}
+}
+
+export const disableSensorWindowOpen = (id?: number) => {
+	if (id) {
+		disableSensorWindowOpenForSensor(id);
+	} else {
+		Object.keys(sensorData).map(Number).forEach(sensorId => {
+			disableSensorWindowOpen(sensorId);
 		});
 	}
 }

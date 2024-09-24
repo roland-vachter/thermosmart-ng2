@@ -16,7 +16,7 @@ export class SharedServerApiService {
 		private locationService: LocationService
 	) { }
 
-	changeConfig (name: string, value: string | number) {
+	changeConfig (name: string, value: string | number | boolean) {
 		return this.http.post<ApiResult>('/api/changeconfig', {
 			name,
 			value,

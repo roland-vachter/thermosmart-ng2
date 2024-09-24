@@ -12,9 +12,17 @@ interface ChangeHeatingPowerEvent {
 	until?: Date;
 }
 
+interface HeatingConditionStatus {
+	location: number;
+	hasIncreasingTrend: boolean;
+	hasFavorableWeatherForecast: boolean;
+	hasWindowOpen: boolean;
+}
+
 type HeatingEvents = {
 	changeHeating: (h: ChangeHeatingEvent) => void;
 	changeHeatingPower: (h: ChangeHeatingPowerEvent) => void;
+	conditionStatusChange: (h: HeatingConditionStatus) => void;
 }
 
 export default new EventEmitter() as TypedEventEmitter<HeatingEvents>;

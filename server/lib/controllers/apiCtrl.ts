@@ -66,7 +66,7 @@ export const log = (req: Request, res: Response) => {
 }
 
 export const changeConfig = async (req: Request, res: Response) => {
-	if (!req.body.name || !req.body.value || !req.body.location) {
+	if (!req.body.name || (!req.body.value && req.body.value !== false && req.body.value !== 0) || !req.body.location) {
 		return res.status(400).json({
 			status: RESPONSE_STATUS.ERROR,
 			reason: 'name, value or location parameter is missing'

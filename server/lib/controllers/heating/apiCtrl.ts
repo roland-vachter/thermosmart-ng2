@@ -10,7 +10,7 @@ import { getAllConfigs } from '../../services/config';
 import { getOutsideConditions } from '../../services/outsideConditions';
 import { changeSensorSettings as insideConditionsChangeSensorSettings, getLocationBySensorId, getSensors, disableSensorWindowOpen as insideConditionsDisableSensorWindowOpen,
 	setSensorInput, toggleSensorStatus as insideConditionsToggleSensorStatus } from '../../services/insideConditions';
-import { getPowerStatus, isHeatingOn, togglePower } from '../../services/heating';
+import { getHeatingConditions, getPowerStatus, ignoreHoldConditions, isHeatingOn, togglePower } from '../../services/heating';
 import moment from 'moment-timezone';
 import { getRestartStatus, initiateRestart } from '../../services/restartSensor';
 import { isNumber } from '../../utils/utils';
@@ -92,6 +92,7 @@ export const initHeating = async (req: Request, res: Response) => {
 				status: getPowerStatus(location._id).poweredOn,
 				until: getPowerStatus(location._id).until
 			},
+			heatingConditions: getHeatingConditions(location._id),
 			targetTempId: targetTemp ? targetTemp._id : null,
 			temperatures: (temps || []).map(t => ({
 				...t,
@@ -330,6 +331,27 @@ export const toggleHeatingPower = async (req: Request, res: Response) => {
 				status: getPowerStatus(location).poweredOn,
 				until: getPowerStatus(location).until
 			}
+		}
+	});
+};
+
+export const ignoreHeatingHoldConditions = (req: Request, res: Response) => {
+	if (!isNumber(req.body.location)) {
+		return res.status(400).json({
+			status: RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	const location = parseInt(req.body.location, 10);
+
+	ignoreHoldConditions(location);
+	insideConditionsDisableSensorWindowOpen();
+
+	res.json({
+		status: 'ok',
+		data: {
+			heatingConditions: getHeatingConditions(location)
 		}
 	});
 };

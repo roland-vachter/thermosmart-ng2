@@ -2,7 +2,7 @@ import { ApplicationRef, EventEmitter, Injectable } from '@angular/core';
 import { Moment } from 'moment-timezone';
 import * as moment from 'moment-timezone';
 import { ServerUpdateService } from '../../shared/server-update.service';
-import { HeatingPlan, HeatingPower, ThermoInitUpdateData } from "../types/types";
+import { HeatingConditions, HeatingPlan, HeatingPower, ThermoInitUpdateData } from "../types/types";
 import { Temperature } from "../types/types";
 import { HeatingDefaultPlan } from "../types/types";
 import { HeatingPlanOverride } from "../types/types";
@@ -46,11 +46,12 @@ export class ThermoDataStoreService {
 	percentInDay: number = 0;
 	currentTime: string;
 	currentDate: Moment;
-	config: Record<string, Record<string, string | number>> = {};
+	config: Record<string, Record<string, string | number | boolean>> = {};
 	heatingPower: HeatingPower = {
 		status: false,
 		until: moment(Date.now() + 15 * 60 * 1000)
 	};
+	heatingConditions: HeatingConditions;
 	sensorRestartInProgress: boolean = false;
 	heatingPlanOverrides: HeatingPlanOverride[] = [];
 
@@ -219,6 +220,10 @@ export class ThermoDataStoreService {
 				status: data.heatingPower.status,
 				until: moment(data.heatingPower.until)
 			}
+		}
+
+		if (data.heatingConditions) {
+			this.heatingConditions = data.heatingConditions;
 		}
 
 		if (data.heatingPlanOverrides) {

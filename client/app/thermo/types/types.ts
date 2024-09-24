@@ -72,8 +72,19 @@ export interface HeatingPowerResponse {
 	};
 }
 
+
 export interface HeatingPower extends HeatingPowerBase {
 	until: Moment;
+}
+
+export interface HeatingConditions {
+  hasIncreasingTrend: boolean;
+  hasFavorableWeatherForecast: boolean;
+  hasWindowOpen: boolean;
+}
+
+export interface HeatingConditionsResponse {
+  heatingConditions: HeatingConditions;
 }
 
 export interface SensorResponse {
@@ -189,6 +200,7 @@ export interface ThermoInitUpdateData {
     status: boolean;
     until: string;
   };
+  heatingConditions?: HeatingConditions;
   targetTempId?: number;
   temperatures?: Temperature[];
   heatingPlans?: HeatingPlanInitUpdate[];

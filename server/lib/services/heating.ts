@@ -1,11 +1,12 @@
-import { getOutsideTemperature } from './outsideConditions';
+import { getOutsideConditions, getOutsideTemperature } from './outsideConditions';
 import heatingEvts from './heatingEvts';
 
-import { insideConditionsEvts, getSensors } from './insideConditions';
+import { insideConditionsEvts, getSensors, TemperatureDirection } from './insideConditions';
 import { getConfig } from './config';
 import { HydratedDocument } from 'mongoose';
 import { IConfig } from '../models/Config';
 import { getTargetTempByLocation } from './targetTemp';
+import moment from 'moment-timezone';
 
 interface Heating {
 	isOn: boolean;
@@ -17,9 +18,12 @@ interface Heating {
 	};
 	poweredOn: boolean;
 	hasWindowOpen: boolean;
+	hasIncreasingTrend: boolean;
+	hasFavorableWeatherForecast: boolean;
 	until?: Date;
 	suspendTimeout?: NodeJS.Timeout;
 	initialized: boolean;
+	shouldIgnoreHoldConditions: boolean;
 }
 
 const defaultValues: Heating = {
@@ -32,7 +36,10 @@ const defaultValues: Heating = {
 	},
 	poweredOn: true,
 	hasWindowOpen: false,
-	initialized: false
+	initialized: false,
+	hasIncreasingTrend: false,
+	hasFavorableWeatherForecast: false,
+	shouldIgnoreHoldConditions: false
 };
 const statusByLocation: Record<number, Heating> = {};
 
@@ -68,6 +75,13 @@ insideConditionsEvts.on('change', async (data) => {
 
 	locationStatus.hasWindowOpen = hasWindowOpen;
 	locationStatus.avgValues.temperature = locationStatus.avgValues.temperature / activeCount;
+
+	heatingEvts.emit('conditionStatusChange', {
+		hasIncreasingTrend: locationStatus.hasIncreasingTrend,
+		hasFavorableWeatherForecast: locationStatus.hasFavorableWeatherForecast,
+		hasWindowOpen: locationStatus.hasWindowOpen,
+		location
+	});
 
 	await updateHeatingStatusByLocation(location);
 });
@@ -137,6 +151,27 @@ export const togglePower = async (locationId: number) => {
 	await updateHeatingStatusByLocation(locationId);
 };
 
+export const getHeatingConditions = (locationId: number) => {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
+	return {
+		hasIncreasingTrend: locationStatus.hasIncreasingTrend,
+		hasFavorableWeatherForecast: locationStatus.hasFavorableWeatherForecast,
+		hasWindowOpen: locationStatus.hasWindowOpen,
+	};
+}
+
+export const ignoreHoldConditions = (locationId: number) => {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
+	locationStatus.shouldIgnoreHoldConditions = true;
+	locationStatus.hasIncreasingTrend = false;
+	locationStatus.hasFavorableWeatherForecast = false;
+	locationStatus.hasWindowOpen = false;
+}
+
 
 function turnHeatingOn (locationId: number) {
 	initLocation(locationId);
@@ -144,6 +179,7 @@ function turnHeatingOn (locationId: number) {
 
 	locationStatus.isOn = true;
 	locationStatus.lastStatusReadBySensor = false;
+	locationStatus.shouldIgnoreHoldConditions = false;
 }
 
 function turnHeatingOff (locationId: number) {
@@ -202,15 +238,52 @@ async function updateHeatingStatusByLocation (locationId: number) {
 		if (target) {
 			const sensors = getSensors(locationId);
 
-			if (!locationStatus.isOn && locationStatus.avgValues.temperature <= target.value - (switchThresholdBelow.value as number)) {
-				if (!locationStatus.isOn) {
-					console.log(`[${locationId}] sensor data`, locationId, JSON.stringify(sensors));
+			if (!locationStatus.isOn) {
+				let conditionToStart = locationStatus.avgValues.temperature <= target.value - (switchThresholdBelow.value as number);
+
+				const [temperatureTrendsFeature, weatherForecastFeature] = await Promise.all([
+					getConfig('temperatureTrendsFeature', locationId),
+					getConfig('weatherForecastFeature', locationId)
+				]);
+
+				if (temperatureTrendsFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
+					const sensorsWithIncreasingTemps = Object.keys(sensors).map(Number).filter(k => sensors[k].temperatureDirection === TemperatureDirection.increase);
+					if (sensorsWithIncreasingTemps?.length > Object.keys(sensors)?.length) {
+						conditionToStart = false;
+						locationStatus.hasIncreasingTrend = true;
+					} else {
+						locationStatus.hasIncreasingTrend = false;
+					}
+				} else {
+					locationStatus.hasIncreasingTrend = false;
 				}
-				turnHeatingOn(locationId);
+
+				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
+					if (target.value - locationStatus.avgValues.temperature < 0.3 &&
+						moment().valueOf() > getOutsideConditions().sunrise &&
+							(
+								getOutsideConditions().highestExpectedTemperature > locationStatus.avgValues.temperature ||
+								getOutsideConditions().sunshineNextConsecutiveHours >= 2
+							)
+						) {
+							conditionToStart = false;
+							locationStatus.hasFavorableWeatherForecast = true;
+					} else {
+						locationStatus.hasFavorableWeatherForecast = false;
+					}
+				}
+
+				heatingEvts.emit('conditionStatusChange', {
+					hasIncreasingTrend: locationStatus.hasIncreasingTrend,
+					hasFavorableWeatherForecast: locationStatus.hasFavorableWeatherForecast,
+					hasWindowOpen: locationStatus.hasWindowOpen,
+					location: locationId
+				});
+
+				if (conditionToStart) {
+					turnHeatingOn(locationId);
+				}
 			} else if (locationStatus.avgValues.temperature >= target.value + (switchThresholdAbove.value as number)) {
-				if (locationStatus.isOn) {
-					console.log(`[${locationId}] sensor data`, locationId, JSON.stringify(sensors));
-				}
 				turnHeatingOff(locationId);
 			}
 		} else {

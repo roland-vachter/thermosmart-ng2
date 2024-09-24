@@ -6,6 +6,16 @@ import { fetch } from '../utils/fetch';
 import { DAYTIME, OutsideConditions, WEATHER_TYPE } from '../types/outsideConditions';
 import { ErrorWithResponse } from '../types/generic';
 import TypedEmitter from 'typed-emitter';
+import moment from 'moment-timezone';
+
+interface Forecast {
+	dt: number;
+	temp: number;
+	clouds: number;
+	weather: {
+		main: string;
+	}[];
+}
 
 interface WeatherApiResponse {
 	current: {
@@ -17,7 +27,8 @@ interface WeatherApiResponse {
 			icon: string;
 			main: string;
 		}[];
-	}
+	};
+	hourly: Forecast[];
 }
 const lastValues: OutsideConditions = {} as OutsideConditions;
 
@@ -86,7 +97,7 @@ const weatherColorMapping: Record<DAYTIME, Record<WEATHER_TYPE, string>> = {
 
 async function update () {
 	try {
-		const resWeather = await fetch(`${process.env.WEATHER_API_URL}?appid=${process.env.WEATHER_API_KEY}&lat=${process.env.LOCATION_LAT}&lon=${process.env.LOCATION_LNG}&units=metric&exclude=minutely,hourly,daily,alerts`);
+		const resWeather = await fetch(`${process.env.WEATHER_API_URL}?appid=${process.env.WEATHER_API_KEY}&lat=${process.env.LOCATION_LAT}&lon=${process.env.LOCATION_LNG}&units=metric&exclude=minutely,daily,alerts`);
 
 		if (!resWeather.ok) {
 			const err = new ErrorWithResponse(resWeather.status.toString(), resWeather);
@@ -95,34 +106,56 @@ async function update () {
 
 		const jsonWeather: WeatherApiResponse = await resWeather.json() as WeatherApiResponse;
 
-		if (jsonWeather && jsonWeather.current) {
-			const temperature = jsonWeather.current.temp;
-			const humidity = jsonWeather.current.humidity;
-			const sunrise = jsonWeather.current.sunrise * 1000;
-			const sunset = jsonWeather.current.sunset * 1000;
-			const weatherType: WEATHER_TYPE = weatherTypeMapping[parseInt(jsonWeather.current.weather[0].icon.substring(0, 2), 10)];
+		if (jsonWeather) {
+			if (jsonWeather.current) {
+				const temperature = jsonWeather.current.temp;
+				const humidity = jsonWeather.current.humidity;
+				const sunrise = jsonWeather.current.sunrise * 1000;
+				const sunset = jsonWeather.current.sunset * 1000;
+				const weatherType: WEATHER_TYPE = weatherTypeMapping[parseInt(jsonWeather.current.weather[0].icon.substring(0, 2), 10)];
 
-			let daytime;
-			if (Date.now() > sunrise && Date.now() < sunset) {
-				daytime = DAYTIME.day;
-			} else {
-				daytime = DAYTIME.night;
+				let daytime;
+				if (Date.now() > sunrise && Date.now() < sunset) {
+					daytime = DAYTIME.day;
+				} else {
+					daytime = DAYTIME.night;
+				}
+
+				if (lastValues.temperature !== temperature
+						|| lastValues.humidity !== humidity
+						|| lastValues.weatherIconClass !== weatherIconClassMapping[daytime][weatherType]
+						|| lastValues.daytime !== daytime) {
+					lastValues.temperature = temperature;
+					lastValues.humidity = humidity;
+					lastValues.daytime = daytime;
+					lastValues.color = weatherColorMapping[daytime][weatherType];
+					lastValues.weatherDescription = jsonWeather.current.weather[0].main;
+					lastValues.weatherIconClass = weatherIconClassMapping[daytime][weatherType];
+					lastValues.backgroundImage = getBackgroundImage(weatherType, daytime);
+					lastValues.sunrise = sunrise;
+				}
 			}
 
-			if (lastValues.temperature !== temperature
-					|| lastValues.humidity !== humidity
-					|| lastValues.weatherIconClass !== weatherIconClassMapping[daytime][weatherType]
-					|| lastValues.daytime !== daytime) {
-				lastValues.temperature = temperature;
-				lastValues.humidity = humidity;
-				lastValues.daytime = daytime;
-				lastValues.color = weatherColorMapping[daytime][weatherType];
-				lastValues.weatherDescription = jsonWeather.current.weather[0].main;
-				lastValues.weatherIconClass = weatherIconClassMapping[daytime][weatherType];
-				lastValues.backgroundImage = getBackgroundImage(weatherType, daytime);
+			if (jsonWeather.hourly) {
+				const forecast: Forecast[] = [];
+				jsonWeather.hourly.forEach(h => {
+					if (h.dt <= moment().endOf('day').valueOf()) {
+						forecast.push(h);
+					}
+				});
 
-				outsideConditionsEvts.emit('change', lastValues);
+				lastValues.highestExpectedTemperature = forecast.reduce((acc, v) => v.temp > acc ? v.temp : acc, forecast.length && forecast[0].temp || 0);
+				lastValues.sunshineNextConsecutiveHours = forecast.reduce((acc, v) => {
+					if (v.weather[0].main === 'Clear' && acc.consecutive) {
+						acc.count++;
+					} else {
+						acc.consecutive = false;
+					}
+					return acc;
+				}, { count: 0, consecutive: true }).count;
 			}
+
+			outsideConditionsEvts.emit('change', lastValues);
 		}
 	} catch (e) {
 		console.error(e);

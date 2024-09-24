@@ -181,8 +181,31 @@
 	line-height: 1.7rem;
 	vertical-align: text-bottom;
 	position: absolute;
-    top: -4px;
-    left: 23px;
+	top: -4px;
+	left: 23px;
+}
+
+.thermo-heating--power-status-label {
+	font-size: 0.8rem;
+	line-height: 1.8rem;
+	vertical-align: text-bottom;
+	color: $white;
+	position: absolute;
+	top: -4px;
+	left: 20px;
+	width: 35px;
+	text-align: center;
+}
+
+.thermo-heating--condition {
+	font-size: 0.8rem;
+	line-height: 1.9rem;
+	vertical-align: text-bottom;
+	color: $white;
+	position: absolute;
+	top: -4px;
+	left: 57px;
+	text-align: center;
 }
 
 .thermo--inside,
@@ -208,7 +231,6 @@
 
 
 
-
 $switchTransition: .2s ease-out;
 
 .switch {
@@ -216,7 +238,7 @@ $switchTransition: .2s ease-out;
 	position: relative;
 	display: inline-block;
 	vertical-align: top;
-	width: 56px;
+	width: 76px;
 	height: 20px;
 	background-color: white;
 	border-radius: 18px;
@@ -277,6 +299,10 @@ $switchTransition: .2s ease-out;
 		&:before { opacity: 0; }
 		&:after { opacity: 1; }
 	}
+
+	.switch-input.on-hold ~ & {
+		background: $yellow;
+	}
 }
 
 .switch-handle {
@@ -306,7 +332,7 @@ $switchTransition: .2s ease-out;
 	}
 
 	.switch-input:checked ~ & {
-		left: 37px;
+		left: 57px;
 		box-shadow: -1px 1px 5px rgba(black, .2);
 	}
 }
