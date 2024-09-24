@@ -50,37 +50,6 @@
 
 	<div class="row">
 		<div class="col-12">
-			<h2>Smart features</h2>
-			
-			<div class="form-check form-switch">
-				<input class="form-check-input" type="checkbox" id="temperatureTrends" [ngModel]="temperatureTrendsFeature" (change)="toggleTemperatureTrendsFeature($event)">
-				<label class="form-check-label" for="temperatureTrends">
-					Temperature trends
-				</label>
-			</div>
-			<small>Prevents the start of the heating while at least 50% of the rooms have a natural increase of temperature (due to sun or other factors).</small>
-
-			<br><br>
-
-			<div class="form-check form-switch">
-				<input class="form-check-input" type="checkbox" id="weatherForecast" [ngModel]="weatherForecastFeature"  (change)="toggleWeatherForecastFeature($event)">
-				<label class="form-check-label" for="weatherForecast">
-					Weather forecast
-				</label>
-			</div>
-			<small>
-				Prevents the start of the heating if:
-				<ul>
-					<li>the forecasted maximum temperature is higher than the target temperature</li>
-					<li>in the current and next hour sunshine is expected</li>
-					<li>all conditions above have effect only if the difference between the current and target temperature is lower than 0.3C</li>
-				</ul>
-			</small>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-12">
 			<h2>Plan for the week</h2>
 			<div class="thermo-default-plans clearfix">
 				<div class="thermo-default-plans--plan" [ngClass]="{ 'thermo-default-plans--current-date': currentDayOfWeek === i + 1 }" *ngFor="let defaultPlan of dataStore.defaultHeatingPlans | slice:1; let i = index" (click)="changePlan(defaultPlan.dayOfWeek)">
@@ -95,6 +64,37 @@
 					<i class="{{dataStore.defaultHeatingPlans[0]?.plan?.iconClass}}"></i>
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+			<h2>Smart features</h2>
+			
+			<div class="form-check form-switch">
+				<input class="form-check-input" type="checkbox" id="temperatureTrends" [ngModel]="temperatureTrendsFeature" (change)="toggleTemperatureTrendsFeature($event)">
+				<label class="form-check-label label-center" for="temperatureTrends">
+					<i class="icon-temperature-arrow"></i> Temperature trends
+				</label>
+			</div>
+			<small>Prevents the start of the heating while at least 50% of the rooms have a natural increase of temperature (due to sun or other factors).</small>
+
+			<br><br>
+
+			<div class="form-check form-switch">
+				<input class="form-check-input" type="checkbox" id="weatherForecast" [ngModel]="weatherForecastFeature"  (change)="toggleWeatherForecastFeature($event)">
+				<label class="form-check-label label-center" for="weatherForecast">
+					<i class="icon-sun-icon"></i> Weather forecast
+				</label>
+			</div>
+			<small>
+				Prevents the start of the heating if:
+				<ul>
+					<li>the forecasted maximum temperature is higher than the target temperature</li>
+					<li>in the current and next hour sunshine is expected</li>
+					<li>all conditions above have effect only if the difference between the current and target temperature is lower than 0.3C</li>
+				</ul>
+			</small>
 		</div>
 	</div>
 

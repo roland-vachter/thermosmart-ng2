@@ -127,3 +127,12 @@
 .input-group-append button:first-child {
 	margin-right: 10px;
 }
+
+.label-center {
+	display: flex;
+	align-items: center;
+
+	i {
+		margin: 0 10px;
+	}
+}
