@@ -134,25 +134,25 @@ async function update () {
 					lastValues.backgroundImage = getBackgroundImage(weatherType, daytime);
 					lastValues.sunrise = sunrise;
 				}
-			}
 
-			if (jsonWeather.hourly) {
-				const forecast: Forecast[] = [];
-				jsonWeather.hourly.forEach(h => {
-					if (h.dt <= moment().endOf('day').valueOf()) {
-						forecast.push(h);
-					}
-				});
+				if (jsonWeather.hourly) {
+					const forecast: Forecast[] = [];
+					jsonWeather.hourly.forEach(h => {
+						if (h.dt <= moment().endOf('day').valueOf()) {
+							forecast.push(h);
+						}
+					});
 
-				lastValues.highestExpectedTemperature = forecast.reduce((acc, v) => v.temp > acc ? v.temp : acc, forecast.length && forecast[0].temp || 0);
-				lastValues.sunshineNextConsecutiveHours = forecast.reduce((acc, v) => {
-					if (v.weather[0].main === 'Clear' && acc.consecutive) {
-						acc.count++;
-					} else {
-						acc.consecutive = false;
-					}
-					return acc;
-				}, { count: 0, consecutive: true }).count;
+					lastValues.highestExpectedTemperature = forecast.reduce((acc, v) => v.temp > acc ? v.temp : acc, forecast.length && forecast[0].temp || 0);
+					lastValues.sunshineNextConsecutiveHours = forecast.reduce((acc, v) => {
+						if (v.weather[0].main === 'Clear' && acc.consecutive && v.dt < sunset) {
+							acc.count++;
+						} else {
+							acc.consecutive = false;
+						}
+						return acc;
+					}, { count: 0, consecutive: true }).count;
+				}
 			}
 
 			outsideConditionsEvts.emit('change', lastValues);
