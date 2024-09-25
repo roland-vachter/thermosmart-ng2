@@ -258,8 +258,8 @@ async function updateHeatingStatusByLocation (locationId: number) {
 					locationStatus.hasIncreasingTrend = false;
 				}
 
-				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
-					if (target.value - locationStatus.avgValues.temperature < 0.3 &&
+				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions &&
+						target.value - locationStatus.avgValues.temperature < 0.3 &&
 						moment().valueOf() > getOutsideConditions().sunrise &&
 							(
 								getOutsideConditions().highestExpectedTemperature > locationStatus.avgValues.temperature ||
@@ -268,9 +268,8 @@ async function updateHeatingStatusByLocation (locationId: number) {
 						) {
 							conditionToStart = false;
 							locationStatus.hasFavorableWeatherForecast = true;
-					} else {
-						locationStatus.hasFavorableWeatherForecast = false;
-					}
+				} else {
+					locationStatus.hasFavorableWeatherForecast = false;
 				}
 
 				heatingEvts.emit('conditionStatusChange', {
