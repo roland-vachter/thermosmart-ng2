@@ -248,7 +248,9 @@ async function updateHeatingStatusByLocation (locationId: number) {
 
 				if (temperatureTrendsFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
 					const sensorsWithIncreasingTemps = Object.keys(sensors).map(Number).filter(k => sensors[k].temperatureDirection === TemperatureDirection.increase);
-					if (sensorsWithIncreasingTemps?.length > Object.keys(sensors)?.length) {
+					console.log('sensorsWithIncreasingTemps', sensorsWithIncreasingTemps?.length, sensorsWithIncreasingTemps?.length >= Object.keys(sensors)?.length / 2);
+					if (sensorsWithIncreasingTemps?.length >= Object.keys(sensors)?.length / 2 &&
+							target.value - locationStatus.avgValues.temperature < 0.4) {
 						conditionToStart = false;
 						locationStatus.hasIncreasingTrend = true;
 					} else {
@@ -259,7 +261,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				}
 
 				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions &&
-						target.value - locationStatus.avgValues.temperature < 0.3 &&
+						target.value - locationStatus.avgValues.temperature < 0.4 &&
 						moment().valueOf() > getOutsideConditions().sunrise &&
 							(
 								getOutsideConditions().highestExpectedTemperature > locationStatus.avgValues.temperature ||
