@@ -90,9 +90,12 @@
 			<small>
 				Prevents the start of the heating if:
 				<ul>
-					<li>the forecasted maximum temperature is higher than the target temperature</li>
-					<li>in the current and next hour sunshine is expected</li>
-					<li>all conditions above have effect only if the difference between the current and target temperature is lower than 0.3C</li>
+					<li>if the difference between the current and target temperature is lower than 0.4C AND:</li>
+					<ul>
+						<li>the forecasted maximum temperature is higher than the target temperature</li>
+						<li>in the current and next hour sunshine is expected</li>
+					</ul>
+					<li>all sensor temperatures and target temperature are below the current outside temperature</li>
 				</ul>
 			</small>
 		</div>

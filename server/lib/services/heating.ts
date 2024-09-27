@@ -64,7 +64,7 @@ insideConditionsEvts.on('change', async (data) => {
 	let hasWindowOpen = false;
 
 	keys.forEach(key => {
-		if (sensors[key].active && sensors[key].enabled && (sensors[key].temperature || 0) > getOutsideTemperature()) {
+		if (sensors[key].active && sensors[key].enabled) {
 			locationStatus.avgValues.temperature += sensors[key].temperature;
 			locationStatus.avgValues.humidity += sensors[key].humidity;
 			activeCount++;
@@ -226,10 +226,15 @@ async function updateHeatingStatusByLocation (locationId: number) {
 			} as HydratedDocument<IConfig>;
 		}
 
-		if (Number.isNaN(locationStatus.avgValues.temperature) || !locationStatus.poweredOn || locationStatus.hasWindowOpen) {
+		if (!locationStatus.poweredOn || locationStatus.hasWindowOpen) {
 			console.log(`[${locationId}] turn off because of ` +
-				(Number.isNaN(locationStatus.avgValues.temperature) ? 'avgTemp NaN' :
-				(!locationStatus.poweredOn ? 'not power on' : 'has window open')));
+				(!locationStatus.poweredOn ? 'not power on' : 'has window open'));
+			turnHeatingOff(locationId);
+			return;
+		}
+
+		if (Number.isNaN(locationStatus.avgValues.temperature)) {
+			console.log(`[${locationId}] turn off because there are no sensors.`);
 			turnHeatingOff(locationId);
 			return;
 		}
@@ -248,7 +253,6 @@ async function updateHeatingStatusByLocation (locationId: number) {
 
 				if (temperatureTrendsFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
 					const sensorsWithIncreasingTemps = Object.keys(sensors).map(Number).filter(k => sensors[k].temperatureDirection === TemperatureDirection.increase);
-					console.log('sensorsWithIncreasingTemps', sensorsWithIncreasingTemps?.length, sensorsWithIncreasingTemps?.length >= Object.keys(sensors)?.length / 2);
 					if (sensorsWithIncreasingTemps?.length >= Object.keys(sensors)?.length / 2 &&
 							target.value - locationStatus.avgValues.temperature < 0.4) {
 						conditionToStart = false;
@@ -260,16 +264,22 @@ async function updateHeatingStatusByLocation (locationId: number) {
 					locationStatus.hasIncreasingTrend = false;
 				}
 
-				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions &&
-						target.value - locationStatus.avgValues.temperature < 0.4 &&
-						moment().valueOf() > getOutsideConditions().sunrise &&
-							(
-								getOutsideConditions().highestExpectedTemperature > locationStatus.avgValues.temperature ||
-								getOutsideConditions().sunshineNextConsecutiveHours >= 2
-							)
-						) {
-							conditionToStart = false;
-							locationStatus.hasFavorableWeatherForecast = true;
+				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
+					if (locationStatus.avgValues.temperature < getOutsideTemperature() && target?.value < getOutsideTemperature()) {
+						conditionToStart = false;
+						locationStatus.hasFavorableWeatherForecast = true;
+					} else if (target.value - locationStatus.avgValues.temperature < 0.4 &&
+							moment().valueOf() > getOutsideConditions().sunrise &&
+								(
+									getOutsideConditions().highestExpectedTemperature > locationStatus.avgValues.temperature ||
+									getOutsideConditions().sunshineNextConsecutiveHours >= 2
+								)
+							) {
+								conditionToStart = false;
+								locationStatus.hasFavorableWeatherForecast = true;
+					} else {
+						locationStatus.hasFavorableWeatherForecast = false;
+					}
 				} else {
 					locationStatus.hasFavorableWeatherForecast = false;
 				}
