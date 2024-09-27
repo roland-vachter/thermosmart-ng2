@@ -242,14 +242,19 @@ async function updateHeatingStatusByLocation (locationId: number) {
 		const target = getTargetTempByLocation(locationId);
 		if (target) {
 			const sensors = getSensors(locationId);
+			const [temperatureTrendsFeature, weatherForecastFeature] = await Promise.all([
+				getConfig('temperatureTrendsFeature', locationId),
+				getConfig('weatherForecastFeature', locationId)
+			]);
+
+			if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions &&
+					target?.value < getOutsideTemperature()) {
+				console.log(`[${locationId}] turn off because target temperature is below outside temperature.`);
+				turnHeatingOff(locationId);
+			}
 
 			if (!locationStatus.isOn) {
 				let conditionToStart = locationStatus.avgValues.temperature <= target.value - (switchThresholdBelow.value as number);
-
-				const [temperatureTrendsFeature, weatherForecastFeature] = await Promise.all([
-					getConfig('temperatureTrendsFeature', locationId),
-					getConfig('weatherForecastFeature', locationId)
-				]);
 
 				if (temperatureTrendsFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
 					const sensorsWithIncreasingTemps = Object.keys(sensors).map(Number).filter(k => sensors[k].temperatureDirection === TemperatureDirection.increase);
@@ -265,7 +270,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				}
 
 				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
-					if (locationStatus.avgValues.temperature < getOutsideTemperature() && target?.value < getOutsideTemperature()) {
+					if (target?.value < getOutsideTemperature()) {
 						conditionToStart = false;
 						locationStatus.hasFavorableWeatherForecast = true;
 					} else if (target.value - locationStatus.avgValues.temperature < 0.4 &&
