@@ -2,8 +2,6 @@
 @import '../../../../styles/icons/mixins';
 
 .thermo-inside {
-	font-size: 2.5rem;
-	line-height: 1.5rem;
 	font-weight: bold;
 }
 
@@ -12,7 +10,6 @@
 }
 
 .thermo-inside--temp-icon {
-	@include icon('thermometer6');
 	font-size: 1.8rem;
 	vertical-align: super;
 }
@@ -22,7 +19,6 @@
 }
 
 .thermo-inside--humi-icon {
-	@include icon('humidity');
 	font-size: 1.8rem;
 	vertical-align: super;
 }

@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
+import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 
 @Component({
 	selector: 'thermo-outside',
@@ -7,10 +8,8 @@ import { Component, Input } from '@angular/core';
 })
 export class OutsideComponent {
 
-	@Input() temperature: number;
-	@Input() humidity: number;
-	@Input() weatherIconClass: string;
-
-	constructor() { }
+	constructor(
+		public dataStore: ThermoDataStoreService
+	) { }
 
 }

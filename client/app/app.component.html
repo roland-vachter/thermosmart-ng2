@@ -29,6 +29,33 @@
 	</div>
 
 	<div class="mainContent container">
+		<thermo-outside></thermo-outside>
+
+		<div class="row">
+			<div class="col">
+				<div class="home-wrapper">
+					<div class="home">
+						<thermo-heating-status></thermo-heating-status>
+						<div class="inside-temperatures">
+							<thermo-inside></thermo-inside>
+						</div>
+						<ng-container *ngIf="hasFeature('security')">
+							<security-statuses></security-statuses>
+							<security></security>
+						</ng-container>
+						<img src="/assets/static/images/house.webp">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<thermo-sensor-list></thermo-sensor-list>
+			</div>
+		</div>
+	</div>
+
+	<!-- <div class="mainContent container">
 		<div class="row">
 			<div class="col-md col-12" *ngIf="hasFeature('security')">
 				<security class="align"></security>
@@ -50,5 +77,5 @@
 				<thermo-heating-current-plan></thermo-heating-current-plan>
 			</div>
 		</div>
-	</div>
+	</div> -->
 </ng-container>

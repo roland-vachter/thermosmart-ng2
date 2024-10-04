@@ -6,11 +6,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { RefreshEventService } from '../services/refresh-event.service';
 import { LocationService } from '../services/location.service';
 
-enum HEALTH {
-	OK = 'OK',
-	PARTIAL = 'PARTIAL',
-	FAIL = 'FAIL'
-}
+
 
 @Component({
 	selector: 'security',
@@ -19,17 +15,14 @@ enum HEALTH {
 })
 export class SecurityComponent implements OnInit {
 
-	HEALTH = HEALTH;
+	
 
 	status;
 	lastActivity;
 	lastArmedAt;
 	alarmTriggeredCount = 0;
 
-	cameraHealth: HEALTH = HEALTH.FAIL;
-	controllerHealth: HEALTH = HEALTH.FAIL;
-	keypadHealth: HEALTH = HEALTH.FAIL;
-	motionSensorHealth: HEALTH = HEALTH.FAIL;
+	
 
 	constructor
 		(
@@ -51,10 +44,6 @@ export class SecurityComponent implements OnInit {
 		this.lastActivity = null;
 		this.lastArmedAt = null;
 		this.alarmTriggeredCount = null;
-		this.cameraHealth = HEALTH.FAIL;
-		this.controllerHealth = HEALTH.FAIL;
-		this.keypadHealth = HEALTH.FAIL;
-		this.motionSensorHealth = HEALTH.FAIL;
 	}
 
 
@@ -86,22 +75,6 @@ export class SecurityComponent implements OnInit {
 
 			if (data.security.alarmTriggeredCount) {
 				this.alarmTriggeredCount = data.security.alarmTriggeredCount;
-			}
-
-			if (data.security.cameraHealth) {
-				this.cameraHealth = data.security.cameraHealth;
-			}
-
-			if (data.security.controllerHealth) {
-				this.controllerHealth = data.security.controllerHealth;
-			}
-
-			if (data.security.keypadHealth) {
-				this.keypadHealth = data.security.keypadHealth;
-			}
-
-			if (data.security.motionSensorHealth) {
-				this.motionSensorHealth = data.security.motionSensorHealth;
 			}
 		}
 	}

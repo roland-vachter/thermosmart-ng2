@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
+import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 
 @Component({
 	selector: 'thermo-inside',
@@ -7,9 +8,7 @@ import { Component, Input } from '@angular/core';
 })
 export class InsideComponent {
 
-	@Input() temperature: number;
-	@Input() humidity: number;
-
-	constructor() { }
-
+	constructor(
+		public dataStore: ThermoDataStoreService
+	) { }
 }

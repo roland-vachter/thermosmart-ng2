@@ -164,10 +164,10 @@ export class ThermoDataStoreService {
 				color: data.outside.color
 			}
 
-			if (data.outside.backgroundImage) {
-				document.body.style.backgroundImage =
-					document.body.style.backgroundImage.substring(0, document.body.style.backgroundImage.lastIndexOf('/') + 1) + data.outside.backgroundImage;
-			}
+			// if (data.outside.backgroundImage) {
+			// 	document.body.style.backgroundImage =
+			// 		document.body.style.backgroundImage.substring(0, document.body.style.backgroundImage.lastIndexOf('/') + 1) + data.outside.backgroundImage;
+			// }
 		}
 
 		if (typeof data.isHeatingOn === 'boolean') {

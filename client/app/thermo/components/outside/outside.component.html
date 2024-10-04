@@ -1,13 +1,13 @@
 <div class="thermo-outside">
-	<div class="thermo-outside--weather">
-		<i class="{{weatherIconClass}}"></i>
+	<div class="thermo-outside--weather color-{{ dataStore.outsideConditions.color }}">
+		<i class="{{ dataStore.outsideConditions.weatherIconClass }}"></i>
 	</div>
 
-	<div class="thermo-outside--value thermo-outside--temp">
-		{{temperature | integer}}<span class="decimal">.{{temperature | decimal}}</span>
+	<div class="thermo-outside--temp">
+		<temperature [value]="dataStore.outsideConditions.temperature" [withIcon]="true" [outside]="true"></temperature>
 	</div>
 
-	<div class="thermo-outside--value thermo-outside--humi">
-		{{humidity | integer}}
+	<div class="thermo-outside--humi">
+		<humidity [value]="dataStore.outsideConditions.humidity" [withIcon]="true"></humidity>
 	</div>
 </div>

@@ -1,19 +1,14 @@
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+) !default;
+
 @mixin respond-to($breakpoint) {
-	@if $breakpoint == "small" {
-		@media (min-width: $screen-sm-min) {
-			@content;
-		}
-	}
-
-	@else if $breakpoint == "medium" {
-		@media (min-width: $screen-md-min) {
-			@content;
-		}
-	}
-
-	@else if $breakpoint == "large" {
-		@media (min-width: $screen-lg-min) {
-			@content;
-		}
+	@media (min-width: map-get($grid-breakpoints, $breakpoint)) {
+		@content;
 	}
 }

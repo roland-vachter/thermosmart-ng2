@@ -2,25 +2,19 @@
 @import '../../../../styles/icons/mixins';
 
 .thermo-outside {
-	font-size: 1.7rem;
 	font-weight: bold;
+	display: flex;
+	justify-content: space-around;
 }
 
 .thermo-outside--temp {
 	color: $maroon;
-
-	@include icon('thermometer6');
 }
 
 .thermo-outside--humi {
 	color: $navy;
-	margin-bottom: 20px;
-
-	@include icon('humidity');
 }
 
 .thermo-outside--weather {
-	margin-bottom: 60px;
-	text-align: center;
 	font-size: 3.1rem;
 }

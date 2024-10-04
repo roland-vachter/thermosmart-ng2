@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import htmlParser, { Node } from 'node-html-parser';
 import fs from 'fs';
 import path from 'path';
-import { getOutsideConditions } from '../services/outsideConditions';
 
 const indexPath = __dirname.includes('dist') ? '../../../../dist/index.html' : '../../../dist/index.html';
 const indexHtml = fs.readFileSync(path.join(__dirname, indexPath)).toString();
@@ -30,7 +29,7 @@ if (titleEl) {
 // 	headEl.appendChild(htmlParser.parse('<link href="https://fonts.googleapis.com/css?family=Jura" rel="stylesheet"></link>'));
 // }
 
-const bodyEl = indexHtmlParsed.querySelector('body');
+// const bodyEl = indexHtmlParsed.querySelector('body');
 
 export default function (req: Request, res: Response) {
 	if (!req.isAuthenticated()) {
@@ -38,9 +37,9 @@ export default function (req: Request, res: Response) {
 		return;
 	}
 
-	if (bodyEl) {
-		bodyEl.setAttribute('style', `background-image: url(/assets/static/images/${getOutsideConditions()?.backgroundImage})`);
-	}
+	// if (bodyEl) {
+	// 	bodyEl.setAttribute('style', `background-image: url(/assets/static/images/${getOutsideConditions()?.backgroundImage})`);
+	// }
 
 	res.send(indexHtmlParsed.toString());
 };

@@ -1,4 +1,4 @@
-<div class="component thermo">
+<!-- <div class="component thermo">
     <div class="thermo-settings" dropdown>
         <button dropdownToggle id="optionsDropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></button>
         <div *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="optionsDropdown">
@@ -27,7 +27,7 @@
             <div class="thermo-inside--humi">
                 <humidity [value]="dataStore.insideConditions.humidity" [withIcon]="true"></humidity>
             </div>
-        </div>
+        </div> -->
         <div class="thermo-status--wrapper">
             <button type="button" class="thermo-target--button thermo-target--decrease" (click)="tempAdjust(-0.1)"></button>
             <button type="button" class="thermo-target--button thermo-target--increase" (click)="tempAdjust(0.1)"></button>
@@ -60,7 +60,7 @@
                 </div>
             </div>
         </div>
-        <div class="thermo--outside">
+        <!-- <div class="thermo--outside">
             <div class="thermo-outside--weather color-{{ dataStore.outsideConditions.color }}">
                 <i class="{{ dataStore.outsideConditions.weatherIconClass }}"></i>
             </div>
@@ -74,4 +74,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->

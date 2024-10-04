@@ -50,6 +50,8 @@ import { LocationService } from '../services/location.service';
 		HumidityComponent
 	],
 	exports: [
+		InsideComponent,
+		OutsideComponent,
 		HeatingStatusComponent,
 		ChangeHeatingPlanModalComponent,
 		ChangeSensorSettingsModalComponent,

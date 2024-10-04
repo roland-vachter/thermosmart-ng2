@@ -7,6 +7,7 @@ import { SecuritySettingsModalComponent } from './components/security-settings-m
 import { FormsModule } from '@angular/forms';
 import { RefreshEventService } from '../services/refresh-event.service';
 import { LocationService } from '../services/location.service';
+import { SecurityStatusesComponent } from './components/security-statuses/security-statuses.component';
 
 @NgModule({
 	imports: [
@@ -14,11 +15,13 @@ import { LocationService } from '../services/location.service';
 		FormsModule
 	],
 	exports: [
-		SecurityComponent
+		SecurityComponent,
+		SecurityStatusesComponent
 	],
 	declarations: [
 		SecurityComponent,
-		SecuritySettingsModalComponent
+		SecuritySettingsModalComponent,
+		SecurityStatusesComponent
 	],
 	providers: [
 		ServerApiService,
