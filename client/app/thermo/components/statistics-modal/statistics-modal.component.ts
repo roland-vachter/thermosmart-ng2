@@ -168,7 +168,6 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
-								borderWidth: 1,
 							});
 						}
 					}
