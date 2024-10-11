@@ -8,6 +8,7 @@ export interface IHeatingHoldConditionHistory {
 }
 
 export enum HeatingHoldConditionTypes {
+  POWERED_OFF = 'powered_off',
   INCREASING_TREND = 'increasing_trend',
   FAVORABLE_WEATHER_FORECAST = 'favorable_weather_forecast',
   WINDOW_OPEN = 'window_open'

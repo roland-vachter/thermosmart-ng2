@@ -640,6 +640,27 @@ export const initStatistics = () => {
 		}
 	});
 
+	heatingEvts.on('changeHeatingPower', async data => {
+		const result = await HeatingHoldConditionHistory
+			.findOne({
+				location: data.location,
+				type: HeatingHoldConditionTypes.POWERED_OFF
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec();
+
+		if (!result || result.status === data.poweredOn) {
+			await new HeatingHoldConditionHistory({
+				datetime: moment().toDate(),
+				location: data.location,
+				type: HeatingHoldConditionTypes.POWERED_OFF,
+				status: !data.poweredOn
+			}).save();
+		}
+	});
+
 	heatingEvts.on('conditionStatusChange', async data => {
 		const resultWeather = await HeatingHoldConditionHistory
 			.findOne({

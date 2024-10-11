@@ -157,7 +157,8 @@ export interface Statistics {
 export enum HeatingHoldConditionTypes {
   INCREASING_TREND = 'increasing_trend',
   FAVORABLE_WEATHER_FORECAST = 'favorable_weather_forecast',
-  WINDOW_OPEN = 'window_open'
+  WINDOW_OPEN = 'window_open',
+  POWERED_OFF = 'powered_off'
 }
 
 export enum DAYTIME {

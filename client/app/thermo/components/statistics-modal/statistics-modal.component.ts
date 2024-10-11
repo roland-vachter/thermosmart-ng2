@@ -65,6 +65,32 @@ export class StatisticsModalComponent implements OnInit {
 					}
 
 					if (response.data.heatingConditionsForToday) {
+						if (response.data.heatingConditionsForToday[HeatingHoldConditionTypes.POWERED_OFF]) {
+							datasets.push({
+								label: 'Power off',
+								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.POWERED_OFF].map(item => ({
+									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
+									y: item.status ? 5 : 0
+								})),
+								steppedLine: true,
+								backgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},0.4)`,
+								borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+								borderCapStyle: 'butt',
+								borderDash: [],
+								borderDashOffset: 0.0,
+								borderJoinStyle: 'miter',
+								pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+								pointBackgroundColor: "#fff",
+								pointBorderWidth: 1,
+								pointHoverRadius: 6,
+								pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+								pointHoverBorderColor: "rgba(220,220,220,1)",
+								pointHoverBorderWidth: 2,
+								pointRadius: 3,
+								pointHitRadius: 5,
+							});
+						}
+
 						if (response.data.heatingConditionsForToday[HeatingHoldConditionTypes.WINDOW_OPEN]) {
 							datasets.push({
 								label: 'Window open',
@@ -142,6 +168,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
+								borderWidth: 1,
 							});
 						}
 					}
@@ -188,7 +215,7 @@ export class StatisticsModalComponent implements OnInit {
 								yAxes: [{
 									ticks: {
 										callback: function(value) {
-											return value === 0 ? 'OFF' : value === 10 ? 'ON' : '';
+											return value === 0 ? 'OFF' : value === 5 ? 'ACTIVE' : value === 10 ? 'ON' : '';
 										},
 										fixedStepSize: 1,
 										min: 0,

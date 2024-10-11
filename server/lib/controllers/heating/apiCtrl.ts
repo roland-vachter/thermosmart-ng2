@@ -507,6 +507,7 @@ export const statistics = async (req: Request, res: Response) => {
 	}
 
 	const [lastHeatingHistory, heatingForToday, statisticsForLastMonth, statisticsByMonth, statisticsByYear, sensorTempHistory,
+		lastPowerOffHistory, powerOffForToday,
 		lastFavorableWeatherForecastHistory, favorableWeatherForecastForToday,
 		lastIncreasingTrendHistory, increasingTrendForToday,
 		lastWindowOpenHistory, windowOpenForToday
@@ -544,6 +545,28 @@ export const statistics = async (req: Request, res: Response) => {
 			})
 			.exec()
 			.then(result => result.filter(r => r.sensor.location === location._id)),
+
+		HeatingHoldConditionHistory
+			.findOne({
+				datetime: {
+					$lt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				type: HeatingHoldConditionTypes.POWERED_OFF,
+				location
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec(),
+		HeatingHoldConditionHistory
+			.find({
+				datetime: {
+					$gt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				type: HeatingHoldConditionTypes.POWERED_OFF,
+				location
+			})
+			.exec(),
 
 		HeatingHoldConditionHistory
 			.findOne({
@@ -621,6 +644,15 @@ export const statistics = async (req: Request, res: Response) => {
 		status: heatingForToday.length ? heatingForToday[heatingForToday.length - 1].status : false
 	} as HydratedDocument<IHeatingHistory>);
 
+	powerOffForToday.unshift({
+		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
+		status: lastPowerOffHistory ? lastPowerOffHistory.status : false
+	} as HydratedDocument<IHeatingHoldConditionHistory>);
+	powerOffForToday.push({
+		datetime: new Date(moment().tz(location.timezone).toISOString()),
+		status: powerOffForToday.length ? powerOffForToday[powerOffForToday.length - 1].status : false
+	} as HydratedDocument<IHeatingHoldConditionHistory>);
+
 	favorableWeatherForecastForToday.unshift({
 		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
 		status: lastFavorableWeatherForecastHistory ? lastFavorableWeatherForecastHistory.status : false
@@ -672,6 +704,7 @@ export const statistics = async (req: Request, res: Response) => {
 		data: {
 			heatingForToday,
 			heatingConditionsForToday: {
+				[HeatingHoldConditionTypes.POWERED_OFF]: powerOffForToday,
 				[HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST]: favorableWeatherForecastForToday,
 				[HeatingHoldConditionTypes.INCREASING_TREND]: increasingTrendForToday,
 				[HeatingHoldConditionTypes.WINDOW_OPEN]: windowOpenForToday

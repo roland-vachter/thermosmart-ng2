@@ -255,6 +255,10 @@ async function updateHeatingStatusByLocation (locationId: number) {
 
 		if (Number.isNaN(locationStatus.avgValues.temperature)) {
 			console.log(`[${locationId}] turn off because there are no sensors.`);
+			locationStatus.hasFavorableWeatherForecast = false;
+			locationStatus.hasIncreasingTrend = false;
+			locationStatus.hasWindowOpen = false;
+			emitConditionStatusChange(locationId);
 			turnHeatingOff(locationId);
 			return;
 		}
