@@ -12,11 +12,12 @@ interface ChangeHeatingPowerEvent {
 	until?: Date;
 }
 
-interface HeatingConditionStatus {
+export interface HeatingConditionStatus {
 	location: number;
 	hasIncreasingTrend: boolean;
 	hasFavorableWeatherForecast: boolean;
 	hasWindowOpen: boolean;
+	shouldIgnoreHoldConditions: boolean;
 }
 
 type HeatingEvents = {

@@ -9,6 +9,7 @@ import { getTargetTempByLocation } from './targetTemp';
 import moment, { Moment } from 'moment-timezone';
 import { HydratedDocument } from 'mongoose';
 import { toSameDateInUTC } from './timezoneConversion';
+import HeatingHoldConditionHistory, { HeatingHoldConditionTypes } from '../models/HeatingHoldConditionHistory';
 
 
 interface Total {
@@ -411,6 +412,21 @@ const saveStatisticsForADayByLocation = async (locationId: number) => {
 			.catch(e => {
 				console.error('Failed to cleanup target temp history with error:', e);
 			});
+
+		await HeatingHoldConditionHistory
+			.deleteMany({
+				location: locationId,
+				datetime: {
+					$lt: moment(currentDate).subtract(2, 'month').toDate()
+				}
+			})
+			.exec()
+			.then(result => {
+				console.log('Successfully cleaned up heating hold condition history, deleted count:', result.deletedCount);
+			})
+			.catch(e => {
+				console.error('Failed to cleanup heating hold condition history with error:', e);
+			});
 	}
 };
 
@@ -620,6 +636,65 @@ export const initStatistics = () => {
 				datetime: moment().toDate(),
 				location: data.location,
 				status: data.isOn
+			}).save();
+		}
+	});
+
+	heatingEvts.on('conditionStatusChange', async data => {
+		const resultWeather = await HeatingHoldConditionHistory
+			.findOne({
+				location: data.location,
+				type: HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec();
+
+		if (!resultWeather || resultWeather.status !== data.hasFavorableWeatherForecast) {
+			await new HeatingHoldConditionHistory({
+				datetime: moment().toDate(),
+				location: data.location,
+				type: HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST,
+				status: data.hasFavorableWeatherForecast
+			}).save();
+		}
+
+		const resultTrend = await HeatingHoldConditionHistory
+			.findOne({
+				location: data.location,
+				type: HeatingHoldConditionTypes.INCREASING_TREND
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec();
+
+		if (!resultTrend || resultTrend.status !== data.hasIncreasingTrend) {
+			await new HeatingHoldConditionHistory({
+				datetime: moment().toDate(),
+				location: data.location,
+				type: HeatingHoldConditionTypes.INCREASING_TREND,
+				status: data.hasIncreasingTrend
+			}).save();
+		}
+
+		const resultWindow = await HeatingHoldConditionHistory
+			.findOne({
+				location: data.location,
+				type: HeatingHoldConditionTypes.WINDOW_OPEN
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec();
+
+		if (!resultWindow || resultWindow.status !== data.hasWindowOpen) {
+			await new HeatingHoldConditionHistory({
+				datetime: moment().toDate(),
+				location: data.location,
+				type: HeatingHoldConditionTypes.WINDOW_OPEN,
+				status: data.hasWindowOpen
 			}).save();
 		}
 	});

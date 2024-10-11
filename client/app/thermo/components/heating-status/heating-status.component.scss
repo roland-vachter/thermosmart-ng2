@@ -337,3 +337,23 @@ $switchTransition: .2s ease-out;
 		box-shadow: -1px 1px 5px rgba(black, .2);
 	}
 }
+
+
+.smart-features-ignored {
+	position: absolute;
+	top: 27px;
+	right: 13px;
+	color: $red;
+	font-size: 18px;
+
+	&:hover {
+		cursor: pointer;
+	}
+
+	.ignore {
+		position: absolute;
+    top: -5px;
+    left: 3px;
+    font-size: 29px;
+	}
+}

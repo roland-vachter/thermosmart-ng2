@@ -33,20 +33,24 @@
             <button type="button" class="thermo-target--button thermo-target--increase" (click)="tempAdjust(0.1)"></button>
             <div class="thermo-status" [ngClass]="{ 'thermo-status--idle': !dataStore.heatingStatus, 'thermo-status--heating': dataStore.heatingStatus }">                
                 <div class="thermo-heating--power">
-                    <label class="switch">
-                        <input type="checkbox" class="switch-input" [ngClass]="{'on-hold': onHold && dataStore.heatingPower.status}" [checked]="dataStore.heatingPower.status && !onHold" (change)="toggleStatus()">
-                        <span class="switch-label" data-on=" " data-off=" "></span>
-                        <span class="switch-handle"></span>
-                        <span class="thermo-heating--power-counter">{{timerString}}</span>
-                        <span class="thermo-heating--power-status-label" *ngIf="dataStore.heatingPower.status">
-                          {{ onHold ? 'Hold' : 'On' }}
-                        </span>
-                        <span class="thermo-heating--condition" *ngIf="onHold && dataStore.heatingPower.status">
-                          <i class="icon-window-open-icon" *ngIf="dataStore.heatingConditions.hasWindowOpen"></i>
-                          <i class="icon-temperature-arrow" *ngIf="!dataStore.heatingConditions.hasWindowOpen && dataStore.heatingConditions.hasIncreasingTrend"></i>
-                          <i class="icon-sun-icon" *ngIf="!dataStore.heatingConditions.hasWindowOpen && !dataStore.heatingConditions.hasIncreasingTrend && dataStore.heatingConditions.hasFavorableWeatherForecast"></i>
-                        </span>
-                    </label>
+                  <div class="smart-features-ignored" title="End ignoring smart features" (click)="endIgnoringSmartFeatures()" *ngIf="dataStore?.heatingConditions?.shouldIgnoreHoldConditions">
+                    <i class="icon-temperature-arrow"></i>
+                    <div class="ignore">/</div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" class="switch-input" [ngClass]="{'on-hold': onHold && dataStore.heatingPower.status}" [checked]="dataStore.heatingPower.status && !onHold" (change)="toggleStatus()">
+                    <span class="switch-label" data-on=" " data-off=" "></span>
+                    <span class="switch-handle"></span>
+                    <span class="thermo-heating--power-counter">{{timerString}}</span>
+                    <span class="thermo-heating--power-status-label" *ngIf="dataStore.heatingPower.status">
+                      {{ onHold ? 'Hold' : 'On' }}
+                    </span>
+                    <span class="thermo-heating--condition" *ngIf="onHold && dataStore.heatingPower.status">
+                      <i class="icon-window-open-icon" *ngIf="dataStore.heatingConditions.hasWindowOpen"></i>
+                      <i class="icon-temperature-arrow" *ngIf="!dataStore.heatingConditions.hasWindowOpen && dataStore.heatingConditions.hasIncreasingTrend"></i>
+                      <i class="icon-sun-icon" *ngIf="!dataStore.heatingConditions.hasWindowOpen && !dataStore.heatingConditions.hasIncreasingTrend && dataStore.heatingConditions.hasFavorableWeatherForecast"></i>
+                    </span>
+                  </label>
                 </div>
 
                 <div class="thermo-target--value color-{{ dataStore.temperatures[dataStore.targetTempId]?.color }}">

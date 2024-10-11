@@ -10,7 +10,7 @@ import { getAllConfigs } from '../../services/config';
 import { getOutsideConditions } from '../../services/outsideConditions';
 import { changeSensorSettings as insideConditionsChangeSensorSettings, getLocationBySensorId, getSensors, disableSensorWindowOpen as insideConditionsDisableSensorWindowOpen,
 	setSensorInput, toggleSensorStatus as insideConditionsToggleSensorStatus } from '../../services/insideConditions';
-import { getHeatingConditions, getPowerStatus, ignoreHoldConditions, isHeatingOn, togglePower } from '../../services/heating';
+import { endIgnoringHoldConditions, getHeatingConditions, getPowerStatus, ignoreHoldConditions, isHeatingOn, togglePower } from '../../services/heating';
 import moment from 'moment-timezone';
 import { getRestartStatus, initiateRestart } from '../../services/restartSensor';
 import { isNumber } from '../../utils/utils';
@@ -19,6 +19,7 @@ import HeatingHistory, { IHeatingHistory } from '../../models/HeatingHistory';
 import HeatingSensorHistory, { IHeatingSensorHistory } from '../../models/HeatingSensorHistory';
 import { HydratedDocument } from 'mongoose';
 import Location from '../../models/Location';
+import HeatingHoldConditionHistory, { HeatingHoldConditionTypes, IHeatingHoldConditionHistory } from '../../models/HeatingHoldConditionHistory';
 
 
 type HeatingHistoryWithSensor = HydratedDocument<IHeatingSensorHistory & { sensor: ISensorSetting }>;
@@ -356,6 +357,26 @@ export const ignoreHeatingHoldConditions = (req: Request, res: Response) => {
 	});
 };
 
+export const endIgnoringHeatingHoldConditions = (req: Request, res: Response) => {
+	if (!isNumber(req.body.location)) {
+		return res.status(400).json({
+			status: RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	const location = parseInt(req.body.location, 10);
+
+	endIgnoringHoldConditions(location);
+
+	res.json({
+		status: 'ok',
+		data: {
+			heatingConditions: getHeatingConditions(location)
+		}
+	});
+};
+
 export const disableSensorWindowOpen = (req: Request, res: Response) => {
 	if (!isNumber(req.body.location)) {
 		return res.status(400).json({
@@ -485,7 +506,11 @@ export const statistics = async (req: Request, res: Response) => {
 		});
 	}
 
-	const [lastHeatingHistory, statisticsForToday, statisticsForLastMonth, statisticsByMonth, statisticsByYear, sensorTempHistory] = await Promise.all([
+	const [lastHeatingHistory, heatingForToday, statisticsForLastMonth, statisticsByMonth, statisticsByYear, sensorTempHistory,
+		lastFavorableWeatherForecastHistory, favorableWeatherForecastForToday,
+		lastIncreasingTrendHistory, increasingTrendForToday,
+		lastWindowOpenHistory, windowOpenForToday
+	] = await Promise.all([
 		HeatingHistory
 			.findOne({
 				datetime: {
@@ -518,17 +543,110 @@ export const statistics = async (req: Request, res: Response) => {
 				path: 'sensor'
 			})
 			.exec()
-			.then(result => result.filter(r => r.sensor.location === location._id))
+			.then(result => result.filter(r => r.sensor.location === location._id)),
+
+		HeatingHoldConditionHistory
+			.findOne({
+				datetime: {
+					$lt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				type: HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST,
+				location
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec(),
+		HeatingHoldConditionHistory
+			.find({
+				datetime: {
+					$gt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				type: HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST,
+				location
+			})
+			.exec(),
+
+		HeatingHoldConditionHistory
+			.findOne({
+				datetime: {
+					$lt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				type: HeatingHoldConditionTypes.INCREASING_TREND,
+				location
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec(),
+		HeatingHoldConditionHistory
+			.find({
+				datetime: {
+					$gt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				type: HeatingHoldConditionTypes.INCREASING_TREND,
+				location
+			})
+			.exec(),
+
+		HeatingHoldConditionHistory
+			.findOne({
+				datetime: {
+					$lt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				type: HeatingHoldConditionTypes.WINDOW_OPEN,
+				location
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec(),
+		HeatingHoldConditionHistory
+			.find({
+				datetime: {
+					$gt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				type: HeatingHoldConditionTypes.WINDOW_OPEN,
+				location
+			})
+			.exec(),
 	]);
 
-	statisticsForToday.unshift({
+	heatingForToday.unshift({
 		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
 		status: lastHeatingHistory ? lastHeatingHistory.status : false
 	} as HydratedDocument<IHeatingHistory>);
-	statisticsForToday.push({
+	heatingForToday.push({
 		datetime: new Date(moment().tz(location.timezone).toISOString()),
-		status: statisticsForToday.length ? statisticsForToday[statisticsForToday.length - 1].status : false
+		status: heatingForToday.length ? heatingForToday[heatingForToday.length - 1].status : false
 	} as HydratedDocument<IHeatingHistory>);
+
+	favorableWeatherForecastForToday.unshift({
+		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
+		status: lastFavorableWeatherForecastHistory ? lastFavorableWeatherForecastHistory.status : false
+	} as HydratedDocument<IHeatingHoldConditionHistory>);
+	favorableWeatherForecastForToday.push({
+		datetime: new Date(moment().tz(location.timezone).toISOString()),
+		status: favorableWeatherForecastForToday.length ? favorableWeatherForecastForToday[favorableWeatherForecastForToday.length - 1].status : false
+	} as HydratedDocument<IHeatingHoldConditionHistory>);
+
+	increasingTrendForToday.unshift({
+		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
+		status: lastIncreasingTrendHistory ? lastIncreasingTrendHistory.status : false
+	} as HydratedDocument<IHeatingHoldConditionHistory>);
+	increasingTrendForToday.push({
+		datetime: new Date(moment().tz(location.timezone).toISOString()),
+		status: increasingTrendForToday.length ? increasingTrendForToday[increasingTrendForToday.length - 1].status : false
+	} as HydratedDocument<IHeatingHoldConditionHistory>);
+
+	windowOpenForToday.unshift({
+		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
+		status: lastWindowOpenHistory ? lastWindowOpenHistory.status : false
+	} as HydratedDocument<IHeatingHoldConditionHistory>);
+	windowOpenForToday.push({
+		datetime: new Date(moment().tz(location.timezone).toISOString()),
+		status: windowOpenForToday.length ? windowOpenForToday[windowOpenForToday.length - 1].status : false
+	} as HydratedDocument<IHeatingHoldConditionHistory>);
 
 	const lastHistoryBySensor: HeatingHistoryWithSensor[] = [];
 	sensorTempHistory.forEach(sth => {
@@ -552,7 +670,12 @@ export const statistics = async (req: Request, res: Response) => {
 	return res.json({
 		status: 'ok',
 		data: {
-			statisticsForToday,
+			heatingForToday,
+			heatingConditionsForToday: {
+				[HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST]: favorableWeatherForecastForToday,
+				[HeatingHoldConditionTypes.INCREASING_TREND]: increasingTrendForToday,
+				[HeatingHoldConditionTypes.WINDOW_OPEN]: windowOpenForToday
+			},
 			statisticsForLastMonth,
 			statisticsByMonth,
 			statisticsByYear,

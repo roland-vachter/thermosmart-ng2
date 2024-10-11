@@ -41,6 +41,10 @@ export class ThermoServerApiService {
 		return this.http.post<ApiResult<HeatingConditionsResponse>>('/api/ignoreholdconditions', { location: this.locationService.getSelectedLocationId() });
 	}
 
+	endIgnoringHoldConditions(): Observable<ApiResult<HeatingConditionsResponse>> {
+		return this.http.post<ApiResult<HeatingConditionsResponse>>('/api/endignoringholdconditions', { location: this.locationService.getSelectedLocationId() });
+	}
+
 	toggleSensorStatus (id: number) {
 		return this.http.post<ApiResult<SensorResponse>>('/api/togglesensorstatus', {
 			id,

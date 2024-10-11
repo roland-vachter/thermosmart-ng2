@@ -5,6 +5,8 @@ import moment from 'moment';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { TimezoneService } from '../../../shared/services/timezone.service';
 import { LocationService } from '../../../services/location.service';
+import { HeatingHoldConditionTypes } from '../../types/types';
+import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 
 @Component({
 	selector: 'app-statistics-modal',
@@ -25,6 +27,7 @@ export class StatisticsModalComponent implements OnInit {
 		private serverApiService: ThermoServerApiService,
 		private timezoneService: TimezoneService,
 		private locationService: LocationService,
+		private dataStore: ThermoDataStoreService,
 		public bsModalRef: BsModalRef
 	) { }
 
@@ -33,33 +36,120 @@ export class StatisticsModalComponent implements OnInit {
 
 		this.serverApiService.statistics().subscribe(response => {
 			if (response.data) {
-				if (response.data.statisticsForToday) {
-					new Chart(document.querySelector('#heatingHistoryChart'), {
-						type: 'line',
-						data: {
-							datasets: [{
-								label: 'Heating status',
-								data: response.data.statisticsForToday.map(item => ({
+				if (response.data.heatingForToday || response.data.heatingConditionsForToday) {
+					const datasets = [];
+					if (response.data.heatingForToday) {
+						datasets.push({
+							label: 'Heating status',
+							data: response.data.heatingForToday.map(item => ({
+								x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
+								y: item.status ? 10 : 0
+							})),
+							steppedLine: true,
+							backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
+							borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+							borderCapStyle: 'butt',
+							borderDash: [],
+							borderDashOffset: 0.0,
+							borderJoinStyle: 'miter',
+							pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+							pointBackgroundColor: "#fff",
+							pointBorderWidth: 1,
+							pointHoverRadius: 6,
+							pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+							pointHoverBorderColor: "rgba(220,220,220,1)",
+							pointHoverBorderWidth: 2,
+							pointRadius: 3,
+							pointHitRadius: 5,
+						});
+					}
+
+					if (response.data.heatingConditionsForToday) {
+						if (response.data.heatingConditionsForToday[HeatingHoldConditionTypes.WINDOW_OPEN]) {
+							datasets.push({
+								label: 'Window open',
+								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.WINDOW_OPEN].map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
-									y: item.status ? 10 : 0
+									y: item.status ? 5 : 0
 								})),
 								steppedLine: true,
-								backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
-								borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+								backgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},0.4)`,
+								borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+								pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+								pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
-							}]
+							});
+						}
+
+						if (this.dataStore.config.weatherForecastFeature &&
+								response.data.heatingConditionsForToday[HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST]) {
+							datasets.push({
+								label: 'Favorable weather',
+								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST].map(item => ({
+									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
+									y: item.status ? 5 : 0
+								})),
+								steppedLine: true,
+								backgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},0.4)`,
+								borderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								borderCapStyle: 'butt',
+								borderDash: [],
+								borderDashOffset: 0.0,
+								borderJoinStyle: 'miter',
+								pointBorderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointBackgroundColor: "#fff",
+								pointBorderWidth: 1,
+								pointHoverRadius: 6,
+								pointHoverBackgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointHoverBorderColor: "rgba(220,220,220,1)",
+								pointHoverBorderWidth: 2,
+								pointRadius: 3,
+								pointHitRadius: 5,
+							});
+						}
+
+						if (this.dataStore.config.temperatureTrendsFeature &&
+								response.data.heatingConditionsForToday[HeatingHoldConditionTypes.INCREASING_TREND]) {
+							datasets.push({
+								label: 'Increasing trend',
+								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.INCREASING_TREND].map(item => ({
+									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
+									y: item.status ? 5 : 0
+								})),
+								steppedLine: true,
+								backgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},0.4)`,
+								borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+								borderCapStyle: 'butt',
+								borderDash: [],
+								borderDashOffset: 0.0,
+								borderJoinStyle: 'miter',
+								pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+								pointBackgroundColor: "#fff",
+								pointBorderWidth: 1,
+								pointHoverRadius: 6,
+								pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+								pointHoverBorderColor: "rgba(220,220,220,1)",
+								pointHoverBorderWidth: 2,
+								pointRadius: 3,
+								pointHitRadius: 5,
+							});
+						}
+					}
+
+					new Chart(document.querySelector('#heatingHistoryChart'), {
+						type: 'line',
+						data: {
+							datasets
 						},
 						options: {
 							maintainAspectRatio: false,
@@ -67,7 +157,7 @@ export class StatisticsModalComponent implements OnInit {
 							tooltips: {
 								callbacks: {
 									label: function(tooltipItem, data) {
-										if (tooltipItem.yLabel === 10) {
+										if (tooltipItem.yLabel > 0) {
 											return `${data.datasets[tooltipItem.datasetIndex].label}: ON`;
 										} else {
 											return `${data.datasets[tooltipItem.datasetIndex].label}: OFF`;

@@ -128,4 +128,10 @@ export class HeatingStatusComponent implements OnInit {
 			});
 		}
 	}
+
+	endIgnoringSmartFeatures() {
+		this.serverApiService.endIgnoringHoldConditions().subscribe(res => {
+			this.dataStore.handleServerData(res?.data);
+		});
+	}
 }

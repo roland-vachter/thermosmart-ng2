@@ -134,12 +134,30 @@ export interface HeatingHistory {
   status: boolean;
 }
 
+export interface HeatingHoldConditionHistory {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: string;
+  datetime: string;
+  location: number;
+  status: boolean;
+  type: HeatingHoldConditionTypes
+}
+
 export interface Statistics {
   sensorTempHistory: SensorTempHistory[];
   statisticsByYear: StatisticsByYear[];
   statisticsByMonth: StatisticsByMonth[];
   statisticsForLastMonth: StatisticsByDay[];
-  statisticsForToday: HeatingHistory[];
+  heatingForToday: HeatingHistory[];
+  heatingConditionsForToday: {
+    [key: string]: HeatingHoldConditionHistory[]
+  }
+}
+
+export enum HeatingHoldConditionTypes {
+  INCREASING_TREND = 'increasing_trend',
+  FAVORABLE_WEATHER_FORECAST = 'favorable_weather_forecast',
+  WINDOW_OPEN = 'window_open'
 }
 
 export enum DAYTIME {
