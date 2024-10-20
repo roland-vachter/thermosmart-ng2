@@ -279,6 +279,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 
 			if (!locationStatus.isOn) {
 				let conditionToStart = locationStatus.avgValues.temperature <= target.value - (switchThresholdBelow.value as number);
+				console.log(`[${locationId}] target temp condition ${conditionToStart}`);
 
 				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
 					if (target?.value < getOutsideTemperature()) {
@@ -312,6 +313,8 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				} else {
 					locationStatus.hasIncreasingTrend = false;
 				}
+
+				console.log(`[${locationId}] condition to start ${conditionToStart}`);
 
 				emitConditionStatusChange(locationId);
 
