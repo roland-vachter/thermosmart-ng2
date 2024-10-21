@@ -170,13 +170,13 @@ export const ignoreHoldConditions = (locationId: number) => {
 	emitConditionStatusChange(locationId);
 }
 
-export const endIgnoringHoldConditions = (locationId: number) => {
+export const endIgnoringHoldConditions = async (locationId: number) => {
 	initLocation(locationId);
 	const locationStatus = statusByLocation[locationId];
 
 	locationStatus.shouldIgnoreHoldConditions = false;
 
-	emitConditionStatusChange(locationId);
+	await updateHeatingStatusByLocation(locationId);
 }
 
 

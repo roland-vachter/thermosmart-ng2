@@ -357,7 +357,7 @@ export const ignoreHeatingHoldConditions = (req: Request, res: Response) => {
 	});
 };
 
-export const endIgnoringHeatingHoldConditions = (req: Request, res: Response) => {
+export const endIgnoringHeatingHoldConditions = async (req: Request, res: Response) => {
 	if (!isNumber(req.body.location)) {
 		return res.status(400).json({
 			status: RESPONSE_STATUS.ERROR,
@@ -367,7 +367,7 @@ export const endIgnoringHeatingHoldConditions = (req: Request, res: Response) =>
 
 	const location = parseInt(req.body.location, 10);
 
-	endIgnoringHoldConditions(location);
+	await endIgnoringHoldConditions(location);
 
 	res.json({
 		status: 'ok',
