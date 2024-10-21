@@ -47,8 +47,8 @@
                     </span>
                     <span class="thermo-heating--condition" *ngIf="onHold && dataStore.heatingPower.status">
                       <i class="icon-window-open-icon" *ngIf="dataStore.heatingConditions.hasWindowOpen"></i>
-                      <i class="icon-temperature-arrow" *ngIf="!dataStore.heatingConditions.hasWindowOpen && dataStore.heatingConditions.hasIncreasingTrend"></i>
-                      <i class="icon-sun-icon" *ngIf="!dataStore.heatingConditions.hasWindowOpen && !dataStore.heatingConditions.hasIncreasingTrend && dataStore.heatingConditions.hasFavorableWeatherForecast"></i>
+                      <i class="icon-sun-icon" *ngIf="!dataStore.heatingConditions.hasWindowOpen && dataStore.heatingConditions.hasFavorableWeatherForecast"></i>
+                      <i class="icon-temperature-arrow" *ngIf="!dataStore.heatingConditions.hasWindowOpen && !dataStore.heatingConditions.hasFavorableWeatherForecast && dataStore.heatingConditions.hasIncreasingTrend"></i>
                     </span>
                   </label>
                 </div>
