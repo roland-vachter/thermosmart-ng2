@@ -154,6 +154,7 @@ export const getHeatingConditions = (locationId: number) => {
 		hasIncreasingTrend: locationStatus.hasIncreasingTrend,
 		hasFavorableWeatherForecast: locationStatus.hasFavorableWeatherForecast,
 		hasWindowOpen: locationStatus.hasWindowOpen,
+		shouldIgnoreHoldConditions: locationStatus.shouldIgnoreHoldConditions
 	};
 }
 
