@@ -162,8 +162,12 @@ async function update () {
 	};
 }
 
-export const getOutsideConditions = () => {
-	return lastValues;
+export const getOutsideConditions = (): OutsideConditions => {
+	const sunrise = lastValues?.sunrise ? moment(lastValues?.sunrise) : null;
+	return {
+		...lastValues,
+		sunrise: sunrise ? moment().hour(sunrise.hour()).minute(sunrise.minute()).valueOf() : null
+	};
 };
 
 export const outsideConditionsEvts = new EventEmitter() as TypedEmitter<{ change: (o: OutsideConditions) => void }>;

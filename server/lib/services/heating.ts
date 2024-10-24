@@ -285,8 +285,8 @@ async function updateHeatingStatusByLocation (locationId: number) {
 					if (target?.value < getOutsideTemperature()) {
 						conditionToStart = false;
 						locationStatus.hasFavorableWeatherForecast = true;
-					} else if (target.value - locationStatus.avgValues.temperature < 0.4 &&
-							moment().valueOf() > getOutsideConditions().sunrise &&
+					} else if (target.value - locationStatus.avgValues.temperature - (switchThresholdBelow.value as number) < 0.4 &&
+							getOutsideConditions().sunrise && moment().valueOf() > getOutsideConditions().sunrise &&
 								(
 									getOutsideConditions().highestExpectedTemperature > locationStatus.avgValues.temperature ||
 									getOutsideConditions().sunshineNextConsecutiveHours >= 2
