@@ -308,6 +308,30 @@ export class StatisticsModalComponent implements OnInit {
 								pointRadius: 3,
 								pointHitRadius: 5,
 								fill: false,
+							}, {
+								label: 'Avg sunshine a day',
+								yAxisID: "duration2",
+								data: [
+									...response.data.statisticsForLastMonth.map(item => ({
+										x: moment(item.date).startOf('day'),
+										y: item.sunshineMinutes
+									}))
+								],
+								backgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},0.4)`,
+								borderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								borderCapStyle: 'butt',
+								borderDash: [],
+								borderDashOffset: 0.0,
+								borderJoinStyle: 'miter',
+								pointBorderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointBackgroundColor: "#fff",
+								pointBorderWidth: 1,
+								pointHoverRadius: 6,
+								pointHoverBackgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointHoverBorderColor: "rgba(220,220,220,1)",
+								pointHoverBorderWidth: 2,
+								pointRadius: 3,
+								pointHitRadius: 5,
 							}]
 						},
 						options: {
@@ -320,6 +344,7 @@ export class StatisticsModalComponent implements OnInit {
 									label: function(tooltipItem, data) {
 										switch (tooltipItem.datasetIndex) {
 											case 0:
+											case 3:
 												let str = '';
 												const duration = moment.duration(tooltipItem.yLabel * 60 * 1000);
 
@@ -356,6 +381,22 @@ export class StatisticsModalComponent implements OnInit {
 								}],
 								yAxes: [{
 									id: "duration",
+									ticks: {
+										callback: value => {
+											let str = '';
+
+											const duration = moment.duration(value * 60 * 1000);
+
+											str += `${duration.hours() || 0}h `;
+											str += `${duration.minutes() || 0}m`;
+
+											return str.trim();
+										},
+										fixedStepSize: 60,
+										min: 0
+									}
+								}, {
+									id: "duration2",
 									ticks: {
 										callback: value => {
 											let str = '';
@@ -467,6 +508,30 @@ export class StatisticsModalComponent implements OnInit {
 								pointRadius: 3,
 								pointHitRadius: 5,
 								fill: false,
+							}, {
+								label: 'Avg sunshine a day',
+								yAxisID: "duration2",
+								data: [
+									...response.data.statisticsForLastMonth.map(item => ({
+										x: moment(item.date).startOf('month'),
+										y: item.sunshineMinutes
+									}))
+								],
+								backgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},0.4)`,
+								borderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								borderCapStyle: 'butt',
+								borderDash: [],
+								borderDashOffset: 0.0,
+								borderJoinStyle: 'miter',
+								pointBorderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointBackgroundColor: "#fff",
+								pointBorderWidth: 1,
+								pointHoverRadius: 6,
+								pointHoverBackgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointHoverBorderColor: "rgba(220,220,220,1)",
+								pointHoverBorderWidth: 2,
+								pointRadius: 3,
+								pointHitRadius: 5,
 							}]
 						},
 						options: {
@@ -479,6 +544,7 @@ export class StatisticsModalComponent implements OnInit {
 									label: function(tooltipItem, data) {
 										switch (tooltipItem.datasetIndex) {
 											case 0:
+											case 3:
 												let str = '';
 												const duration = moment.duration(tooltipItem.yLabel * 60 * 1000);
 
@@ -515,6 +581,22 @@ export class StatisticsModalComponent implements OnInit {
 								}],
 								yAxes: [{
 									id: "duration",
+									ticks: {
+										callback: value => {
+											let str = '';
+
+											const duration = moment.duration(value * 60 * 1000);
+
+											str += `${duration.hours() || 0}h `;
+											str += `${duration.minutes() || 0}m`;
+
+											return str.trim();
+										},
+										fixedStepSize: 60,
+										min: 0
+									}
+								}, {
+									id: "duration2",
 									ticks: {
 										callback: value => {
 											let str = '';
@@ -627,6 +709,30 @@ export class StatisticsModalComponent implements OnInit {
 								pointRadius: 3,
 								pointHitRadius: 5,
 								fill: false,
+							}, {
+								label: 'Avg sunshine a day',
+								yAxisID: "duration2",
+								data: [
+									...response.data.statisticsByYear.map(item => ({
+										x: moment(item.year, 'YYYY').startOf('year'),
+										y: item.avgSunshineMinutes
+									}))
+								],
+								backgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},0.4)`,
+								borderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								borderCapStyle: 'butt',
+								borderDash: [],
+								borderDashOffset: 0.0,
+								borderJoinStyle: 'miter',
+								pointBorderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointBackgroundColor: "#fff",
+								pointBorderWidth: 1,
+								pointHoverRadius: 6,
+								pointHoverBackgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointHoverBorderColor: "rgba(220,220,220,1)",
+								pointHoverBorderWidth: 2,
+								pointRadius: 3,
+								pointHitRadius: 5,
 							}]
 						},
 						options: {
@@ -639,6 +745,7 @@ export class StatisticsModalComponent implements OnInit {
 									label: function(tooltipItem, data) {
 										switch (tooltipItem.datasetIndex) {
 											case 0:
+											case 3:
 												let str = '';
 												const duration = moment.duration(tooltipItem.yLabel * 60 * 1000);
 
@@ -675,6 +782,22 @@ export class StatisticsModalComponent implements OnInit {
 								}],
 								yAxes: [{
 									id: "duration",
+									ticks: {
+										callback: value => {
+											let str = '';
+
+											const duration = moment.duration(value * 60 * 1000);
+
+											str += `${duration.hours() || 0}h `;
+											str += `${duration.minutes() || 0}m`;
+
+											return str.trim();
+										},
+										fixedStepSize: 60,
+										min: 0
+									}
+								}, {
+									id: "duration2",
 									ticks: {
 										callback: value => {
 											let str = '';

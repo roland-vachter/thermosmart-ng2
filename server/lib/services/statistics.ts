@@ -614,7 +614,8 @@ export const getStatisticsByYear = async (locationId: number, dateStart: Date, d
 			avgRunningMinutes: byMonths.reduce((acc, v) => acc + v.avgRunningMinutes, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
 			avgTargetTemp: byMonths.reduce((acc, v) => acc + v.avgTargetTemp, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
 			avgOutsideTemp: byMonths.reduce((acc, v) => acc + v.avgOutsideTemp, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
-			avgOutsideHumi: byMonths.reduce((acc, v) => acc + v.avgOutsideHumi, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1))
+			avgOutsideHumi: byMonths.reduce((acc, v) => acc + v.avgOutsideHumi, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
+			avgSunshineMinutes: byMonths.reduce((acc, v) => acc + v.avgSunshineMinutes, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1))
 		};
 	}));
 }
