@@ -4,6 +4,7 @@ export interface IOutsideConditionHistory {
 	datetime: Date;
 	t: number;
 	h: number;
+	sunny: boolean;
 }
 
 const outsideConditionHistorySchema = new Schema<IOutsideConditionHistory>({
@@ -12,7 +13,8 @@ const outsideConditionHistorySchema = new Schema<IOutsideConditionHistory>({
 		index: true
 	},
 	t: Number,
-	h: Number
+	h: Number,
+	sunny: Boolean
 });
 
 outsideConditionHistorySchema.index({datetime: 1});

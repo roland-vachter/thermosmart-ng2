@@ -24,6 +24,8 @@ export interface OutsideConditions {
   weatherIconClass: string;
   backgroundImage: string;
   sunrise: number;
+  sunny: boolean;
   highestExpectedTemperature: number;
   sunshineNextConsecutiveHours: number;
+  totalNumberOfSunshineExpected: number;
 }

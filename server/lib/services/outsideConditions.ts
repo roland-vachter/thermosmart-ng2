@@ -133,6 +133,7 @@ async function update () {
 					lastValues.weatherIconClass = weatherIconClassMapping[daytime][weatherType];
 					lastValues.backgroundImage = getBackgroundImage(weatherType, daytime);
 					lastValues.sunrise = sunrise;
+					lastValues.sunny = daytime === DAYTIME.day && jsonWeather.current.weather[0].main === 'Clear';
 				}
 
 				if (jsonWeather.hourly) {
@@ -144,8 +145,15 @@ async function update () {
 					});
 
 					lastValues.highestExpectedTemperature = forecast.reduce((acc, v) => v.temp > acc ? v.temp : acc, forecast.length && forecast[0].temp || 0);
+					lastValues.totalNumberOfSunshineExpected = forecast.reduce((acc, v) => {
+						if (v.weather[0].main === 'Clear' && v.dt * 1000 >= sunrise && v.dt * 1000 <= sunset) {
+							acc++;
+						}
+
+						return acc;
+					}, 0);
 					lastValues.sunshineNextConsecutiveHours = forecast.reduce((acc, v) => {
-						if (v.weather[0].main === 'Clear' && acc.consecutive && v.dt * 1000 < sunset) {
+						if (v.weather[0].main === 'Clear' && acc.consecutive && v.dt * 1000 >= sunrise && v.dt * 1000 <= sunset) {
 							acc.count++;
 						} else {
 							acc.consecutive = false;

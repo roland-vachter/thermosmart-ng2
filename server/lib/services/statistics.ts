@@ -21,6 +21,7 @@ interface Total {
 	daysOutsideCondition: number;
 	outsideTempTotal: number;
 	outsideHumiTotal: number;
+	sunshineMinutesTotal: number;
 }
 
 interface Average {
@@ -30,6 +31,7 @@ interface Average {
 	avgTargetTemp: number;
 	avgOutsideTemp: number;
 	avgOutsideHumi: number;
+	avgSunshineMinutes: number;
 }
 
 
@@ -239,13 +241,15 @@ async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation
 	if (!results || !results.length) {
 		return {
 			t: null,
-			h: null
+			h: null,
+			sunshineMinutes: null
 		};
 	}
 
 	let measuredTimeTotal = 0; // minutes
 	let measuredTempTotal = 0;
 	let measuredHumidityTotal = 0;
+	let sunshineMinutes = 0;
 	let lastEntry: HydratedDocument<IOutsideConditionHistory>;
 	let duration: number;
 
@@ -256,6 +260,7 @@ async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation
 			measuredTimeTotal += duration;
 			measuredTempTotal += lastEntry.t * duration;
 			measuredHumidityTotal += lastEntry.h * duration;
+			sunshineMinutes += lastEntry.sunny ? duration : 0;
 		}
 
 		lastEntry = entry;
@@ -268,7 +273,8 @@ async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation
 
 	return {
 		t: measuredTempTotal / measuredTimeTotal,
-		h: measuredHumidityTotal / measuredTimeTotal
+		h: measuredHumidityTotal / measuredTimeTotal,
+		sunshineMinutes
 	};
 }
 
@@ -488,6 +494,7 @@ export const getStatisticsByDay = async (locationId: number, dateStart: Date, da
 			avgTargetTemp: todayTargetTemp,
 			date: toSameDateInUTC(moment(), location.timezone).startOf('day').toDate(),
 			runningMinutes: todayRunningMinutes,
+			sunshineMinutes: todayOutsideCondition.sunshineMinutes,
 			location: locationId
 		} as HydratedDocument<IHeatingStatistics>);
 	}
@@ -530,7 +537,8 @@ export const getStatisticsByMonth = async (locationId: number, dateStart: Date, 
 				targetTempTotal: 0,
 				daysOutsideCondition: 0,
 				outsideTempTotal: 0,
-				outsideHumiTotal: 0
+				outsideHumiTotal: 0,
+				sunshineMinutesTotal: 0
 			});
 		}
 
@@ -550,6 +558,7 @@ export const getStatisticsByMonth = async (locationId: number, dateStart: Date, 
 			currentAvg.daysOutsideCondition++;
 			currentAvg.outsideTempTotal += statistic.avgOutsideTemp;
 			currentAvg.outsideHumiTotal += statistic.avgOutsideHumi;
+			currentAvg.sunshineMinutesTotal += statistic.sunshineMinutes;
 		}
 	});
 
@@ -562,7 +571,8 @@ export const getStatisticsByMonth = async (locationId: number, dateStart: Date, 
 			avgRunningMinutes: total.daysRunningMinutes ? total.runningMinutesTotal / total.daysRunningMinutes : 0,
 			avgTargetTemp: total.targetTempTotal / total.daysTargetTemp,
 			avgOutsideTemp: total.outsideTempTotal / total.daysOutsideCondition,
-			avgOutsideHumi: total.outsideHumiTotal / total.daysOutsideCondition
+			avgOutsideHumi: total.outsideHumiTotal / total.daysOutsideCondition,
+			avgSunshineMinutes: total.sunshineMinutesTotal / total.daysOutsideCondition
 		});
 	});
 
@@ -616,7 +626,8 @@ export const initStatistics = () => {
 			await new OutsideConditionHistory({
 				datetime: moment().toDate(),
 				t: values.temperature,
-				h: values.humidity
+				h: values.humidity,
+				sunny: values.sunny
 			}).save();
 		}
 	});
