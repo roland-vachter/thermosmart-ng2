@@ -106,13 +106,14 @@ export interface StatisticsByMonth {
   avgRunningMinutes: number;
   avgTargetTemp: number;
   date: string;
-  totalRunningMinutes: number;
+  avgSunshineMinutes: number;
 }
 
 export interface StatisticsByYear {
   avgOutsideHumi: number;
   avgOutsideTemp: number;
   avgRunningMinutes: number;
+  avgSunshineMinutes: number;
   avgTargetTemp: number;
   year: string;
 }
@@ -120,10 +121,10 @@ export interface StatisticsByYear {
 export interface StatisticsByDay {
   avgOutsideHumi: number;
   avgOutsideTemp: number;
-  avgRunningMinutes: number;
   avgTargetTemp: number;
   date: string;
   runningMinutes: number;
+  sunshineMinutes: number;
 }
 
 export interface HeatingHistory {
