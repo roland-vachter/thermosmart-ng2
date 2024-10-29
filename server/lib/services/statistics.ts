@@ -378,6 +378,7 @@ const saveStatisticsForADayByLocation = async (locationId: number) => {
 					avgTargetTemp: avgTargetTemp || null,
 					avgOutsideTemp: avgOutsideCondition.t,
 					avgOutsideHumi: avgOutsideCondition.h,
+					sunshineMinutes: avgOutsideCondition.sunshineMinutes,
 					runningMinutes: heatingDuration,
 					location: locationId
 				}).save();
