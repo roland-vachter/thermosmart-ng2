@@ -11,7 +11,7 @@ enum OnHoldStatus {
 	'decrease' = 'decrease',
 	'firstIncrease' = 'firstIncrease',
 	'increase' = 'increase',
-	'firstStabilized' = 'firstStabilized'
+	'stabilized' = 'stabilized'
 }
 
 export enum TemperatureDirection {
@@ -40,6 +40,7 @@ interface Sensor {
 	onHoldTempLowest?: number;
 	onHoldTempHighest?: number;
 	onHoldStatus?: OnHoldStatus | null;
+	onHoldStabilizedCount?: number;
 	sensorSetting: HydratedDocument<ISensorSetting>;
 	lastUpdate?: Date;
 	temperatureDirection: TemperatureDirection;
@@ -204,7 +205,7 @@ export const setSensorInput = async (data: SensorInput) => {
 						clearTimeout(sensor.windowOpenTimeout);
 						sensor.windowOpenTimeout = setTimeout(() => {
 							sensor.windowOpen = false;
-						}, 20 * 60 * 1000);
+						}, 35 * 60 * 1000);
 
 						changesMade = true;
 						sensor.onHoldStatus = OnHoldStatus.decrease;
@@ -236,14 +237,17 @@ export const setSensorInput = async (data: SensorInput) => {
 					if (currentTemp > sensor.onHoldTempHighest) {
 						sensor.onHoldTempHighest = currentTemp;
 					} else {
-						sensor.onHoldStatus = OnHoldStatus.firstStabilized;
+						sensor.onHoldStatus = OnHoldStatus.stabilized;
+						sensor.onHoldStabilizedCount = 0;
 					}
-				} else if (sensor.onHoldStatus === OnHoldStatus.firstStabilized) {
+				} else if (sensor.onHoldStatus === OnHoldStatus.stabilized) {
 					if (currentTemp > sensor.onHoldTempHighest) {
 						sensor.onHoldTempHighest = currentTemp;
 						sensor.onHoldStatus = OnHoldStatus.increase;
 					} else if (currentTemp > lastTemp) {
 						sensor.onHoldStatus = OnHoldStatus.increase;
+					} else if (sensor.onHoldStabilizedCount < 5) {
+						sensor.onHoldStabilizedCount++;
 					} else {
 						sensor.windowOpen = false;
 						clearTimeout(sensor.windowOpenTimeout);
