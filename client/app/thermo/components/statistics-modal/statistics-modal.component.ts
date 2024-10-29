@@ -309,7 +309,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHitRadius: 5,
 								fill: false,
 							}, {
-								label: 'Avg sunshine a day',
+								label: 'Sunshine duration',
 								yAxisID: "duration2",
 								data: [
 									...response.data.statisticsForLastMonth.map(item => ({
@@ -509,7 +509,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHitRadius: 5,
 								fill: false,
 							}, {
-								label: 'Avg sunshine a day',
+								label: 'Avg sunshine per day',
 								yAxisID: "duration2",
 								data: [
 									...response.data.statisticsForLastMonth.map(item => ({
@@ -710,7 +710,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHitRadius: 5,
 								fill: false,
 							}, {
-								label: 'Avg sunshine a day',
+								label: 'Avg sunshine per day',
 								yAxisID: "duration2",
 								data: [
 									...response.data.statisticsByYear.map(item => ({
