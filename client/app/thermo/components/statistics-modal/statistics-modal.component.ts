@@ -317,7 +317,6 @@ export class StatisticsModalComponent implements OnInit {
 										y: item.sunshineMinutes
 									}))
 								],
-								backgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},0.4)`,
 								borderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
@@ -332,6 +331,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
+								fill: false,
 							}]
 						},
 						options: {
@@ -512,12 +512,11 @@ export class StatisticsModalComponent implements OnInit {
 								label: 'Avg sunshine per day',
 								yAxisID: "duration2",
 								data: [
-									...response.data.statisticsForLastMonth.map(item => ({
+									...response.data.statisticsByMonth.map(item => ({
 										x: moment(item.date).startOf('month'),
-										y: item.sunshineMinutes
+										y: item.avgSunshineMinutes
 									}))
 								],
-								backgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},0.4)`,
 								borderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
@@ -532,6 +531,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
+								fill: false,
 							}]
 						},
 						options: {
@@ -718,7 +718,6 @@ export class StatisticsModalComponent implements OnInit {
 										y: item.avgSunshineMinutes
 									}))
 								],
-								backgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},0.4)`,
 								borderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
@@ -733,6 +732,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
+								fill: false,
 							}]
 						},
 						options: {

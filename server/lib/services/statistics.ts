@@ -559,7 +559,7 @@ export const getStatisticsByMonth = async (locationId: number, dateStart: Date, 
 			currentAvg.daysOutsideCondition++;
 			currentAvg.outsideTempTotal += statistic.avgOutsideTemp;
 			currentAvg.outsideHumiTotal += statistic.avgOutsideHumi;
-			currentAvg.sunshineMinutesTotal += statistic.sunshineMinutes;
+			currentAvg.sunshineMinutesTotal += statistic.sunshineMinutes || 0;
 		}
 	});
 
@@ -573,7 +573,7 @@ export const getStatisticsByMonth = async (locationId: number, dateStart: Date, 
 			avgTargetTemp: total.targetTempTotal / total.daysTargetTemp,
 			avgOutsideTemp: total.outsideTempTotal / total.daysOutsideCondition,
 			avgOutsideHumi: total.outsideHumiTotal / total.daysOutsideCondition,
-			avgSunshineMinutes: total.sunshineMinutesTotal / total.daysOutsideCondition
+			avgSunshineMinutes: (total.sunshineMinutesTotal / total.daysOutsideCondition) || null
 		});
 	});
 
@@ -616,7 +616,7 @@ export const getStatisticsByYear = async (locationId: number, dateStart: Date, d
 			avgTargetTemp: byMonths.reduce((acc, v) => acc + v.avgTargetTemp, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
 			avgOutsideTemp: byMonths.reduce((acc, v) => acc + v.avgOutsideTemp, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
 			avgOutsideHumi: byMonths.reduce((acc, v) => acc + v.avgOutsideHumi, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
-			avgSunshineMinutes: byMonths.reduce((acc, v) => acc + v.avgSunshineMinutes, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1))
+			avgSunshineMinutes: byMonths.reduce((acc, v) => acc + v.avgSunshineMinutes, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)) || null
 		};
 	}));
 }
