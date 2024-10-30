@@ -205,7 +205,7 @@ export const setSensorInput = async (data: SensorInput) => {
 						clearTimeout(sensor.windowOpenTimeout);
 						sensor.windowOpenTimeout = setTimeout(() => {
 							sensor.windowOpen = false;
-						}, 35 * 60 * 1000);
+						}, 45 * 60 * 1000);
 
 						changesMade = true;
 						sensor.onHoldStatus = OnHoldStatus.decrease;

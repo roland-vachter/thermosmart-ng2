@@ -203,14 +203,16 @@ async function calculateAvgTargetTemp (location: HydratedDocument<ILocation>, da
 
 async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation>, date?: Date) {
 	if (!date) {
-		date = moment().toDate();
+		date = new Date();
 	}
+
+	const momentDate = moment(date);
 
 	const [initial, rest] = await Promise.all([
 		OutsideConditionHistory
 			.findOne({
 				datetime: {
-					$lt: moment(date).tz(location.timezone).startOf('day').toDate()
+					$lt: momentDate.tz(location.timezone).startOf('day').toDate()
 				}
 			})
 			.sort({
@@ -220,8 +222,8 @@ async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation
 		OutsideConditionHistory
 			.find({
 				datetime: {
-					$gt: moment(date).tz(location.timezone).startOf('day').toDate(),
-					$lt: moment(date).tz(location.timezone).endOf('day').toDate()
+					$gt: momentDate.tz(location.timezone).startOf('day').toDate(),
+					$lt: momentDate.tz(location.timezone).endOf('day').toDate()
 				}
 			})
 			.sort({
@@ -232,7 +234,7 @@ async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation
 
 	let results = [];
 	if (initial) {
-		initial.datetime = moment(date).tz(location.timezone).startOf('day').toDate();
+		initial.datetime = momentDate.tz(location.timezone).startOf('day').toDate();
 		results = [initial, ...rest];
 	} else {
 		results = rest;
@@ -260,16 +262,23 @@ async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation
 			measuredTimeTotal += duration;
 			measuredTempTotal += lastEntry.t * duration;
 			measuredHumidityTotal += lastEntry.h * duration;
-			sunshineMinutes += lastEntry.sunny ? duration : 0;
+
+			if (lastEntry !== initial) {
+				sunshineMinutes += lastEntry.sunny ? duration : 0;
+			}
 		}
 
 		lastEntry = entry;
 	});
 
-	duration = (moment(date).tz(location.timezone).endOf('day').valueOf() - moment(lastEntry.datetime).tz(location.timezone).valueOf()) / 60000;
+	duration = (momentDate.tz(location.timezone).endOf('day').valueOf() - moment(lastEntry.datetime).tz(location.timezone).valueOf()) / 60000;
 	measuredTimeTotal += duration;
 	measuredTempTotal += lastEntry.t * duration;
 	measuredHumidityTotal += lastEntry.h * duration;
+
+	if (lastEntry !== initial) {
+		sunshineMinutes += lastEntry.sunny ? duration : 0;
+	}
 
 	return {
 		t: measuredTempTotal / measuredTimeTotal,
