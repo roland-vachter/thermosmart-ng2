@@ -194,6 +194,8 @@ export const setSensorInput = async (data: SensorInput) => {
 						changesMade = true;
 
 						sensor.onHoldStatus = OnHoldStatus.firstDecrease;
+
+						console.log('window open - first decrease', sensor.id, currentTemp);
 					}
 				} else if (sensor.onHoldStatus === OnHoldStatus.firstDecrease) {
 					if (lastTemp - currentTemp >= 0.15 ||
@@ -205,10 +207,12 @@ export const setSensorInput = async (data: SensorInput) => {
 						clearTimeout(sensor.windowOpenTimeout);
 						sensor.windowOpenTimeout = setTimeout(() => {
 							sensor.windowOpen = false;
+							console.log('window open - timeout reached', sensor.id, currentTemp);
 						}, 45 * 60 * 1000);
 
 						changesMade = true;
 						sensor.onHoldStatus = OnHoldStatus.decrease;
+						console.log('window open - decrease', sensor.id, currentTemp);
 					} else {
 						sensor.onHoldStatus = null;
 						sensor.onHoldTempLowest = currentTemp;
@@ -216,38 +220,49 @@ export const setSensorInput = async (data: SensorInput) => {
 						sensor.windowOpen = false;
 						clearTimeout(sensor.windowOpenTimeout);
 						changesMade = true;
+
+						console.log('window open - cleared', sensor.id, currentTemp);
 					}
 				} else if (sensor.onHoldStatus === OnHoldStatus.decrease) {
 						if (currentTemp <= sensor.onHoldTempLowest) {
 							sensor.onHoldTempLowest = currentTemp;
 						} else {
 							sensor.onHoldStatus = OnHoldStatus.firstIncrease;
+							console.log('window open - first increase', sensor.id, currentTemp);
 						}
 				} else if (sensor.onHoldStatus === OnHoldStatus.firstIncrease) {
 					if (currentTemp <= sensor.onHoldTempLowest) {
 						sensor.onHoldStatus = OnHoldStatus.decrease;
 						sensor.onHoldTempLowest = currentTemp;
+						console.log('window open - decrease', sensor.id, currentTemp);
 					} else if (currentTemp < lastTemp) {
 						sensor.onHoldStatus = OnHoldStatus.decrease;
+						console.log('window open - decrease', sensor.id, currentTemp);
 					} else if (currentTemp > lastTemp) {
 						sensor.onHoldStatus = OnHoldStatus.increase;
+						console.log('window open - increase', sensor.id, currentTemp);
 						sensor.onHoldTempHighest = currentTemp;
 					}
 				} else if (sensor.onHoldStatus === OnHoldStatus.increase) {
 					if (currentTemp > sensor.onHoldTempHighest) {
 						sensor.onHoldTempHighest = currentTemp;
+						console.log('window open - increase', sensor.id, currentTemp);
 					} else {
 						sensor.onHoldStatus = OnHoldStatus.stabilized;
 						sensor.onHoldStabilizedCount = 0;
+						console.log('window open - stabilized', sensor.id, 'count:', sensor.onHoldStabilizedCount, currentTemp);
 					}
 				} else if (sensor.onHoldStatus === OnHoldStatus.stabilized) {
 					if (currentTemp > sensor.onHoldTempHighest) {
 						sensor.onHoldTempHighest = currentTemp;
 						sensor.onHoldStatus = OnHoldStatus.increase;
+						console.log('window open - increase', sensor.id, currentTemp);
 					} else if (currentTemp > lastTemp) {
 						sensor.onHoldStatus = OnHoldStatus.increase;
+						console.log('window open - increase', sensor.id, currentTemp);
 					} else if (sensor.onHoldStabilizedCount < 5) {
 						sensor.onHoldStabilizedCount++;
+						console.log('window open - stabilized', sensor.id, 'count:', sensor.onHoldStabilizedCount, currentTemp);
 					} else {
 						sensor.windowOpen = false;
 						clearTimeout(sensor.windowOpenTimeout);
@@ -255,6 +270,8 @@ export const setSensorInput = async (data: SensorInput) => {
 						sensor.onHoldTempHighest = currentTemp;
 						sensor.onHoldTempLowest = currentTemp;
 						changesMade = true;
+
+						console.log('window open - cleared', sensor.id, currentTemp);
 					}
 				}
 
