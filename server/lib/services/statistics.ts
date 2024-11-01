@@ -202,7 +202,9 @@ async function calculateAvgTargetTemp (location: HydratedDocument<ILocation>, da
 }
 
 async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation>, date?: Date) {
+	let noDate = false;
 	if (!date) {
+		noDate = true;
 		date = new Date();
 	}
 
@@ -275,10 +277,6 @@ async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation
 	measuredTimeTotal += duration;
 	measuredTempTotal += lastEntry.t * duration;
 	measuredHumidityTotal += lastEntry.h * duration;
-
-	if (lastEntry !== initial) {
-		sunshineMinutes += lastEntry.sunny ? duration : 0;
-	}
 
 	return {
 		t: measuredTempTotal / measuredTimeTotal,
