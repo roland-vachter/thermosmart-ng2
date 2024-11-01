@@ -134,17 +134,17 @@ export const setSensorInput = async (data: SensorInput) => {
 
 			let changesMade = false;
 
-			if (sensor.temperature !== getAvgTemp(sensor, temp) ||
-					sensor.humidity !== humidity ||
+			sensor.reportedTemperature = Math.round(data.temperature * 10) / 10;
+			sensor.reportedHumidity = Math.round(data.humidity * 10) / 10;
+
+			if (sensor.savedTempHistory[0] !== getAvgTemp(sensor, temp) ||
+					sensor.reportedHumidity !== humidity ||
 					sensor.active !== true) {
 				changesMade = true;
 			}
 
 			sensor.temperature = getAvgTemp(sensor, temp);
 			sensor.humidity = humidity;
-
-			sensor.reportedTemperature = data.temperature;
-			sensor.reportedHumidity = data.humidity;
 
 			sensor.lastUpdate = new Date();
 			sensor.active = true;
@@ -170,7 +170,7 @@ export const setSensorInput = async (data: SensorInput) => {
 				sensor.savedTempHistory[0] = sensor.temperature;
 			}
 
-			sensor.reportedTempHistory.unshift(data.temperature);
+			sensor.reportedTempHistory.unshift(sensor.reportedTemperature);
 			if (sensor.reportedTempHistory.length > 5) {
 				sensor.reportedTempHistory.pop();
 			}
