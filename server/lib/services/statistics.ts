@@ -202,9 +202,7 @@ async function calculateAvgTargetTemp (location: HydratedDocument<ILocation>, da
 }
 
 async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation>, date?: Date) {
-	let noDate = false;
 	if (!date) {
-		noDate = true;
 		date = new Date();
 	}
 
