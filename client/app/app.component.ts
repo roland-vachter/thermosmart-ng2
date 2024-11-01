@@ -55,7 +55,7 @@ export class AppComponent implements OnInit {
 	}
 
 	checkLoginStatus (onDemand = false) {
-		if (onDemand || !this.lastLoginStatusCheck || new Date().getTime() - this.lastLoginStatusCheck.getTime() > 10 * 60 * 1000) {
+		if (onDemand || !this.lastLoginStatusCheck || new Date().getTime() - this.lastLoginStatusCheck.getTime() > 60 * 1000) {
 			this.lastLoginStatusCheck = new Date();
 
 			this.loginStatusService.check().subscribe({
@@ -88,7 +88,7 @@ export class AppComponent implements OnInit {
 
 	ngOnInit () {
 		setTimeout(this.updateFreshnessStatus.bind(this), 60000);
-		setTimeout(this.checkLoginStatus, 60 * 60 * 1000);
+		setTimeout(this.checkLoginStatus, 5 * 60 * 1000);
 
 		document.addEventListener("visibilitychange", (() => {
 			if (document.visibilityState === 'visible') {

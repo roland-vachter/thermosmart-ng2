@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 
 import { Subject ,  PartialObserver } from 'rxjs';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class RefreshEventService {
 
     private source = new Subject<string>();
