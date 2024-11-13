@@ -581,13 +581,14 @@ export const getStatisticsByDay = async (locationId: number, dateStart: Date, da
 		.exec();
 
 	if (moment(dateEnd).tz(location.timezone).endOf('day').valueOf() === moment().tz(location.timezone).endOf('day').valueOf()) {
-		const [todayOutsideCondition, todayTargetTemp, todayRunningMinutes] = await Promise.all([
+		const [todayOutsideCondition, todayTargetTemp, todayRunningMinutes, solarHeatingDuration] = await Promise.all([
 				calculateAvgOutsideCondition(location),
 				calculateAvgTargetTemp(location),
-				calculateHeatingDuration(location)
+				calculateHeatingDuration(location),
+				calculateSolarHeatingDuration(location)
 			]);
 
-		heatingStatistics.push({
+		const heatingStatisticData = {
 			avgOutsideHumi: todayOutsideCondition.h,
 			avgOutsideTemp: todayOutsideCondition.t,
 			avgTargetTemp: todayTargetTemp,
@@ -595,7 +596,13 @@ export const getStatisticsByDay = async (locationId: number, dateStart: Date, da
 			runningMinutes: todayRunningMinutes,
 			sunshineMinutes: todayOutsideCondition.sunshineMinutes,
 			location: locationId
-		} as HydratedDocument<IHeatingStatistics>);
+		} as HydratedDocument<IHeatingStatistics>;
+
+		if (hasLocationFeature(location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+			heatingStatisticData.radiatorRunningMinutes = solarHeatingDuration;
+		}
+
+		heatingStatistics.push(heatingStatisticData);
 	}
 
 	return heatingStatistics.map(hs => ({ ...hs, date: moment(hs.date).tz('utc').format('YYYY-MM-DD') })) || [];

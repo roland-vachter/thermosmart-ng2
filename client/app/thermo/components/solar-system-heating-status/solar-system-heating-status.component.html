@@ -5,7 +5,7 @@
         <div class="col-12 col-md-6">
           <div class="solar-production" [ngClass]="{
             'color-orange': dataStore?.solarHeatingStatus?.solarProduction > 0,
-            'color-gray': dataStore?.solarHeatingStatus?.gridInjection === 0
+            'color-dark-gray': dataStore?.solarHeatingStatus?.gridInjection === 0
           }">
             <i class="icon-solar-panel"></i>
             {{ dataStore?.solarHeatingStatus?.solarProduction }} W
@@ -28,7 +28,7 @@
       <div class="radiators">
         <div *ngIf="!radiators?.length">No radiators</div>
         <i class="icon-radiator" *ngFor="let r of radiators"
-          [ngClass]="{ 'color-olive': r.isOn, 'color-gray': !r.isOn }"></i>
+          [ngClass]="{ 'color-olive': r.isOn, 'color-dark-gray': !r.isOn }"></i>
       </div>
     </div>
   </div>

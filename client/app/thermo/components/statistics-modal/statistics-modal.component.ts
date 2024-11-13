@@ -420,6 +420,7 @@ export class StatisticsModalComponent implements OnInit {
 										switch (tooltipItem.datasetIndex) {
 											case 0:
 											case 3:
+											case 4:
 												let str = '';
 												const duration = moment.duration(tooltipItem.yLabel * 60 * 1000);
 
@@ -616,16 +617,16 @@ export class StatisticsModalComponent implements OnInit {
 									y: item.avgRadiatorRunningMinutes
 								}))
 							],
-							borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							borderColor: `rgba(${this.colors[5][0]},${this.colors[5][1]},${this.colors[5][2]},1)`,
 							borderCapStyle: 'butt',
 							borderDash: [],
 							borderDashOffset: 0.0,
 							borderJoinStyle: 'miter',
-							pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							pointBorderColor: `rgba(${this.colors[5][0]},${this.colors[5][1]},${this.colors[5][2]},1)`,
 							pointBackgroundColor: "#fff",
 							pointBorderWidth: 1,
 							pointHoverRadius: 6,
-							pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							pointHoverBackgroundColor: `rgba(${this.colors[5][0]},${this.colors[5][1]},${this.colors[5][2]},1)`,
 							pointHoverBorderColor: "rgba(220,220,220,1)",
 							pointHoverBorderWidth: 2,
 							pointRadius: 3,
@@ -650,6 +651,7 @@ export class StatisticsModalComponent implements OnInit {
 										switch (tooltipItem.datasetIndex) {
 											case 0:
 											case 3:
+											case 4:
 												let str = '';
 												const duration = moment.duration(tooltipItem.yLabel * 60 * 1000);
 
@@ -847,16 +849,16 @@ export class StatisticsModalComponent implements OnInit {
 									y: item.avgSunshineMinutes
 								}))
 							],
-							borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							borderColor: `rgba(${this.colors[5][0]},${this.colors[5][1]},${this.colors[5][2]},1)`,
 							borderCapStyle: 'butt',
 							borderDash: [],
 							borderDashOffset: 0.0,
 							borderJoinStyle: 'miter',
-							pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							pointBorderColor: `rgba(${this.colors[5][0]},${this.colors[5][1]},${this.colors[5][2]},1)`,
 							pointBackgroundColor: "#fff",
 							pointBorderWidth: 1,
 							pointHoverRadius: 6,
-							pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							pointHoverBackgroundColor: `rgba(${this.colors[5][0]},${this.colors[5][1]},${this.colors[5][2]},1)`,
 							pointHoverBorderColor: "rgba(220,220,220,1)",
 							pointHoverBorderWidth: 2,
 							pointRadius: 3,
@@ -881,6 +883,7 @@ export class StatisticsModalComponent implements OnInit {
 										switch (tooltipItem.datasetIndex) {
 											case 0:
 											case 3:
+											case 4:
 												let str = '';
 												const duration = moment.duration(tooltipItem.yLabel * 60 * 1000);
 
