@@ -7,6 +7,7 @@ export interface IHeatingStatistics {
 	avgOutsideHumi: number;
 	sunshineMinutes: number;
 	runningMinutes: number;
+	radiatorRunningMinutes?: number;
 	location: number;
 }
 
@@ -17,6 +18,7 @@ const heatingStatisticsSchema = new Schema<IHeatingStatistics>({
 	avgOutsideHumi: Number,
 	runningMinutes: Number,
 	sunshineMinutes: Number,
+	radiatorRunningMinutes: Number,
 	location: {
 		type: Number,
 		ref: 'Location'

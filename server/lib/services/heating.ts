@@ -1,12 +1,13 @@
 import { getOutsideConditions, getOutsideTemperature } from './outsideConditions';
 import heatingEvts from './heatingEvts';
 
-import { insideConditionsEvts, getSensors, TemperatureDirection } from './insideConditions';
+import { insideConditionsEvts, getSensors } from './insideConditions';
 import { getConfig } from './config';
 import { HydratedDocument } from 'mongoose';
 import { IConfig } from '../models/Config';
 import { getTargetTempByLocation } from './targetTemp';
 import moment from 'moment-timezone';
+import { TemperatureDirection } from '../types/generic';
 
 interface Heating {
 	isOn: boolean;
@@ -75,6 +76,7 @@ insideConditionsEvts.on('change', async (data) => {
 
 	locationStatus.hasWindowOpen = hasWindowOpen;
 	locationStatus.avgValues.temperature = locationStatus.avgValues.temperature / activeCount;
+	locationStatus.avgValues.humidity = locationStatus.avgValues.humidity / activeCount;
 
 	emitConditionStatusChange(location);
 
@@ -255,7 +257,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 		}
 
 		if (Number.isNaN(locationStatus.avgValues.temperature)) {
-			console.log(`[${locationId}] turn off because there are no sensors.`);
+			// console.log(`[${locationId}] turn off because there are no sensors.`);
 			locationStatus.hasFavorableWeatherForecast = false;
 			locationStatus.hasIncreasingTrend = false;
 			locationStatus.hasWindowOpen = false;

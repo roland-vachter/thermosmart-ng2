@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { SharedServerApiService } from '../../../shared/shared-server-api.service';
-import { ALERT_TYPE, RESPONSE_STATUS } from '../../../types/types';
+import { ALERT_TYPE, Location, LOCATION_FEATURE, RESPONSE_STATUS } from '../../../types/types';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 import { ThermoModalsService } from '../../services/thermo-modals.service';
 import { ThermoServerApiService } from '../../services/thermo-server-api.service';
@@ -33,11 +33,22 @@ export class ThermoConfigModalComponent {
 	@Input() temperatureTrendsFeature: boolean;
 	@Input() weatherForecastFeature: boolean;
 
+	location: Location = this.locationService.getSelectedLocation();
+	hasSolarSystemHeatingFeature = this.locationService.hasFeature(this.location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING);
 	timezone: string = this.locationService.getSelectedLocationTimezone();
 	currentDayOfWeek: number = moment().tz(this.timezone).day();
 	overrideToAdd: OverrideToAdd = {
 		date: this.timezoneService.toSameDateInCurrentTimezone(moment(), this.timezone).toDate()
-	} as OverrideToAdd;;
+	} as OverrideToAdd;
+
+	solarSystemHeatingTemperature: number;
+	solarSystemInverterType: string;
+	solarSystemApiUrl: string;
+	solarSystemUsername: string;
+	solarSystemPassword: string = '';
+	solarSystemPasswordSet = false;
+	solarSystemStationCode: string;
+	solarSystemRadiatorPower: number;
 
 	constructor(
 		public bsModalRef: BsModalRef,
@@ -49,7 +60,15 @@ export class ThermoConfigModalComponent {
 		private timezoneService: TimezoneService,
 		private locationService: LocationService
 	) {
-		
+		if (this.dataStore?.config) {
+			this.solarSystemHeatingTemperature = this.dataStore.config.solarSystemHeatingTemperature?.value as number || 24;
+			this.solarSystemInverterType = this.dataStore.config.solarSystemInverterType?.value as string;
+			this.solarSystemApiUrl = this.dataStore.config.solarSystemApiUrl?.value as string;
+			this.solarSystemUsername = this.dataStore.config.solarSystemUsername?.value as string;
+			this.solarSystemPasswordSet = this.dataStore.config.solarSystemPassword?.value as string === 'PRIVATE';
+			this.solarSystemStationCode = this.dataStore.config.solarSystemStationCode?.value as string;
+			this.solarSystemRadiatorPower = this.dataStore.config.solarSystemRadiatorPower?.value as number;
+		}
 	}
 
 	tempAdjust(temp: Temperature, diff: number) {
@@ -152,4 +171,108 @@ export class ThermoConfigModalComponent {
 			}
 		});
 	}
+
+	saveSolarSystemHeatingTemperature() {
+		this.sharedApiService.changeConfig('solarSystemHeatingTemperature', this.solarSystemHeatingTemperature).subscribe({
+			next: () => {
+				this.dataStore.config.solarSystemHeatingTemperature = {
+					name: 'solarSystemHeatingTemperature',
+					value: this.solarSystemHeatingTemperature
+				};
+			},
+			error: () => {
+				this.solarSystemHeatingTemperature = this.dataStore?.config?.solarSystemHeatingTemperature?.value as number;
+			}
+		})
+	}
+
+	saveSolarSystemInverterType() {
+		this.sharedApiService.changeConfig('solarSystemInverterType', this.solarSystemInverterType).subscribe({
+			next: () => {
+				this.dataStore.config.solarSystemInverterType = {
+					name: 'solarSystemInverterType',
+					value: this.solarSystemInverterType
+				};
+			},
+			error: () => {
+				this.solarSystemInverterType = this.dataStore?.config?.solarSystemInverterType?.value as string;
+			}
+		})
+	}
+
+	saveSolarSystemApiUrl() {
+		this.sharedApiService.changeConfig('solarSystemApiUrl', this.solarSystemApiUrl).subscribe({
+			next: () => {
+				this.dataStore.config.solarSystemApiUrl = {
+					name: 'solarSystemApiUrl',
+					value: this.solarSystemApiUrl
+				};
+			},
+			error: () => {
+				this.solarSystemApiUrl = this.dataStore?.config?.solarSystemApiUrl?.value as string;
+			}
+		})
+	}
+
+	saveSolarSystemUsername() {
+		this.sharedApiService.changeConfig('solarSystemUsername', this.solarSystemUsername).subscribe({
+			next: () => {
+				this.dataStore.config.solarSystemUsername = {
+					name: 'solarSystemUsername',
+					value: this.solarSystemUsername
+				};
+			},
+			error: () => {
+				this.solarSystemUsername = this.dataStore?.config?.solarSystemUsername?.value as string;
+			}
+		})
+	}
+
+	saveSolarSystemPassword() {
+		if (this.solarSystemPassword) {
+			this.sharedApiService.changeConfig('solarSystemPassword', this.solarSystemPassword, {
+				encrypted: true,
+				private: true
+			}).subscribe({
+				next: () => {
+					this.dataStore.config.solarSystemPassword = {
+						name: 'solarSystemPassword',
+						value: 'PRIVATE'
+					};
+				},
+				error: () => {
+					this.solarSystemPassword = this.dataStore?.config?.solarSystemPassword?.value as string;
+				}
+			});
+		}
+	}
+
+	saveRadiatorPower() {
+		this.sharedApiService.changeConfig('solarSystemRadiatorPower', this.solarSystemRadiatorPower).subscribe({
+			next: () => {
+				this.dataStore.config.solarSystemRadiatorPower = {
+					name: 'radiatorPower',
+					value: this.solarSystemRadiatorPower
+				};
+			},
+			error: () => {
+				this.solarSystemRadiatorPower = this.dataStore?.config?.solarSystemRadiatorPower?.value as number;
+			}
+		})
+	}
+
+	saveSolarSystemStationCode() {
+		this.sharedApiService.changeConfig('solarSystemStationCode', this.solarSystemStationCode).subscribe({
+			next: () => {
+				this.dataStore.config.solarSystemStationCode = {
+					name: 'solarSystemStationCode',
+					value: this.solarSystemStationCode
+				};
+			},
+			error: () => {
+				this.solarSystemStationCode = this.dataStore?.config?.solarSystemStationCode?.value as string;
+			}
+		})
+	}
+
 }

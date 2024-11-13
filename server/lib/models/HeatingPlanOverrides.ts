@@ -3,7 +3,7 @@ import EventEmitter from 'events';
 import moment from 'moment-timezone';
 import TypedEventEmitter from 'typed-emitter';
 
-interface IHeatingPlanOverrides {
+export interface IHeatingPlanOverrides {
 	date: number;
 	plan: number;
 	location: number;

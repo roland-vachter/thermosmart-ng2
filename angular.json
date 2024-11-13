@@ -18,6 +18,7 @@
             "main": "client/main.ts",
             "polyfills": "client/polyfills.ts",
             "tsConfig": "client/tsconfig.app.json",
+						"sourceMap": true,
             "assets": [
               "client/favicon.ico",
               "client/assets"

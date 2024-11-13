@@ -10,10 +10,12 @@ import { insideConditionsEvts } from '../services/insideConditions';
 import { configEvts } from '../services/config';
 import HeatingPlanOverrides, { heatingPlanOverrideEvts } from '../models/HeatingPlanOverrides';
 import { isHeatingOn } from '../services/heating';
-import { plantWateringEvts } from '../services/plantWatering';
 import { restartSensorEvts } from '../services/restartSensor';
 import { securityHealthEvents } from '../services/securityHealth';
 import { securityStatusEvents } from '../services/securityStatus';
+import { isSolarHeatingOn, solarSystemEvts } from '../services/solarSystemHeating';
+import { hasLocationFeature } from '../services/location';
+import { LOCATION_FEATURE } from '../types/generic';
 
 let initialized = false;
 
@@ -132,14 +134,20 @@ export const init = async () => {
 				.exec();
 
 			socketIo.of('/frontend/' + data.location).emit('update', {
-				HeatingPlanOverrides: planOverrides
+				heatingPlanOverrides: planOverrides
 			});
-		})
+		});
+
+		solarSystemEvts.on('change', data => {
+			socketIo.of('/frontend/' + data.location).emit('update', {
+				solarHeatingStatus: data
+			})
+		});
 
 
 		setInterval(() => {
 			locations.forEach(l => {
-				if (isHeatingOn(l._id)) {
+				if (isHeatingOn(l._id) || (hasLocationFeature(l, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) && isSolarHeatingOn(l._id))) {
 					void recalculateHeatingDuration(l._id);
 				}
 			});
@@ -213,12 +221,12 @@ export const init = async () => {
 		});
 
 
-		plantWateringEvts.on('update', data => {
-			io.emit('update', {
-				plantWatering: {
-					status: data
-				}
-			})
-		});
+		// plantWateringEvts.on('update', data => {
+		// 	io.emit('update', {
+		// 		plantWatering: {
+		// 			status: data
+		// 		}
+		// 	})
+		// });
 	}
 };

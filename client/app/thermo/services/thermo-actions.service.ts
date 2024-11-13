@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { ThermoDataStoreService } from './thermo-data-store.service';
 import { ThermoServerApiService } from './thermo-server-api.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ThermoActionsService {
     constructor(
         private serverApiService: ThermoServerApiService,

@@ -1,5 +1,7 @@
 {
-	"ignorePatterns": [],
+	"ignorePatterns": [
+		"tapo/**/*"
+	],
 	"env": {
 			"browser": true,
 			"es6": true,

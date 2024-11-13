@@ -5,7 +5,9 @@ import { StatisticsModalComponent } from '../components/statistics-modal/statist
 import { HeatingPlan } from '../types/types';
 import { ThermoDataStoreService } from './thermo-data-store.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ThermoModalsService {
     constructor(
         private modalService: BsModalService,

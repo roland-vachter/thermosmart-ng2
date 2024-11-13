@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { RESPONSE_STATUS } from '../types/generic';
 import { getConfig as getConfigItem, setConfig } from '../services/config';
+import Cryptr from 'cryptr';
 
+const cryptr = new Cryptr(process.env.CRYPTO_SECRET);
 
 // exports.plantWateringInit = async (req: Request, res: Response) => {
 // 	res.json({
@@ -75,8 +77,17 @@ export const changeConfig = async (req: Request, res: Response) => {
 
 	const location = parseInt(req.body.location, 10);
 
+	let value = req.body.value;
+
+	if (req.body.encrypted === true) {
+		value = cryptr.encrypt(value);
+	}
+
 	try {
-		await setConfig(req.body.name, req.body.value, location);
+		await setConfig(req.body.name, value, location, {
+			private: req.body.private === true,
+			encrypted: req.body.encrypted === true
+		});
 		res.json({
 			status: 'ok'
 		});
@@ -101,6 +112,10 @@ export const getConfig = async (req: Request, res: Response) => {
 
 	try {
 		const configItem = await getConfigItem(req.query.name as string, location);
+		if (configItem.private) {
+			configItem.value = 'PRIVATE';
+		}
+
 		res.json(configItem?.value);
 	} catch(e: any) {
 		console.error(e);

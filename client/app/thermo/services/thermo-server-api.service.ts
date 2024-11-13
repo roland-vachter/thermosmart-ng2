@@ -8,7 +8,9 @@ import { of, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Moment } from 'moment';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ThermoServerApiService {
 
 	constructor(

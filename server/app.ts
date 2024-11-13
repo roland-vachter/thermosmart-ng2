@@ -7,6 +7,7 @@ import * as socketControllersFrontend from './lib/socketControllers/frontend';
 import * as socketControllersSensor from './lib/socketControllers/sensor';
 import { initSecurity } from "./lib/services/securityStatus";
 import { initStatistics } from "./lib/services/statistics";
+import { init as initSolarSystemHeating } from './lib/services/solarSystemHeating';
 
 void (async () => {
   const server = initExpress();
@@ -18,6 +19,7 @@ void (async () => {
   await socketControllersSensor.init();
   void initStatistics();
   void initSecurity();
+  initSolarSystemHeating();
 
   process.on("SIGTERM", () => {
     // eslint-disable-next-line no-console

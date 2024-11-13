@@ -61,47 +61,47 @@ let initialPromise: Promise<void> | null = Promise.all(zones.map(async z => {
 })).then(() => {
 	initialPromise = null;
 
-	setInterval(() => {
-		Object.keys(status).map(Number).forEach(async z => {
-			status[z].minutesUntilDry -= 1;
-			if (status[z].minutesUntilDry <= 0) {
-				status[z].minutesUntilDry = 0;
-				status[z].status = PLANT_WATERING_STATUS.DRY;
+	// setInterval(() => {
+	// 	Object.keys(status).map(Number).forEach(async z => {
+	// 		status[z].minutesUntilDry -= 1;
+	// 		if (status[z].minutesUntilDry <= 0) {
+	// 			status[z].minutesUntilDry = 0;
+	// 			status[z].status = PLANT_WATERING_STATUS.DRY;
 
-				await new PlantWateringStatusHistory({
-					zone: z,
-					datetime: new Date(),
-					status: PLANT_WATERING_STATUS.DRY
-				}).save();
+	// 			await new PlantWateringStatusHistory({
+	// 				zone: z,
+	// 				datetime: new Date(),
+	// 				status: PLANT_WATERING_STATUS.DRY
+	// 			}).save();
 
-				await PlantWateringSchedule
-					.findOneAndUpdate({
-						zone: z
-					}, {
-						minutesUntilDry: 0
-					});
+	// 			await PlantWateringSchedule
+	// 				.findOneAndUpdate({
+	// 					zone: z
+	// 				}, {
+	// 					minutesUntilDry: 0
+	// 				});
 
-				plantWateringEvts.emit('update', status[z]);
-			}
-		});
-	}, 60 * 1000);
+	// 			plantWateringEvts.emit('update', status[z]);
+	// 		}
+	// 	});
+	// }, 60 * 1000);
 });
 
 export const getPlantWateringStatus = async () => initialPromise ? initialPromise.then(() => status) : status;
 
 export const markAsWet = async (z: number) => {
-	await new PlantWateringStatusHistory({
-		zone: z,
-		datetime: new Date(),
-		status: PLANT_WATERING_STATUS.WET
-	}).save();
+	// await new PlantWateringStatusHistory({
+	// 	zone: z,
+	// 	datetime: new Date(),
+	// 	status: PLANT_WATERING_STATUS.WET
+	// }).save();
 
-	await PlantWateringSchedule
-		.findOneAndUpdate({
-			zone: z
-		}, {
-			minutesUntilDry: MINUTES_UNTIL_DRY
-		});
+	// await PlantWateringSchedule
+	// 	.findOneAndUpdate({
+	// 		zone: z
+	// 	}, {
+	// 		minutesUntilDry: MINUTES_UNTIL_DRY
+	// 	});
 
-	plantWateringEvts.emit('update', status[z]);
+	// plantWateringEvts.emit('update', status[z]);
 };

@@ -129,4 +129,78 @@
 			</div>
 		</div>
 	</div>
+
+
+	<div class="row" *ngIf="hasSolarSystemHeatingFeature">
+		<div class="col-12">
+			<h2>Solar system heating</h2>
+
+			<div class="thermo-temps--temp">
+				<div class="color-yellow">
+					<i class=""></i> <span class="thermo-temps--temp-name">Heating temperature</span>
+					<div class="thermo-temps--temp-control" data-id="">
+						<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease"
+							(click)="solarSystemHeatingTemperature = solarSystemHeatingTemperature - 0.1; saveSolarSystemHeatingTemperature()">-</button>
+						<span class="thermo-temps--temp-value">{{solarSystemHeatingTemperature | integer}}<span class="decimal">.{{solarSystemHeatingTemperature | decimal}}</span> &deg;C</span>
+						<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase"
+							(click)="solarSystemHeatingTemperature = solarSystemHeatingTemperature + 0.1; saveSolarSystemHeatingTemperature()">+</button>
+					</div>
+				</div>
+			</div>
+
+			<h3>Inverter</h3>
+			<div class="row">
+				<div class="col-12 col-sm-5 col-lg-4 col-xl-3">
+					<div class="form-group">
+						<label for="inverter-type">Inverter type</label>
+						<div class="input-group">
+							<select class="form-control" id="inverter-type" name="inverter-type" [(ngModel)]="solarSystemInverterType" (change)="saveSolarSystemInverterType()" placeholder="Select a type">
+								<option>Huawei</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-12 col-sm-7 col-lg-8 col-xl-9">
+					<div class="form-group">
+						<label for="inverter-api">Api URL</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="inverter-api" name="inverter-api" [(ngModel)]="solarSystemApiUrl" (change)="saveSolarSystemApiUrl()" placeholder="e.g. https://eu5.fusionsolar.huawei.com">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-12 col-sm-6">
+					<div class="form-group">
+						<label for="station-code">Station code</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="station-code" name="station-code" [(ngModel)]="solarSystemStationCode" (change)="saveSolarSystemStationCode()" placeholder="e.g. NE=1586523432">
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-sm-6">
+					<div class="form-group">
+						<label for="radiator-power">Radiator power</label>
+						<div class="input-group">
+							<input type="number" class="form-control" id="radiator-power" name="radiator-power" [(ngModel)]="solarSystemRadiatorPower" (change)="saveRadiatorPower()" placeholder="e.g. 750">
+							<div class="input-group-append">
+								<span class="input-group-text">W</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<label for="solar-system-username">Credentials</label>
+			<div class="input-group">
+				<input type="text" class="form-control" name="solar-system-username" id="solar-system-username" [(ngModel)]="solarSystemUsername" placeholder="Username"
+					(change)="saveSolarSystemUsername()">
+				<input #pass type="password" class="form-control" name="solar-system-password" id="solar-system-password" [(ngModel)]="solarSystemPassword"
+					[placeholder]="solarSystemPasswordSet ? 'Password is set. Type to change' : 'Password'"
+					(change)="saveSolarSystemPassword()">
+			</div>
+		</div>
+	</div>
 </div>

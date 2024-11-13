@@ -7,6 +7,7 @@ import * as apiCtrl from '../lib/controllers/apiCtrl';
 import * as heatingApiCtrl from '../lib/controllers/heating/apiCtrl';
 import * as securityStatusAndMovementApiCtrl from '../lib/controllers/security/statusAndMovementApiCtrl';
 import * as securityHealthApiCtrl from '../lib/controllers/security/healthApiCtrl';
+import * as solarApiCtrl from '../lib/controllers/solar/apiCtrl';
 import handleErrors from '../lib/utils/handle-errors';
 
 const router = Router();
@@ -32,6 +33,9 @@ router.post('/toggleheatingpower', apiFlagMiddleware, loginMiddleware, cors(), h
 router.post('/disablesensorwindowopen', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.disableSensorWindowOpen));
 router.post('/ignoreholdconditions', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.ignoreHeatingHoldConditions));
 router.post('/endignoringholdconditions', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.endIgnoringHeatingHoldConditions));
+
+// solar heating
+router.get('/solar/statusandupdate', apiFlagMiddleware, apiKeyMiddleware, cors(), handleErrors(solarApiCtrl.statusAndUpdate));
 
 
 // security UI

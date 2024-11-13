@@ -5,7 +5,6 @@ import { InsideComponent } from './components/inside/inside.component';
 import { OutsideComponent } from './components/outside/outside.component';
 import { HeatingPlanComponent } from './components/heating-plan/heating-plan.component';
 import { ThermoComponent } from './thermo.component';
-import { ThermoServerApiService } from './services/thermo-server-api.service';
 import { SensorComponent } from './components/sensor/sensor.component';
 import { ChangeHeatingPlanModalComponent } from './components/change-heating-plan-modal/change-heating-plan-modal.component';
 import { ChangeSensorSettingsModalComponent } from './components/change-sensor-settings-modal/change-sensor-settings-modal.component';
@@ -15,8 +14,6 @@ import { HeatingCurrentPlanComponent } from './components/heating-current-plan/h
 import { ThermoConfigModalComponent } from './components/thermo-config-modal/thermo-config-modal.component';
 import { ThermoDataStoreService } from './services/thermo-data-store.service';
 import { HeatingStatusComponent } from './components/heating-status/heating-status.component';
-import { ThermoActionsService } from './services/thermo-actions.service';
-import { ThermoModalsService } from './services/thermo-modals.service';
 import { SensorListComponent } from './components/sensor-list/sensor-list.component';
 import { TemperatureComponent } from './components/temperature/temperature.component';
 import { HumidityComponent } from './components/humidity/humidity.component';
@@ -24,6 +21,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { RefreshEventService } from '../services/refresh-event.service';
 import { LocationService } from '../services/location.service';
+import { SolarSystemHeatingStatusComponent } from './components/solar-system-heating-status/solar-system-heating-status.component';
 
 @NgModule({
 	imports: [
@@ -47,7 +45,8 @@ import { LocationService } from '../services/location.service';
 		ThermoConfigModalComponent,
 		SensorListComponent,
 		TemperatureComponent,
-		HumidityComponent
+		HumidityComponent,
+		SolarSystemHeatingStatusComponent
 	],
 	exports: [
 		HeatingStatusComponent,
@@ -56,15 +55,10 @@ import { LocationService } from '../services/location.service';
 		StatisticsModalComponent,
 		ThermoComponent,
 		SensorListComponent,
-		HeatingCurrentPlanComponent
+		HeatingCurrentPlanComponent,
+		SolarSystemHeatingStatusComponent
 	],
 	providers: [
-		ThermoServerApiService,
-		ThermoDataStoreService,
-		ThermoActionsService,
-		ThermoModalsService,
-		RefreshEventService,
-		LocationService
 	]
 })
 export class ThermoModule {

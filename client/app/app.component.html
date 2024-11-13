@@ -30,22 +30,28 @@
 
 	<div class="mainContent container">
 		<div class="row">
-			<div class="col-md col-12" *ngIf="hasFeature('security')">
+			<div class="col-md col-12" *ngIf="hasFeature(LOCATION_FEATURE.SECURITY)">
 				<security class="align"></security>
 			</div>
 
-			<div class="col-md col-12" *ngIf="hasFeature('heating')">
+			<div class="col-md col-12" *ngIf="hasFeature(LOCATION_FEATURE.HEATING)">
 				<thermo-heating-status class="align"></thermo-heating-status>
 			</div>
 		</div>
 
-		<div class="row" *ngIf="hasFeature('heating')">
+		<div class="row" *ngIf="hasFeature(LOCATION_FEATURE.HEATING)">
 			<div class="col-12">
 				<thermo-sensor-list></thermo-sensor-list>
 			</div>
 		</div>
 
-		<div class="row" *ngIf="hasFeature('heating')">
+		<div class="row" *ngIf="hasFeature(LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)">
+			<div class="col-12">
+				<thermo-solar-system-heating-status></thermo-solar-system-heating-status>
+			</div>
+		</div>
+
+		<div class="row" *ngIf="hasFeature(LOCATION_FEATURE.HEATING)">
 			<div class="col-12">
 				<thermo-heating-current-plan></thermo-heating-current-plan>
 			</div>

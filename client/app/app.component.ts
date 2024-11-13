@@ -5,7 +5,7 @@ import { LoginStatusService } from './shared/login-status.service';
 import { ThermoDataStoreService } from './thermo/services/thermo-data-store.service';
 import moment from 'moment';
 import { UserService } from './services/user.service';
-import { User } from './types/types';
+import { LOCATION_FEATURE, User } from './types/types';
 import { RefreshEventService } from './services/refresh-event.service';
 import { LocationService } from './services/location.service';
 import { Location } from './types/types';
@@ -16,6 +16,8 @@ import { Location } from './types/types';
 	styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+	LOCATION_FEATURE = LOCATION_FEATURE;
+
 	title = 'app';
 	refreshInProgress = false;
 	currentTimestamp: number = moment().valueOf();
@@ -88,7 +90,7 @@ export class AppComponent implements OnInit {
 
 	ngOnInit () {
 		setTimeout(this.updateFreshnessStatus.bind(this), 60000);
-		setTimeout(this.checkLoginStatus, 5 * 60 * 1000);
+		setTimeout(this.checkLoginStatus.bind(this), 5 * 60 * 1000);
 
 		document.addEventListener("visibilitychange", (() => {
 			if (document.visibilityState === 'visible') {
@@ -120,7 +122,7 @@ export class AppComponent implements OnInit {
 		this.locationService.updateLocation(location);
 	}
 
-	hasFeature(featureName: string) {
-		return this.locationService.getSelectedLocation().features.includes(featureName);
+	hasFeature(featureName: LOCATION_FEATURE) {
+		return this.locationService.hasFeature(this.locationService.getSelectedLocation(), featureName);
 	}
 }

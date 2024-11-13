@@ -137,18 +137,18 @@
 
 .alarm-triggered {
 	position: absolute;
-    top: 5px;
-    right: 0;
-    border-radius: 50%;
-    border: 1px solid $vermillion;
-    width: 25px;
-    height: 25px;
-    background: $vermillion;
-    color: $white;
-    opacity: 1;
-    z-index: 1;
-    font-weight: bold;
-    line-height: 23px;
-    text-align: center;
-    box-shadow: 0 0 10px $vermillion;
+	top: 5px;
+	right: 0;
+	border-radius: 50%;
+	border: 1px solid $vermillion;
+	width: 25px;
+	height: 25px;
+	background: $vermillion;
+	color: $white;
+	opacity: 1;
+	z-index: 1;
+	font-weight: bold;
+	line-height: 23px;
+	text-align: center;
+	box-shadow: 0 0 10px $vermillion;
 }

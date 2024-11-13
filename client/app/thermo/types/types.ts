@@ -106,7 +106,9 @@ export interface StatisticsByMonth {
   avgRunningMinutes: number;
   avgTargetTemp: number;
   date: string;
+  totalRunningMinutes: number;
   avgSunshineMinutes: number;
+  avgRadiatorRunningMinutes?: number;
 }
 
 export interface StatisticsByYear {
@@ -114,6 +116,7 @@ export interface StatisticsByYear {
   avgOutsideTemp: number;
   avgRunningMinutes: number;
   avgSunshineMinutes: number;
+  avgRadiatorRunningMinutes?: number;
   avgTargetTemp: number;
   year: string;
 }
@@ -121,10 +124,12 @@ export interface StatisticsByYear {
 export interface StatisticsByDay {
   avgOutsideHumi: number;
   avgOutsideTemp: number;
+  avgRunningMinutes: number;
   avgTargetTemp: number;
   date: string;
   runningMinutes: number;
   sunshineMinutes: number;
+  radiatorRunningMinutes?: number;
 }
 
 export interface HeatingHistory {
@@ -133,6 +138,14 @@ export interface HeatingHistory {
   datetime: string;
   location: number;
   status: boolean;
+}
+
+export interface SolarSystemHeatingHistory {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: string;
+  datetime: string;
+  location: number;
+  noOfRunningRadiators: number;
 }
 
 export interface HeatingHoldConditionHistory {
@@ -153,6 +166,7 @@ export interface Statistics {
   heatingConditionsForToday: {
     [key: string]: HeatingHoldConditionHistory[]
   }
+  solarHeatingForToday?: SolarSystemHeatingHistory[];
 }
 
 export enum HeatingHoldConditionTypes {
@@ -211,6 +225,13 @@ export interface HeatingDefaultPlanInitUpdate {
 	nameOfDay: string;
 }
 
+export interface SolarHeatingStatus {
+  numberOfRadiators: number;
+  numberOfRunningRadiators: number;
+  solarProduction?: number;
+  gridInjection?: number;
+}
+
 export interface ThermoInitUpdateData {
   outside?: OutsideConditions;
   sensors?: Sensor[];
@@ -228,7 +249,9 @@ export interface ThermoInitUpdateData {
   heatingPlanOverrides?: HeatingPlanOverrideInitUpdate[];
   statisticsForToday?: {
     heatingDuration: number;
+    solarHeatingDuration?: number;
   };
   restartInProgress?: boolean;
   config?: Record<string, string | number>;
+  solarHeatingStatus?: SolarHeatingStatus;
 }

@@ -8,6 +8,11 @@ interface ApiResult {
 	reason?: string
 }
 
+interface ConfigOptions {
+	encrypted?: boolean;
+	private?: boolean;
+}
+
 @Injectable()
 export class SharedServerApiService {
 
@@ -16,11 +21,12 @@ export class SharedServerApiService {
 		private locationService: LocationService
 	) { }
 
-	changeConfig (name: string, value: string | number | boolean) {
+	changeConfig (name: string, value: string | number | boolean, flags?: ConfigOptions) {
 		return this.http.post<ApiResult>('/api/changeconfig', {
 			name,
 			value,
-			location: this.locationService.getSelectedLocationId()
+			location: this.locationService.getSelectedLocationId(),
+			...(flags || {})
 		});
 	}
 

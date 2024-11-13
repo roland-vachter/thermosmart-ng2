@@ -36,4 +36,8 @@ export interface User {
 	_id: string;
 }
 
-
+export enum LOCATION_FEATURE {
+  HEATING = 'heating',
+  SECURITY = 'security',
+  SOLAR_SYSTEM_HEATING = 'solar-system-heating'
+}

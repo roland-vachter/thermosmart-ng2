@@ -1,0 +1,44 @@
+:host {
+	font-size: 1.4rem;
+}
+
+i {
+	font-size: 2.4rem;
+}
+
+.solar-production,
+.radiators {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.solar-production {
+	justify-content: center;
+
+	i {
+		margin-right: 10px;
+	}
+}
+
+.radiators {
+	height: 100%;
+	align-items: center;
+}
+
+.radiators i {
+	margin: 5px;
+}
+
+.solar-production {
+	margin: 5px 0;
+}
+
+.heating-duration {
+	text-align: center;
+}
+
+.icon-timer {
+	font-size: 1rem;
+}

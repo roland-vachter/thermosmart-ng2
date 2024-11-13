@@ -4,6 +4,8 @@ export interface IConfig {
 	name: string;
 	value?: string | number;
 	location: number;
+	encrypted?: boolean;
+	private?: boolean;
 }
 
 const configSchema = new Schema<IConfig>({
@@ -15,7 +17,9 @@ const configSchema = new Schema<IConfig>({
 	location: {
 		type: Number,
 		ref: 'Location'
-	}
+	},
+	encrypted: Boolean,
+	private: Boolean
 });
 
 configSchema.set('versionKey', false);

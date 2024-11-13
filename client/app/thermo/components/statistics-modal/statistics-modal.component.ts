@@ -7,6 +7,7 @@ import { TimezoneService } from '../../../shared/services/timezone.service';
 import { LocationService } from '../../../services/location.service';
 import { HeatingHoldConditionTypes } from '../../types/types';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
+import { LOCATION_FEATURE } from '../../../types/types';
 
 @Component({
 	selector: 'app-statistics-modal',
@@ -36,8 +37,13 @@ export class StatisticsModalComponent implements OnInit {
 
 		this.serverApiService.statistics().subscribe(response => {
 			if (response.data) {
-				if (response.data.heatingForToday || response.data.heatingConditionsForToday) {
+				if (response.data.heatingForToday || response.data.heatingConditionsForToday || (
+					this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
+						response.data.solarHeatingForToday
+				)) {
 					const datasets = [];
+					let colorIndex = 0;
+
 					if (response.data.heatingForToday) {
 						datasets.push({
 							label: 'Heating status',
@@ -46,22 +52,53 @@ export class StatisticsModalComponent implements OnInit {
 								y: item.status ? 10 : 0
 							})),
 							steppedLine: true,
-							backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
-							borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+							backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
+							borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 							borderCapStyle: 'butt',
 							borderDash: [],
 							borderDashOffset: 0.0,
 							borderJoinStyle: 'miter',
-							pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+							pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 							pointBackgroundColor: "#fff",
 							pointBorderWidth: 1,
 							pointHoverRadius: 6,
-							pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+							pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 							pointHoverBorderColor: "rgba(220,220,220,1)",
 							pointHoverBorderWidth: 2,
 							pointRadius: 3,
 							pointHitRadius: 5,
 						});
+
+						colorIndex++;
+					}
+
+					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
+						response.data.solarHeatingForToday) {
+							datasets.push({
+								label: 'Solar radiator heating status',
+								data: response.data.solarHeatingForToday.map(item => ({
+									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
+									y: item.noOfRunningRadiators * 3
+								})),
+								steppedLine: true,
+								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
+								borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+								borderCapStyle: 'butt',
+								borderDash: [],
+								borderDashOffset: 0.0,
+								borderJoinStyle: 'miter',
+								pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+								pointBackgroundColor: "#fff",
+								pointBorderWidth: 1,
+								pointHoverRadius: 6,
+								pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+								pointHoverBorderColor: "rgba(220,220,220,1)",
+								pointHoverBorderWidth: 2,
+								pointRadius: 3,
+								pointHitRadius: 5,
+							});
+
+							colorIndex++;
 					}
 
 					if (response.data.heatingConditionsForToday) {
@@ -73,22 +110,24 @@ export class StatisticsModalComponent implements OnInit {
 									y: item.status ? 5 : 0
 								})),
 								steppedLine: true,
-								backgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},0.4)`,
-								borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
+								borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+								pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+								pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
 							});
+
+							colorIndex++;
 						}
 
 						if (response.data.heatingConditionsForToday[HeatingHoldConditionTypes.WINDOW_OPEN]) {
@@ -99,22 +138,24 @@ export class StatisticsModalComponent implements OnInit {
 									y: item.status ? 5 : 0
 								})),
 								steppedLine: true,
-								backgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},0.4)`,
-								borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
+								borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+								pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+								pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
 							});
+
+							colorIndex++;
 						}
 
 						if (this.dataStore.config.weatherForecastFeature &&
@@ -126,22 +167,24 @@ export class StatisticsModalComponent implements OnInit {
 									y: item.status ? 5 : 0
 								})),
 								steppedLine: true,
-								backgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},0.4)`,
-								borderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
+								borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[3][0]},${this.colors[3][1]},${this.colors[3][2]},1)`,
+								pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
 							});
+
+							colorIndex++;
 						}
 
 						if (this.dataStore.config.temperatureTrendsFeature &&
@@ -153,22 +196,24 @@ export class StatisticsModalComponent implements OnInit {
 									y: item.status ? 5 : 0
 								})),
 								steppedLine: true,
-								backgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},0.4)`,
-								borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
+								borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								borderCapStyle: 'butt',
 								borderDash: [],
 								borderDashOffset: 0.0,
 								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+								pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								pointBackgroundColor: "#fff",
 								pointBorderWidth: 1,
 								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+								pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 3,
 								pointHitRadius: 5,
 							});
+
+							colorIndex++;
 						}
 					}
 
@@ -233,106 +278,136 @@ export class StatisticsModalComponent implements OnInit {
 					const minAvgOutsideTemp = Math.min(...response.data.statisticsForLastMonth.map(item => item.avgOutsideTemp));
 					const maxAvgOutsideTemp = Math.max(...response.data.statisticsForLastMonth.map(item => item.avgOutsideTemp));
 
+					const datasets = [{
+						label: 'Heating running time',
+						yAxisID: "duration",
+						data: [
+							...response.data.statisticsForLastMonth.map(item => ({
+								x: moment(item.date).startOf('day'),
+								y: item.runningMinutes
+							}))
+						],
+						backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
+						borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+					}, {
+						label: 'Avg target temperature',
+						yAxisID: "temp",
+						data: [
+							...response.data.statisticsForLastMonth.map(item => ({
+								x: moment(item.date).startOf('day'),
+								y: item.avgTargetTemp
+							}))
+						],
+						borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+						fill: false,
+					}, {
+						label: 'Avg outside temperature',
+						yAxisID: "temp",
+						data: [
+							...response.data.statisticsForLastMonth.map(item => ({
+								x: moment(item.date).startOf('day'),
+								y: item.avgOutsideTemp
+							}))
+						],
+						borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+						fill: false,
+					}, {
+						label: 'Sunshine duration',
+						yAxisID: "duration2",
+						data: [
+							...response.data.statisticsForLastMonth.map(item => ({
+								x: moment(item.date).startOf('day'),
+								y: item.sunshineMinutes
+							}))
+						],
+						borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+						fill: false,
+					}];
+
+					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+						datasets.push({
+							label: 'Solar radiator heating time',
+							yAxisID: "duration",
+							data: [
+								...response.data.statisticsForLastMonth.map(item => ({
+									x: moment(item.date).startOf('day'),
+									y: item.radiatorRunningMinutes
+								}))
+							],
+							borderColor: `rgba(${this.colors[5][0]},${this.colors[5][1]},${this.colors[5][2]},1)`,
+							borderCapStyle: 'butt',
+							borderDash: [],
+							borderDashOffset: 0.0,
+							borderJoinStyle: 'miter',
+							pointBorderColor: `rgba(${this.colors[5][0]},${this.colors[5][1]},${this.colors[5][2]},1)`,
+							pointBackgroundColor: "#fff",
+							pointBorderWidth: 1,
+							pointHoverRadius: 6,
+							pointHoverBackgroundColor: `rgba(${this.colors[5][0]},${this.colors[5][1]},${this.colors[5][2]},1)`,
+							pointHoverBorderColor: "rgba(220,220,220,1)",
+							pointHoverBorderWidth: 2,
+							pointRadius: 3,
+							pointHitRadius: 5,
+							fill: false,
+						});
+					}
+
 					new Chart(document.querySelector('#statisticsLast30Days'), {
 						type: 'line',
 						data: {
-							datasets: [{
-								label: 'Heating running time',
-								yAxisID: "duration",
-								data: [
-									...response.data.statisticsForLastMonth.map(item => ({
-										x: moment(item.date).startOf('day'),
-										y: item.runningMinutes
-									}))
-								],
-								backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
-								borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-							}, {
-								label: 'Avg target temperature',
-								yAxisID: "temp",
-								data: [
-									...response.data.statisticsForLastMonth.map(item => ({
-										x: moment(item.date).startOf('day'),
-										y: item.avgTargetTemp
-									}))
-								],
-								borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-								fill: false,
-							}, {
-								label: 'Avg outside temperature',
-								yAxisID: "temp",
-								data: [
-									...response.data.statisticsForLastMonth.map(item => ({
-										x: moment(item.date).startOf('day'),
-										y: item.avgOutsideTemp
-									}))
-								],
-								borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-								fill: false,
-							}, {
-								label: 'Sunshine duration',
-								yAxisID: "duration2",
-								data: [
-									...response.data.statisticsForLastMonth.map(item => ({
-										x: moment(item.date).startOf('day'),
-										y: item.sunshineMinutes
-									}))
-								],
-								borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-								fill: false,
-							}]
+							datasets
 						},
 						options: {
 							maintainAspectRatio: false,
@@ -433,106 +508,136 @@ export class StatisticsModalComponent implements OnInit {
 					const minAvgOutsideTemp = Math.min(...response.data.statisticsByMonth.map(item => item.avgOutsideTemp));
 					const maxAvgOutsideTemp = Math.max(...response.data.statisticsByMonth.map(item => item.avgOutsideTemp));
 
+					const datasets = [{
+						label: 'Avg heating running time',
+						yAxisID: "duration",
+						data: [
+							...response.data.statisticsByMonth.map(item => ({
+								x: moment(item.date).startOf('month'),
+								y: item.avgRunningMinutes
+							}))
+						],
+						backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
+						borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+					}, {
+						label: 'Avg target temperature',
+						yAxisID: "temp",
+						data: [
+							...response.data.statisticsByMonth.map(item => ({
+								x: moment(item.date).startOf('month'),
+								y: item.avgTargetTemp
+							}))
+						],
+						borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+						fill: false,
+					}, {
+						label: 'Avg outside temperature',
+						yAxisID: "temp",
+						data: [
+							...response.data.statisticsByMonth.map(item => ({
+								x: moment(item.date).startOf('month'),
+								y: item.avgOutsideTemp
+							}))
+						],
+						borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+						fill: false,
+					}, {
+						label: 'Avg sunshine per day',
+						yAxisID: "duration2",
+						data: [
+							...response.data.statisticsByMonth.map(item => ({
+								x: moment(item.date).startOf('month'),
+								y: item.avgSunshineMinutes
+							}))
+						],
+						borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+						fill: false,
+					}];
+
+					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+						datasets.push({
+							label: 'Avg solar radiator heating time',
+							yAxisID: "duration2",
+							data: [
+								...response.data.statisticsByMonth.map(item => ({
+									x: moment(item.date).startOf('month'),
+									y: item.avgRadiatorRunningMinutes
+								}))
+							],
+							borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							borderCapStyle: 'butt',
+							borderDash: [],
+							borderDashOffset: 0.0,
+							borderJoinStyle: 'miter',
+							pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							pointBackgroundColor: "#fff",
+							pointBorderWidth: 1,
+							pointHoverRadius: 6,
+							pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							pointHoverBorderColor: "rgba(220,220,220,1)",
+							pointHoverBorderWidth: 2,
+							pointRadius: 3,
+							pointHitRadius: 5,
+							fill: false,
+						})
+					}
+
 					new Chart(document.querySelector('#statisticsByMonth'), {
 						type: 'line',
 						data: {
-							datasets: [{
-								label: 'Avg heating running time',
-								yAxisID: "duration",
-								data: [
-									...response.data.statisticsByMonth.map(item => ({
-										x: moment(item.date).startOf('month'),
-										y: item.avgRunningMinutes
-									}))
-								],
-								backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
-								borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-							}, {
-								label: 'Avg target temperature',
-								yAxisID: "temp",
-								data: [
-									...response.data.statisticsByMonth.map(item => ({
-										x: moment(item.date).startOf('month'),
-										y: item.avgTargetTemp
-									}))
-								],
-								borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-								fill: false,
-							}, {
-								label: 'Avg outside temperature',
-								yAxisID: "temp",
-								data: [
-									...response.data.statisticsByMonth.map(item => ({
-										x: moment(item.date).startOf('month'),
-										y: item.avgOutsideTemp
-									}))
-								],
-								borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-								fill: false,
-							}, {
-								label: 'Avg sunshine per day',
-								yAxisID: "duration2",
-								data: [
-									...response.data.statisticsByMonth.map(item => ({
-										x: moment(item.date).startOf('month'),
-										y: item.avgSunshineMinutes
-									}))
-								],
-								borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-								fill: false,
-							}]
+							datasets
 						},
 						options: {
 							maintainAspectRatio: false,
@@ -634,106 +739,136 @@ export class StatisticsModalComponent implements OnInit {
 					const minAvgOutsideTemp = Math.min(...response.data.statisticsByYear.map(item => item.avgOutsideTemp));
 					const maxAvgOutsideTemp = Math.max(...response.data.statisticsByYear.map(item => item.avgOutsideTemp));
 
+					const datasets = [{
+						label: 'Avg heating running time',
+						yAxisID: "duration",
+						data: [
+							...response.data.statisticsByYear.map(item => ({
+								x: moment(item.year, 'YYYY').startOf('year'),
+								y: item.avgRunningMinutes
+							}))
+						],
+						backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
+						borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+					}, {
+						label: 'Avg target temperature',
+						yAxisID: "temp",
+						data: [
+							...response.data.statisticsByYear.map(item => ({
+								x: moment(item.year, 'YYYY').startOf('year'),
+								y: item.avgTargetTemp
+							}))
+						],
+						borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+						fill: false,
+					}, {
+						label: 'Avg outside temperature',
+						yAxisID: "temp",
+						data: [
+							...response.data.statisticsByYear.map(item => ({
+								x: moment(item.year, 'YYYY').startOf('year'),
+								y: item.avgOutsideTemp
+							}))
+						],
+						borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+						fill: false,
+					}, {
+						label: 'Avg sunshine per day',
+						yAxisID: "duration2",
+						data: [
+							...response.data.statisticsByYear.map(item => ({
+								x: moment(item.year, 'YYYY').startOf('year'),
+								y: item.avgSunshineMinutes
+							}))
+						],
+						borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 6,
+						pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 3,
+						pointHitRadius: 5,
+						fill: false,
+					}];
+
+					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+						datasets.push({
+							label: 'Avg solar radiator heating time',
+							yAxisID: "duration",
+							data: [
+								...response.data.statisticsByYear.map(item => ({
+									x: moment(item.year, 'YYYY').startOf('year'),
+									y: item.avgSunshineMinutes
+								}))
+							],
+							borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							borderCapStyle: 'butt',
+							borderDash: [],
+							borderDashOffset: 0.0,
+							borderJoinStyle: 'miter',
+							pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							pointBackgroundColor: "#fff",
+							pointBorderWidth: 1,
+							pointHoverRadius: 6,
+							pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
+							pointHoverBorderColor: "rgba(220,220,220,1)",
+							pointHoverBorderWidth: 2,
+							pointRadius: 3,
+							pointHitRadius: 5,
+							fill: false,
+						});
+					}
+
 					new Chart(document.querySelector('#statisticsByYear'), {
 						type: 'line',
 						data: {
-							datasets: [{
-								label: 'Avg heating running time',
-								yAxisID: "duration",
-								data: [
-									...response.data.statisticsByYear.map(item => ({
-										x: moment(item.year, 'YYYY').startOf('year'),
-										y: item.avgRunningMinutes
-									}))
-								],
-								backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
-								borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-							}, {
-								label: 'Avg target temperature',
-								yAxisID: "temp",
-								data: [
-									...response.data.statisticsByYear.map(item => ({
-										x: moment(item.year, 'YYYY').startOf('year'),
-										y: item.avgTargetTemp
-									}))
-								],
-								borderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[1][0]},${this.colors[1][1]},${this.colors[1][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-								fill: false,
-							}, {
-								label: 'Avg outside temperature',
-								yAxisID: "temp",
-								data: [
-									...response.data.statisticsByYear.map(item => ({
-										x: moment(item.year, 'YYYY').startOf('year'),
-										y: item.avgOutsideTemp
-									}))
-								],
-								borderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[2][0]},${this.colors[2][1]},${this.colors[2][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-								fill: false,
-							}, {
-								label: 'Avg sunshine per day',
-								yAxisID: "duration2",
-								data: [
-									...response.data.statisticsByYear.map(item => ({
-										x: moment(item.year, 'YYYY').startOf('year'),
-										y: item.avgSunshineMinutes
-									}))
-								],
-								borderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[4][0]},${this.colors[4][1]},${this.colors[4][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-								fill: false,
-							}]
+							datasets
 						},
 						options: {
 							maintainAspectRatio: false,

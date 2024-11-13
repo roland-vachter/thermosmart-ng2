@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { RESPONSE_STATUS } from '../../types/generic';
+import { RESPONSE_STATUS, ApiResponse, ThermoInitUpdateData, Statistics, LOCATION_FEATURE } from '../../types/generic';
 import Temperature, { triggerTemperatureChange } from '../../models/Temperature';
 import HeatingDefaultPlan, { triggerHeatingDefaultPlanChange } from '../../models/HeatingDefaultPlan';
 import HeatingPlan from '../../models/HeatingPlan';
@@ -20,7 +20,9 @@ import HeatingSensorHistory, { IHeatingSensorHistory } from '../../models/Heatin
 import { HydratedDocument } from 'mongoose';
 import Location from '../../models/Location';
 import HeatingHoldConditionHistory, { HeatingHoldConditionTypes, IHeatingHoldConditionHistory } from '../../models/HeatingHoldConditionHistory';
-
+import { getStatusByLocation as getSolarHeatingStatusByLocation } from '../../services/solarSystemHeating';
+import SolarSystemHeatingHistory, { ISolarSystemHeatingHistory } from '../../models/SolarSystemHeatingHistory';
+import { hasLocationFeature } from '../../services/location';
 
 type HeatingHistoryWithSensor = HydratedDocument<IHeatingSensorHistory & { sensor: ISensorSetting }>;
 
@@ -83,8 +85,8 @@ export const initHeating = async (req: Request, res: Response) => {
 		getAllConfigs(location._id)
 	]);
 
-	res.json({
-		status: 'ok',
+	const response: ApiResponse & { data: ThermoInitUpdateData } = {
+		status: RESPONSE_STATUS.OK,
 		data: {
 			outside: getOutsideConditions(),
 			sensors: getSensors(location._id),
@@ -114,7 +116,13 @@ export const initHeating = async (req: Request, res: Response) => {
 			restartInProgress: getRestartStatus(),
 			config
 		}
-	});
+	};
+
+	if (hasLocationFeature(location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+		response.data.solarHeatingStatus = getSolarHeatingStatusByLocation(location.id);
+	}
+
+	res.json(response);
 };
 
 export const tempAdjust = async (req: Request, res: Response) => {
@@ -510,7 +518,7 @@ export const statistics = async (req: Request, res: Response) => {
 		lastPowerOffHistory, powerOffForToday,
 		lastFavorableWeatherForecastHistory, favorableWeatherForecastForToday,
 		lastIncreasingTrendHistory, increasingTrendForToday,
-		lastWindowOpenHistory, windowOpenForToday
+		lastWindowOpenHistory, windowOpenForToday, lastSolarHeatingHistory, solarHeatingForToday
 	] = await Promise.all([
 		HeatingHistory
 			.findOne({
@@ -633,6 +641,26 @@ export const statistics = async (req: Request, res: Response) => {
 				location
 			})
 			.exec(),
+
+		SolarSystemHeatingHistory
+			.findOne({
+				datetime: {
+					$lt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				location
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec(),
+		SolarSystemHeatingHistory
+			.find({
+				datetime: {
+					$gt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				location
+			})
+			.exec(),
 	]);
 
 	heatingForToday.unshift({
@@ -643,6 +671,15 @@ export const statistics = async (req: Request, res: Response) => {
 		datetime: new Date(moment().tz(location.timezone).toISOString()),
 		status: heatingForToday.length ? heatingForToday[heatingForToday.length - 1].status : false
 	} as HydratedDocument<IHeatingHistory>);
+
+	solarHeatingForToday.unshift({
+		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
+		noOfRunningRadiators: lastSolarHeatingHistory ? lastSolarHeatingHistory.noOfRunningRadiators : 0
+	} as HydratedDocument<ISolarSystemHeatingHistory>);
+	solarHeatingForToday.push({
+		datetime: new Date(moment().tz(location.timezone).toISOString()),
+		noOfRunningRadiators: solarHeatingForToday.length ? solarHeatingForToday[solarHeatingForToday.length - 1].noOfRunningRadiators : 0
+	} as HydratedDocument<ISolarSystemHeatingHistory>);
 
 	powerOffForToday.unshift({
 		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
@@ -699,20 +736,26 @@ export const statistics = async (req: Request, res: Response) => {
 	});
 
 
+	const statisticsResponse: Statistics = {
+		heatingForToday,
+		heatingConditionsForToday: {
+			[HeatingHoldConditionTypes.POWERED_OFF]: powerOffForToday,
+			[HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST]: favorableWeatherForecastForToday,
+			[HeatingHoldConditionTypes.INCREASING_TREND]: increasingTrendForToday,
+			[HeatingHoldConditionTypes.WINDOW_OPEN]: windowOpenForToday
+		},
+		statisticsForLastMonth,
+		statisticsByMonth,
+		statisticsByYear,
+		sensorTempHistory
+	};
+
+	if (hasLocationFeature(location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+		statisticsResponse.solarHeatingForToday = solarHeatingForToday;
+	}
+
 	return res.json({
 		status: 'ok',
-		data: {
-			heatingForToday,
-			heatingConditionsForToday: {
-				[HeatingHoldConditionTypes.POWERED_OFF]: powerOffForToday,
-				[HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST]: favorableWeatherForecastForToday,
-				[HeatingHoldConditionTypes.INCREASING_TREND]: increasingTrendForToday,
-				[HeatingHoldConditionTypes.WINDOW_OPEN]: windowOpenForToday
-			},
-			statisticsForLastMonth,
-			statisticsByMonth,
-			statisticsByYear,
-			sensorTempHistory
-		}
+		data: statisticsResponse
 	});
 };

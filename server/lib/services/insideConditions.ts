@@ -1,50 +1,10 @@
-import SensorSetting, { ISensorSetting } from '../models/SensorSetting';
+import SensorSetting from '../models/SensorSetting';
 import heatingEvts from './heatingEvts';
 import EventEmitter from 'events';
 import TypedEventEmitter from 'typed-emitter';
 import HeatingSensorHistory from '../models/HeatingSensorHistory';
-import { HydratedDocument } from 'mongoose';
 import { sendPushNotification } from './pushNotifications';
-
-enum OnHoldStatus {
-	'firstDecrease' = 'firstDecrease',
-	'decrease' = 'decrease',
-	'firstIncrease' = 'firstIncrease',
-	'increase' = 'increase',
-	'stabilized' = 'stabilized'
-}
-
-export enum TemperatureDirection {
-	'increase' = 'increase',
-	'decrease' = 'decrease'
-}
-
-interface Sensor {
-	id: number;
-	temperature: number;
-	reportedTemperature?: number;
-	humidity: number;
-	reportedHumidity?: number;
-	active?: boolean;
-	enabled: boolean;
-	windowOpen: boolean;
-	windowOpenTimeout?: NodeJS.Timeout;
-	label?: string;
-	tempAdjust?: number;
-	humidityAdjust?: number;
-  deleted?: boolean;
-	adjustedTempHistory: number[];
-	reportedTempHistory: number[];
-	savedTempHistory: number[];
-	location?: number;
-	onHoldTempLowest?: number;
-	onHoldTempHighest?: number;
-	onHoldStatus?: OnHoldStatus | null;
-	onHoldSameStateCount?: number;
-	sensorSetting: HydratedDocument<ISensorSetting>;
-	lastUpdate?: Date;
-	temperatureDirection: TemperatureDirection;
-}
+import { Sensor, TemperatureDirection, OnHoldStatus } from '../types/generic';
 
 export interface SensorSetting {
 	label: string;
@@ -417,6 +377,30 @@ export const changeSensorSettings = async (id: number, settings: SensorSetting) 
 
 	return false;
 };
+
+export const getAvgByLocation = (locationId: number) => {
+	const sensors = getSensors(locationId);
+
+	const avgValues = {
+		temperature: 0,
+		humidity: 0
+	};
+	let activeCount = 0;
+
+	const keys = Object.keys(sensors).map(Number);
+	keys.forEach(key => {
+		if (sensors[key].active && sensors[key].enabled) {
+			avgValues.temperature += sensors[key].temperature;
+			avgValues.humidity += sensors[key].humidity;
+			activeCount++;
+		}
+	});
+
+	avgValues.temperature = avgValues.temperature / activeCount;
+	avgValues.humidity = avgValues.humidity / activeCount;
+
+	return avgValues;
+}
 
 setInterval(() => {
 	Object.keys(sensorData).map(Number).forEach(async (id: number) => {

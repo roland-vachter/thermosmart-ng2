@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Location } from '../types/types';
+import { Location, LOCATION_FEATURE } from '../types/types';
 import { BehaviorSubject, PartialObserver } from 'rxjs';
 
 @Injectable({
@@ -31,5 +31,9 @@ export class LocationService {
 
   subscribe(observer?: (s: Location) => void | PartialObserver<Location>) {
     return this.selectedLocation.subscribe(observer);
+  }
+
+  hasFeature(location: Location, feature: LOCATION_FEATURE) {
+    return location?.features?.includes(feature);
   }
 }

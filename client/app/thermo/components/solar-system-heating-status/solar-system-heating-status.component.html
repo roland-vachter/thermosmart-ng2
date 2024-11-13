@@ -1,0 +1,41 @@
+<div class="component">
+  <div class="row">
+    <div class="col-6">
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="solar-production" [ngClass]="{
+            'color-orange': dataStore?.solarHeatingStatus?.solarProduction > 0,
+            'color-gray': dataStore?.solarHeatingStatus?.gridInjection === 0
+          }">
+            <i class="icon-solar-panel"></i>
+            {{ dataStore?.solarHeatingStatus?.solarProduction }} W
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="solar-production" [ngClass]="{
+            'color-olive': dataStore?.solarHeatingStatus?.gridInjection >= 0,
+            'color-vermillion': dataStore?.solarHeatingStatus?.gridInjection < 0
+          }">
+            <i class="icon-plug-circle-plus"></i>
+            {{ dataStore?.solarHeatingStatus?.gridInjection }} W
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div class="radiators">
+        <div *ngIf="!radiators?.length">No radiators</div>
+        <i class="icon-radiator" *ngFor="let r of radiators"
+          [ngClass]="{ 'color-olive': r.isOn, 'color-gray': !r.isOn }"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 heating-duration">
+      <i class="icon-timer color-gold"></i> {{ dataStore?.solarHeatingDuration | duration }}
+    </div>
+  </div>
+</div>

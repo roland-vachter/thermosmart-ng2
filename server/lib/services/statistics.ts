@@ -10,6 +10,9 @@ import moment, { Moment } from 'moment-timezone';
 import { HydratedDocument } from 'mongoose';
 import { toSameDateInUTC } from './timezoneConversion';
 import HeatingHoldConditionHistory, { HeatingHoldConditionTypes } from '../models/HeatingHoldConditionHistory';
+import SolarSystemHeatingHistory, { ISolarSystemHeatingHistory } from '../models/SolarSystemHeatingHistory';
+import { hasLocationFeature } from './location';
+import { LOCATION_FEATURE } from '../types/generic';
 
 
 interface Total {
@@ -22,12 +25,14 @@ interface Total {
 	outsideTempTotal: number;
 	outsideHumiTotal: number;
 	sunshineMinutesTotal: number;
+	radiatorRunningMinutesTotal: number;
 }
 
 interface Average {
 	date: string;
 	totalRunningMinutes: number;
 	avgRunningMinutes: number;
+	avgRadiatorRunningMinutes?: number;
 	avgTargetTemp: number;
 	avgOutsideTemp: number;
 	avgOutsideHumi: number;
@@ -124,6 +129,78 @@ async function calculateHeatingDuration(location: HydratedDocument<ILocation>, d
 			}
 
 			if (lastEntry.status !== entry.status) {
+				lastEntry = entry;
+			}
+		} else {
+			lastEntry = entry;
+		}
+	});
+
+	return Math.round(heatingDuration);
+}
+
+async function calculateSolarHeatingDuration(location: HydratedDocument<ILocation>, date?: Date) {
+	if (!date) {
+		date = moment().toDate();
+	}
+
+	const [lastHistory, history] = await Promise.all([
+		SolarSystemHeatingHistory
+			.findOne({
+				datetime: {
+					$lt: moment(date).tz(location.timezone).startOf('day')
+				},
+				location: location._id
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec(),
+			SolarSystemHeatingHistory
+			.find({
+				datetime: {
+					$gt: moment(date).tz(location.timezone).startOf('day'),
+					$lt: moment(date).tz(location.timezone).endOf('day')
+				},
+				location: location._id
+			})
+			.sort({
+				datetime: 1
+			})
+			.exec()
+	])
+
+	if (!history?.length && !lastHistory?.noOfRunningRadiators) {
+		return 0;
+	}
+
+	history.unshift({
+		datetime: moment(date).tz(location.timezone).startOf('day').toDate(),
+		noOfRunningRadiators: lastHistory ? lastHistory.noOfRunningRadiators : 0,
+		location: location._id
+	} as HydratedDocument<ISolarSystemHeatingHistory>);
+
+	history.push({
+		datetime: new Date(
+			Math.min(
+				moment().tz(location.timezone).valueOf(),
+				moment(date).tz(location.timezone).endOf('day').valueOf()
+			)
+		),
+		noOfRunningRadiators: 0,
+		location: location._id
+	} as HydratedDocument<ISolarSystemHeatingHistory>);
+
+	let heatingDuration = 0; // minutes
+	let lastEntry: HydratedDocument<ISolarSystemHeatingHistory>;
+
+	history.forEach(entry => {
+		if (lastEntry) {
+			if (lastEntry.noOfRunningRadiators > 0 && entry.noOfRunningRadiators === 0) {
+				heatingDuration += (moment(entry.datetime).tz(location.timezone).valueOf() - moment(lastEntry.datetime).tz(location.timezone).valueOf()) / 60000;
+			}
+
+			if ((lastEntry.noOfRunningRadiators > 0) !== (entry.noOfRunningRadiators > 0)) {
 				lastEntry = entry;
 			}
 		} else {
@@ -372,13 +449,14 @@ const saveStatisticsForADayByLocation = async (locationId: number) => {
 
 		while (currentDate < todayStart) {
 			try {
-				const [heatingDuration, avgTargetTemp, avgOutsideCondition] = await Promise.all([
+				const [heatingDuration, avgTargetTemp, avgOutsideCondition, solarHeatingDuration] = await Promise.all([
 					calculateHeatingDuration(location, currentDate),
 					calculateAvgTargetTemp(location, currentDate),
-					calculateAvgOutsideCondition(location, currentDate)
+					calculateAvgOutsideCondition(location, currentDate),
+					hasLocationFeature(location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) ? calculateSolarHeatingDuration(location, currentDate) : Promise.resolve()
 				]);
 
-				await new HeatingStatistics({
+				const heatingStatisticsPayload: IHeatingStatistics = {
 					date: toSameDateInUTC(currentDate, location.timezone).startOf('day').toDate(),
 					avgTargetTemp: avgTargetTemp || null,
 					avgOutsideTemp: avgOutsideCondition.t,
@@ -386,7 +464,13 @@ const saveStatisticsForADayByLocation = async (locationId: number) => {
 					sunshineMinutes: avgOutsideCondition.sunshineMinutes,
 					runningMinutes: heatingDuration,
 					location: locationId
-				}).save();
+				};
+
+				if (hasLocationFeature(location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+					heatingStatisticsPayload.radiatorRunningMinutes = solarHeatingDuration as number;
+				}
+
+				await new HeatingStatistics(heatingStatisticsPayload).save();
 			} catch (e) {
 				console.error('error while calculating statistics or saving it for date', e);
 			}
@@ -456,6 +540,15 @@ export const getStatisticsForToday = async (locationId: number) => {
 	}
 
 	const heatingDuration = await calculateHeatingDuration(location);
+
+	if (hasLocationFeature(location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+		const solarHeatingDuration = await calculateSolarHeatingDuration(location);
+
+		return {
+			heatingDuration,
+			solarHeatingDuration
+		};
+	}
 
 	return {
 		heatingDuration
@@ -544,7 +637,8 @@ export const getStatisticsByMonth = async (locationId: number, dateStart: Date, 
 				daysOutsideCondition: 0,
 				outsideTempTotal: 0,
 				outsideHumiTotal: 0,
-				sunshineMinutesTotal: 0
+				sunshineMinutesTotal: 0,
+				radiatorRunningMinutesTotal: 0
 			});
 		}
 
@@ -553,6 +647,10 @@ export const getStatisticsByMonth = async (locationId: number, dateStart: Date, 
 
 		if (statistic.runningMinutes) {
 			currentAvg.runningMinutesTotal += statistic.runningMinutes;
+		}
+
+		if (statistic.radiatorRunningMinutes) {
+			currentAvg.radiatorRunningMinutesTotal += statistic.radiatorRunningMinutes;
 		}
 
 		if (statistic.avgTargetTemp) {
@@ -575,6 +673,7 @@ export const getStatisticsByMonth = async (locationId: number, dateStart: Date, 
 			date: total.date.format('YYYY-MM'),
 			totalRunningMinutes: total.runningMinutesTotal,
 			avgRunningMinutes: total.daysRunningMinutes ? total.runningMinutesTotal / total.daysRunningMinutes : 0,
+			avgRadiatorRunningMinutes: total.daysRunningMinutes ? total.radiatorRunningMinutesTotal / total.daysRunningMinutes : 0,
 			avgTargetTemp: total.targetTempTotal / total.daysTargetTemp,
 			avgOutsideTemp: total.outsideTempTotal / total.daysOutsideCondition,
 			avgOutsideHumi: total.outsideHumiTotal / total.daysOutsideCondition,
@@ -618,6 +717,7 @@ export const getStatisticsByYear = async (locationId: number, dateStart: Date, d
 		return {
 			year: y,
 			avgRunningMinutes: byMonths.reduce((acc, v) => acc + v.avgRunningMinutes, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
+			avgRadiatorRunningMinutes: byMonths.reduce((acc, v) => acc + v.avgRadiatorRunningMinutes, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
 			avgTargetTemp: byMonths.reduce((acc, v) => acc + v.avgTargetTemp, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
 			avgOutsideTemp: byMonths.reduce((acc, v) => acc + v.avgOutsideTemp, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),
 			avgOutsideHumi: byMonths.reduce((acc, v) => acc + v.avgOutsideHumi, 0) / (y < currentYear ? 12 : (moment().tz(location.timezone).month() + 1)),

@@ -1,8 +1,8 @@
-import { ApplicationRef, EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Moment } from 'moment-timezone';
 import * as moment from 'moment-timezone';
 import { ServerUpdateService } from '../../shared/server-update.service';
-import { HeatingConditions, HeatingPlan, HeatingPower, ThermoInitUpdateData } from "../types/types";
+import { HeatingConditions, HeatingPlan, HeatingPower, SolarHeatingStatus, ThermoInitUpdateData } from "../types/types";
 import { Temperature } from "../types/types";
 import { HeatingDefaultPlan } from "../types/types";
 import { HeatingPlanOverride } from "../types/types";
@@ -10,7 +10,9 @@ import { Sensor } from "../types/types";
 import { ThermoServerApiService } from './thermo-server-api.service';
 import { LocationService } from '../../services/location.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ThermoDataStoreService {
 
 	private dayNameByIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -37,6 +39,7 @@ export class ThermoDataStoreService {
 	};
 	heatingStatus: boolean = false;
 	heatingDuration: number = 0;
+	solarHeatingDuration: number = 0;
 	temperatures: Record<string, Temperature> = {};
 	heatingPlans: Record<string, HeatingPlan> = {};
 	defaultHeatingPlans: HeatingDefaultPlan[] = [];
@@ -54,14 +57,19 @@ export class ThermoDataStoreService {
 	heatingConditions: HeatingConditions;
 	sensorRestartInProgress: boolean = false;
 	heatingPlanOverrides: HeatingPlanOverride[] = [];
+	solarHeatingStatus: SolarHeatingStatus = {
+		numberOfRadiators: 0,
+		numberOfRunningRadiators: 0,
+		gridInjection: 0,
+		solarProduction: 0
+	};
 
 	evt: EventEmitter<string> = new EventEmitter();
 
 	constructor(
 		private serverApiService: ThermoServerApiService,
 		private serverUpdateService: ServerUpdateService,
-		private locationService: LocationService,
-		private appRef: ApplicationRef
+		private locationService: LocationService
 	) {
 		this.serverUpdateService.onUpdate()
 			.subscribe(this.handleServerData.bind(this));
@@ -84,6 +92,7 @@ export class ThermoDataStoreService {
 		};
 		this.heatingStatus = false;
 		this.heatingDuration = 0;
+		this.solarHeatingDuration = 0;
 		this.temperatures = {};
 		this.heatingPlans = {};
 		this.defaultHeatingPlans = [];
@@ -100,6 +109,12 @@ export class ThermoDataStoreService {
 		};
 		this.sensorRestartInProgress = false;
 		this.heatingPlanOverrides = [];
+		this.solarHeatingStatus = {
+			numberOfRadiators: 0,
+			numberOfRunningRadiators: 0,
+			gridInjection: 0,
+			solarProduction: 0
+		};
 	}
 
   init() {
@@ -213,6 +228,10 @@ export class ThermoDataStoreService {
 
 		if (data.statisticsForToday) {
 			this.heatingDuration = data.statisticsForToday.heatingDuration;
+
+			if (typeof data.statisticsForToday.solarHeatingDuration === 'number') {
+				this.solarHeatingDuration = data.statisticsForToday.solarHeatingDuration;
+			}
 		}
 
 		if (data.heatingPower) {
@@ -231,6 +250,13 @@ export class ThermoDataStoreService {
 				date: moment(p.date),
 				plan: this.heatingPlans[p.plan as number]
 			}));
+		}
+
+		if (data.solarHeatingStatus) {
+			this.solarHeatingStatus.numberOfRadiators = data.solarHeatingStatus.numberOfRadiators;
+			this.solarHeatingStatus.numberOfRunningRadiators = data.solarHeatingStatus.numberOfRunningRadiators;
+			this.solarHeatingStatus.solarProduction = data.solarHeatingStatus.solarProduction;
+			this.solarHeatingStatus.gridInjection = data.solarHeatingStatus.gridInjection;
 		}
 
 		this.updateTodaysPlan();
@@ -261,8 +287,6 @@ export class ThermoDataStoreService {
 		this.percentInDay = this.getPercentInDay();
 		this.currentTime = `${this.pad(d.hours(), 2)}:${this.pad(d.minutes(), 2)}`;
 		this.currentDate = d;
-
-        this.appRef.tick();
 	}
 
 	private processPlanForDisplay (heatingPlan: HeatingPlan) {
