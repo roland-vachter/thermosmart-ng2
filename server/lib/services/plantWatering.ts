@@ -90,6 +90,7 @@ let initialPromise: Promise<void> | null = Promise.all(zones.map(async z => {
 export const getPlantWateringStatus = async () => initialPromise ? initialPromise.then(() => status) : status;
 
 export const markAsWet = async (z: number) => {
+	void z;
 	// await new PlantWateringStatusHistory({
 	// 	zone: z,
 	// 	datetime: new Date(),
