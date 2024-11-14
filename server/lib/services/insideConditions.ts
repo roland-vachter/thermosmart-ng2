@@ -126,7 +126,17 @@ export const setSensorInput = async (data: SensorInput) => {
 			if (sensor.savedTempHistory.length) {
 				const avgPreviousTemps = sensor.savedTempHistory.reduce((acc, v) => acc + v, 0) / sensor.savedTempHistory.length;
 				if (avgPreviousTemps !== sensor.temperature) {
-					sensor.temperatureDirection = sensor.temperature < avgPreviousTemps ? TemperatureDirection.decrease : TemperatureDirection.increase;
+					if (sensor.temperatureDirection === TemperatureDirection.decrease) {
+						if (sensor.temperature > avgPreviousTemps) {
+							sensor.temperatureDirection = TemperatureDirection.stabilized;
+						}
+					} else if (sensor.temperatureDirection === TemperatureDirection.increase) {
+						if (sensor.temperature < avgPreviousTemps) {
+							sensor.temperatureDirection = TemperatureDirection.stabilized;
+						}
+					} else {
+						sensor.temperatureDirection = sensor.temperature < avgPreviousTemps ? TemperatureDirection.decrease : TemperatureDirection.increase;
+					}
 				}
 			}
 

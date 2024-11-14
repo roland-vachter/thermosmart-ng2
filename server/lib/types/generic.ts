@@ -90,7 +90,8 @@ export enum OnHoldStatus {
 
 export enum TemperatureDirection {
 	'increase' = 'increase',
-	'decrease' = 'decrease'
+	'decrease' = 'decrease',
+	'stabilized' = 'stabilized'
 }
 
 export enum DAYTIME {
