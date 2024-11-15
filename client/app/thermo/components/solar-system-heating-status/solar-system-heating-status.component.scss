@@ -17,9 +17,19 @@ i {
 
 .solar-production {
 	justify-content: center;
+	position: relative;
+	padding: 5px 0 20px;
 
 	i {
 		margin-right: 10px;
+	}
+
+	.line-vertical {
+		width: 2px;
+		height: 17px;
+		position: absolute;
+		bottom: 2px;
+		left: calc(50% - 1px);
 	}
 }
 
@@ -32,14 +42,28 @@ i {
 	margin: 5px;
 }
 
-.solar-production {
-	margin: 5px 0;
+.grid-injection {
+	.icons {
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+
+		.line-horizontal {
+			flex: 1;
+			height: 2px;
+			margin: 0 5px;
+		}
+	}
+
+	.value {
+		text-align: center;
+	}
 }
 
 .heating-duration {
 	text-align: center;
-	font-size: 1.2rem;
-	font-weight: bold;
+	font-size: 1.1rem;
+	font-weight: normal;
 }
 
 .icon-timer {
