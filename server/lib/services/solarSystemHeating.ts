@@ -393,5 +393,5 @@ export const init = () => {
 
   setInterval(() => {
     void updateAllLocations();
-  }, 5.1 * 60 * 1000);
+  }, 4.1 * 60 * 1000);
 }

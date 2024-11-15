@@ -10,10 +10,14 @@
 				<div class="thermo-temps--temp col-xs-6 col-lg-4" *ngFor="let temp of dataStore.temperatures | keyvalue">
 					<div class="color-{{temp.value.color}}">
 						<i class="{{temp.value.iconClass}}"></i> <span class="thermo-temps--temp-name">{{temp.value.name}}</span>
-						<div class="thermo-temps--temp-control" data-id="{{temp.key}}">
-							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="tempAdjust(temp.value, -0.1)">-</button>
+						<div class="thermo-temp--line" data-id="{{temp.key}}">
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease" (click)="tempAdjust(temp.value, -0.1)">
+								<i class="icon-minus-circle"></i>
+							</button>
 							<span class="thermo-temps--temp-value">{{temp.value.value | integer}}<span class="decimal">.{{temp.value.value | decimal}}</span> &deg;C</span>
-							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase" (click)="tempAdjust(temp.value, 0.1)">+</button>
+							<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase" (click)="tempAdjust(temp.value, 0.1)">
+								<i class="icon-plus-circle"></i>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -32,17 +36,35 @@
 				<div class="thermo-switch--value col-6">
 					<h5>Switch on</h5>
 
-					<button type="button" class="thermo-switch--button thermo-switch--decrease" (click)="switchAdjust(switchThresholdBelow, -0.1)">-</button>
-					<span class="thermo-switch-value">{{switchThresholdBelow.value | integer}}<span class="decimal">.{{switchThresholdBelow.value | decimal}}</span> &deg;C</span>
-					<button type="button" class="thermo-switch--button thermo-switch--increase" (click)="switchAdjust(switchThresholdBelow, 0.1)">+</button>
+					<div class="thermo-temp--line">
+						<button type="button" class="thermo-switch--button thermo-switch--decrease"
+							[disabled]="switchThresholdBelow.value <= 0 || switchThresholdAbove.value + switchThresholdBelow.value <= 0.1"
+							(click)="switchAdjust(switchThresholdBelow, -0.1)">
+							<i class="icon-minus-circle"></i>
+						</button>
+						<span class="thermo-switch-value">{{switchThresholdBelow.value | integer}}<span class="decimal">.{{switchThresholdBelow.value | decimal}}</span> &deg;C</span>
+						<button type="button" class="thermo-switch--button thermo-switch--increase"
+							(click)="switchAdjust(switchThresholdBelow, 0.1)">
+							<i class="icon-plus-circle"></i>
+						</button>
+					</div>
 				</div>
 
 				<div class="thermo-switch--value col-6">
 					<h5>Switch off</h5>
 
-					<button type="button" class="thermo-switch--button thermo-switch--decrease" (click)="switchAdjust(switchThresholdAbove, -0.1)">-</button>
-					<span class="thermo-switch-value">{{switchThresholdAbove.value | integer}}<span class="decimal">.{{switchThresholdAbove.value | decimal}}</span> &deg;C</span>
-					<button type="button" class="thermo-switch--button thermo-switch--increase" (click)="switchAdjust(switchThresholdAbove, 0.1)">+</button>
+					<div class="thermo-temp--line">
+						<button type="button" class="thermo-switch--button thermo-switch--decrease"
+							[disabled]="switchThresholdAbove.value <= 0 || switchThresholdAbove.value + switchThresholdBelow.value <= 0.1"
+							(click)="switchAdjust(switchThresholdAbove, -0.1)">
+							<i class="icon-minus-circle"></i>
+						</button>
+						<span class="thermo-switch-value">{{switchThresholdAbove.value | integer}}<span class="decimal">.{{switchThresholdAbove.value | decimal}}</span> &deg;C</span>
+						<button type="button" class="thermo-switch--button thermo-switch--increase"
+							(click)="switchAdjust(switchThresholdAbove, 0.1)">
+							<i class="icon-plus-circle"></i>
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -15,6 +15,7 @@
 }
 
 .thermo-temps--temp-button {
+	display: flex;
 	outline: 0;
 	border: 0;
 	background: none;
@@ -42,15 +43,24 @@
 	}
 }
 
+.thermo-temp--line {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .thermo-switch--button {
+	display: flex;
 	outline: 0;
 	border: 0;
 	background: none;
 	color: $gray;
 	cursor: pointer;
+
+	&:disabled {
+		color: $silver;
+	}
 }
-
-
 
 .thermo-default-plans {
 	border: 2px solid $silver;

@@ -94,9 +94,14 @@ export class ThermoConfigModalComponent {
 	}
 
 	switchAdjust(switchConfig, diff: number) {
-		const expected = switchConfig.value + diff;
-		this.sharedApiService.changeConfig(switchConfig.name, switchConfig.value + diff).subscribe();
-		switchConfig.value = expected;
+		const previousValue = switchConfig.value;
+		switchConfig.value = Math.round((switchConfig.value + diff) * 10) / 10;
+		this.sharedApiService.changeConfig(switchConfig.name, switchConfig.value).subscribe({
+			next: () => {},
+			error: () => {
+				switchConfig.value = previousValue;
+			}
+		});
 	}
 
 	selectPlan() {

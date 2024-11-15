@@ -64,6 +64,7 @@ h6 {
 	box-sizing: border-box;
 	margin-bottom: 10px;
 	border-radius: 20px;
+	height: calc(100% - 10px);
 
 	.row {
 		width: 100%;
