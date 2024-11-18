@@ -333,8 +333,8 @@ export function getStatusByLocation(locationId: number): SolarSystemStatus {
     return {
       numberOfRadiators: locationStatus.numberOfRadiators || 0,
       numberOfRunningRadiators: locationStatus.numberOfRunningRadiators || 0,
-      solarProduction: 450, // locationStatus.solarProduction?.value || 0,
-      gridInjection: 230 // locationStatus.gridInjection?.value || 0
+      solarProduction: locationStatus.solarProduction?.value || 0,
+      gridInjection: locationStatus.gridInjection?.value || 0
     };
   }
 
