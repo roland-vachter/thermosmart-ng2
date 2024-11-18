@@ -1,7 +1,7 @@
 import { getOutsideConditions } from './outsideConditions';
 import heatingEvts from './heatingEvts';
 
-import { insideConditionsEvts, getSensors } from './insideConditions';
+import { insideConditionsEvts, getSensors, clearWindowOpenByLocation } from './insideConditions';
 import { getConfig } from './config';
 import { HydratedDocument } from 'mongoose';
 import { IConfig } from '../models/Config';
@@ -169,6 +169,8 @@ export const ignoreHoldConditions = (locationId: number) => {
 	locationStatus.hasIncreasingTrend = false;
 	locationStatus.hasFavorableWeatherForecast = false;
 	locationStatus.hasWindowOpen = false;
+
+	clearWindowOpenByLocation(locationId);
 
 	emitConditionStatusChange(locationId);
 }

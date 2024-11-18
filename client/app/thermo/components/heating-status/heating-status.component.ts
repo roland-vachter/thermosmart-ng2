@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { RESPONSE_STATUS } from '../../../types/types';
 import { ThermoActionsService } from '../../services/thermo-actions.service';
@@ -13,6 +13,8 @@ import { ThermoConfigModalComponent } from '../thermo-config-modal/thermo-config
   styleUrls: ['./heating-status.component.scss']
 })
 export class HeatingStatusComponent implements OnInit {
+	@ViewChild('powerSwitch') powerSwitchEl: ElementRef<HTMLInputElement>;
+
 	public timerString: string;
 	onHold: boolean = true;
 	private heatingPowerOffInterval: number;
@@ -46,13 +48,21 @@ export class HeatingStatusComponent implements OnInit {
 	}
 
 	toggleStatus() {
-		if (this.onHold) {
-			this.serverApiService.ignoreHoldConditions().subscribe(res => {
-				this.dataStore.handleServerData(res?.data);
-			});
-		} else {
+		if (!this.dataStore.heatingPower.status || !this.onHold) {
 			this.serverApiService.toggleHeatingPower().subscribe(res => {
 				this.dataStore.handleServerData(res?.data);
+
+				if (this.powerSwitchEl?.nativeElement) {
+					this.powerSwitchEl.nativeElement.checked = this.dataStore.heatingPower.status && !this.onHold;
+				}
+			});
+		} else {
+			this.serverApiService.ignoreHoldConditions().subscribe(res => {
+				this.dataStore.handleServerData(res?.data);
+
+				if (this.powerSwitchEl?.nativeElement) {
+					this.powerSwitchEl.nativeElement.checked = this.dataStore.heatingPower.status && !this.onHold;
+				}
 			});
 		}
 	}

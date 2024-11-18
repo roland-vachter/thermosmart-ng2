@@ -55,14 +55,27 @@ function getAvgTemp(sensor: Sensor, newTemperature: number) {
 	return Math.round(sum * 10 / count) / 10;
 }
 
-const clearWindowOpen = (sensor: Sensor, currentTemp: number) => {
+export const clearWindowOpenBySensor = (sensor: Sensor) => {
 	sensor.onHoldStatus = null;
-	sensor.onHoldTempLowest = currentTemp;
-	sensor.onHoldTempHighest = currentTemp;
+	sensor.onHoldTempLowest = sensor.reportedTempHistory[0];
+	sensor.onHoldTempHighest = sensor.reportedTempHistory[0];
 	sensor.windowOpen = false;
 	clearTimeout(sensor.windowOpenTimeout);
 
-	console.log('window open - cleared', sensor.id, currentTemp);
+	insideConditionsEvts.emit('change', {
+		...sensor,
+		windowOpenTimeout: undefined
+	});
+
+	console.log('window open - cleared', sensor.id, sensor.reportedTempHistory[0]);
+}
+
+export const clearWindowOpenByLocation = (locationId: number) => {
+	Object.keys(sensorData).map(Number).forEach(id => {
+		if (sensorData[id].location === locationId) {
+			clearWindowOpenBySensor(sensorData[id]);
+		}
+	});
 }
 
 export const setSensorInput = async (data: SensorInput) => {
@@ -194,7 +207,7 @@ export const setSensorInput = async (data: SensorInput) => {
 						sensor.onHoldStatus = OnHoldStatus.decrease;
 						console.log('window open - decrease', sensor.id, currentTemp);
 					} else {
-						clearWindowOpen(sensor, currentTemp);
+						clearWindowOpenBySensor(sensor);
 						changesMade = true;
 					}
 				} else if (sensor.onHoldStatus === OnHoldStatus.decrease) {
@@ -202,7 +215,7 @@ export const setSensorInput = async (data: SensorInput) => {
 						if (sensor.onHoldSameStateCount < 5) {
 							sensor.onHoldSameStateCount++;
 						} else {
-							clearWindowOpen(sensor, currentTemp);
+							clearWindowOpenBySensor(sensor);
 							changesMade = true;
 						}
 					} else if (currentTemp < sensor.onHoldTempLowest) {
@@ -218,7 +231,7 @@ export const setSensorInput = async (data: SensorInput) => {
 						if (sensor.onHoldSameStateCount < 5) {
 							sensor.onHoldSameStateCount++;
 						} else {
-							clearWindowOpen(sensor, currentTemp);
+							clearWindowOpenBySensor(sensor);
 							changesMade = true;
 						}
 					} else if (currentTemp <= sensor.onHoldTempLowest) {
@@ -254,7 +267,7 @@ export const setSensorInput = async (data: SensorInput) => {
 						sensor.onHoldSameStateCount++;
 						console.log('window open - stabilized', sensor.id, 'count:', sensor.onHoldSameStateCount, currentTemp);
 					} else {
-						clearWindowOpen(sensor, currentTemp);
+						clearWindowOpenBySensor(sensor);
 						changesMade = true;
 					}
 				}

@@ -37,8 +37,9 @@
                     <i class="icon-temperature-arrow"></i>
                     <div class="ignore">/</div>
                   </div>
+
                   <label class="switch">
-                    <input type="checkbox" class="switch-input" [ngClass]="{'on-hold': onHold && dataStore.heatingPower.status}" [checked]="dataStore.heatingPower.status && !onHold" (change)="toggleStatus()">
+                    <input #powerSwitch type="checkbox" class="switch-input" [ngClass]="{'on-hold': onHold && dataStore.heatingPower.status}" [checked]="dataStore.heatingPower.status && !onHold" (change)="toggleStatus()">
                     <span class="switch-label" data-on=" " data-off=" "></span>
                     <span class="switch-handle"></span>
                     <span class="thermo-heating--power-counter">{{timerString}}</span>
