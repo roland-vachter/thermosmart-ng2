@@ -52,11 +52,24 @@ i {
 			flex: 1;
 			height: 2px;
 			margin: 0 5px;
+			position: relative;
+		}
+
+		.direction-container {
+			width: 100%;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translateX(-50%) translateY(-50%);
+			display: flex;
+			justify-content: space-around;
+			font-size: 1.2rem;
 		}
 	}
 
 	.value {
-		text-align: center;
+		display: flex;
+		justify-content: space-between;
 	}
 }
 

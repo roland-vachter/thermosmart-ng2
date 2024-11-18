@@ -1,4 +1,4 @@
-import { getOutsideConditions, getOutsideTemperature } from './outsideConditions';
+import { getOutsideConditions } from './outsideConditions';
 import heatingEvts from './heatingEvts';
 
 import { insideConditionsEvts, getSensors } from './insideConditions';
@@ -7,7 +7,8 @@ import { HydratedDocument } from 'mongoose';
 import { IConfig } from '../models/Config';
 import { getTargetTempByLocation } from './targetTemp';
 import moment from 'moment-timezone';
-import { TemperatureDirection } from '../types/generic';
+import { LOCATION_FEATURE, TemperatureDirection } from '../types/generic';
+import { hasLocationFeatureById } from './location';
 
 interface Heating {
 	isOn: boolean;
@@ -257,7 +258,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 		}
 
 		if (Number.isNaN(locationStatus.avgValues.temperature)) {
-			// console.log(`[${locationId}] turn off because there are no sensors.`);
+			console.log(`[${locationId}] turn off because there are no sensors.`);
 			locationStatus.hasFavorableWeatherForecast = false;
 			locationStatus.hasIncreasingTrend = false;
 			locationStatus.hasWindowOpen = false;
@@ -274,29 +275,49 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				getConfig('weatherForecastFeature', locationId)
 			]);
 
+			let targetValue = target?.value;
+			const outsideConditions = getOutsideConditions();
+			if (weatherForecastFeature?.value) {
+				outsideConditions.sunshineForecast.forEach((s, index) => {
+					if (s) {
+						targetValue -= 0.1 / (index + 1);
+					}
+				});
+			}
+
+			console.log('targetValue', targetValue, outsideConditions.sunshineForecast);
+
 			if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions &&
-					target?.value < getOutsideTemperature()) {
+					targetValue < outsideConditions.temperature) {
 				console.log(`[${locationId}] turn off because target temperature is below outside temperature.`);
 				turnHeatingOff(locationId);
 			}
 
 			if (!locationStatus.isOn) {
-				let conditionToStart = locationStatus.avgValues.temperature <= target.value - (switchThresholdBelow.value as number);
+				let conditionToStart = locationStatus.avgValues.temperature <= targetValue - (switchThresholdBelow.value as number);
 
 				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
-					if (target?.value < getOutsideTemperature()) {
+					if (target?.value < outsideConditions.temperature) {
 						conditionToStart = false;
 						locationStatus.hasFavorableWeatherForecast = true;
 					} else if (target.value - locationStatus.avgValues.temperature - (switchThresholdBelow.value as number) < 0.4 &&
-							getOutsideConditions().sunrise && moment().valueOf() > getOutsideConditions().sunrise &&
+							outsideConditions.sunrise && moment().valueOf() > outsideConditions.sunrise &&
 								(
-									getOutsideConditions().highestExpectedTemperature > locationStatus.avgValues.temperature ||
-									getOutsideConditions().sunshineNextConsecutiveHours >= 2
+									outsideConditions.highestExpectedTemperature > locationStatus.avgValues.temperature ||
+									outsideConditions.sunshineNextConsecutiveHours >= 2
 								)
 							) {
 								conditionToStart = false;
 								locationStatus.hasFavorableWeatherForecast = true;
 					} else {
+						if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
+							outsideConditions.sunrise && moment().valueOf() > outsideConditions.sunrise &&
+							outsideConditions.sunshineNextConsecutiveHours >= 3 &&
+							target.value - locationStatus.avgValues.temperature - (switchThresholdBelow.value as number) < 0.6) {
+								conditionToStart = false;
+								locationStatus.hasFavorableWeatherForecast = true;
+						}
+
 						locationStatus.hasFavorableWeatherForecast = false;
 					}
 				} else {
@@ -321,7 +342,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				if (conditionToStart) {
 					turnHeatingOn(locationId);
 				}
-			} else if (locationStatus.avgValues.temperature >= target.value + (switchThresholdAbove.value as number)) {
+			} else if (locationStatus.avgValues.temperature >= targetValue + (switchThresholdAbove.value as number)) {
 				turnHeatingOff(locationId);
 			}
 		} else {

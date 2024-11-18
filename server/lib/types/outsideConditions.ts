@@ -27,5 +27,6 @@ export interface OutsideConditions {
   sunny: boolean;
   highestExpectedTemperature: number;
   sunshineNextConsecutiveHours: number;
+  sunshineForecast: boolean[];
   totalNumberOfSunshineExpected: number;
 }

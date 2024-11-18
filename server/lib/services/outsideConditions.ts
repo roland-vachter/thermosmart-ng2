@@ -145,8 +145,9 @@ async function update () {
 					});
 
 					lastValues.highestExpectedTemperature = forecast.reduce((acc, v) => v.temp > acc ? v.temp : acc, forecast.length && forecast[0].temp || 0);
-					lastValues.totalNumberOfSunshineExpected = forecast.reduce((acc, v) => {
-						if (v.weather[0].main === 'Clear' && v.dt * 1000 >= sunrise && v.dt * 1000 < sunset) {
+					lastValues.sunshineForecast = forecast.map(v => v.weather[0].main === 'Clear' && v.dt * 1000 >= sunrise && v.dt * 1000 < sunset);
+					lastValues.totalNumberOfSunshineExpected = lastValues.sunshineForecast.reduce((acc, v) => {
+						if (v) {
 							acc++;
 						}
 
