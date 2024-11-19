@@ -263,7 +263,7 @@ export const setSensorInput = async (data: SensorInput) => {
 					} else if (currentTemp > lastTemp) {
 						sensor.onHoldStatus = OnHoldStatus.increase;
 						console.log('window open - increase', sensor.id, currentTemp);
-					} else if (sensor.onHoldSameStateCount < 5) {
+					} else if (sensor.onHoldSameStateCount < 3) {
 						sensor.onHoldSameStateCount++;
 						console.log('window open - stabilized', sensor.id, 'count:', sensor.onHoldSameStateCount, currentTemp);
 					} else {
