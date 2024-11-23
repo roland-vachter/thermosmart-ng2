@@ -7,6 +7,7 @@ import TypedEventEmitter from 'typed-emitter';
 import { LOCATION_FEATURE, LocationBasedEvent } from '../types/generic';
 import { hasLocationFeature } from './location';
 import { getAvgByLocation } from './insideConditions';
+import { getTargetTempByLocation } from './targetTemp';
 
 enum DEVICE_TYPE {
   INVERTER = 'INVERTER',
@@ -226,6 +227,11 @@ async function calculateNumberOfRunningRadiators(locationId: number) {
   const insideCondition = getAvgByLocation(locationId);
 
   if (insideCondition.temperature > targetTemp) {
+    return 0;
+  }
+
+  // on holiday
+  if (getTargetTempByLocation(locationId)?._id === 3) {
     return 0;
   }
 
