@@ -9,6 +9,7 @@ import { getTargetTempByLocation } from './targetTemp';
 import moment from 'moment-timezone';
 import { LOCATION_FEATURE, TemperatureDirection } from '../types/generic';
 import { hasLocationFeatureById } from './location';
+import { getStatusByLocation } from './solarSystemHeating';
 
 interface Heating {
 	isOn: boolean;
@@ -277,6 +278,8 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				getConfig('weatherForecastFeature', locationId)
 			]);
 
+			const solarSystemHeatingStatus = getStatusByLocation(locationId);
+
 			let targetValue = target?.value;
 			const outsideConditions = getOutsideConditions();
 			if (weatherForecastFeature?.value) {
@@ -285,6 +288,10 @@ async function updateHeatingStatusByLocation (locationId: number) {
 						targetValue -= 0.1 / (index + 1);
 					}
 				});
+			}
+
+			if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) && solarSystemHeatingStatus.numberOfRunningRadiators) {
+				targetValue -= 0.1 * solarSystemHeatingStatus.numberOfRunningRadiators;
 			}
 
 			console.log('targetValue', targetValue, outsideConditions.sunshineForecast);
@@ -309,17 +316,15 @@ async function updateHeatingStatusByLocation (locationId: number) {
 									outsideConditions.sunshineNextConsecutiveHours >= 2
 								)
 							) {
-								conditionToStart = false;
-								locationStatus.hasFavorableWeatherForecast = true;
-					} else {
-						if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
-							outsideConditions.sunrise && moment().valueOf() > outsideConditions.sunrise &&
-							outsideConditions.sunshineNextConsecutiveHours >= 3 &&
+						conditionToStart = false;
+						locationStatus.hasFavorableWeatherForecast = true;
+					} else if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
+							((outsideConditions.sunrise && moment().valueOf() > outsideConditions.sunrise &&
+							outsideConditions.sunshineNextConsecutiveHours >= 3) || solarSystemHeatingStatus.numberOfRunningRadiators > 0) &&
 							target.value - locationStatus.avgValues.temperature - (switchThresholdBelow.value as number) < 0.6) {
-								conditionToStart = false;
-								locationStatus.hasFavorableWeatherForecast = true;
-						}
-
+						conditionToStart = false;
+						locationStatus.hasFavorableWeatherForecast = true;
+					} else {
 						locationStatus.hasFavorableWeatherForecast = false;
 					}
 				} else {
