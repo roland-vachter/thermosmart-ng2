@@ -163,7 +163,7 @@ export interface ThermoInitUpdateData {
     solarHeatingDuration?: number;
   };
   restartInProgress?: boolean;
-  config?: Record<string, string | number>;
+  config?: Record<string, string | number | boolean>;
   solarHeatingStatus?: SolarHeatingStatus;
 }
 

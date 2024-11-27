@@ -278,7 +278,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				getConfig('weatherForecastFeature', locationId)
 			]);
 
-			const solarSystemHeatingStatus = getStatusByLocation(locationId);
+			const solarSystemHeatingStatus = await getStatusByLocation(locationId);
 
 			let targetValue = target?.value;
 			const outsideConditions = getOutsideConditions();

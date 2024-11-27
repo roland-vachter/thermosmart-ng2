@@ -5,7 +5,7 @@ import Cryptr from 'cryptr';
 
 const cryptr = new Cryptr(process.env.CRYPTO_SECRET);
 
-type Config = Record<string, number | string | undefined>;
+type Config = Record<string, number | string | boolean | undefined>;
 
 interface ConfigOptions {
 	encrypted?: boolean;

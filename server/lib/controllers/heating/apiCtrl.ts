@@ -119,7 +119,7 @@ export const initHeating = async (req: Request, res: Response) => {
 	};
 
 	if (hasLocationFeature(location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
-		response.data.solarHeatingStatus = getSolarHeatingStatusByLocation(location.id);
+		response.data.solarHeatingStatus = await getSolarHeatingStatusByLocation(location.id);
 	}
 
 	res.json(response);

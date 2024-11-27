@@ -36,7 +36,7 @@ export const statusAndUpdate = async (req: Request, res: Response, next: NextFun
   try {
     res.json({
       status: 'ok',
-      data: getStatusByLocation(location.id)
+      data: await getStatusByLocation(location.id)
     });
   } catch (e) {
     console.error(e);
