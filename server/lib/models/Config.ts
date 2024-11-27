@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 
 export interface IConfig {
 	name: string;
-	value?: string | number;
+	value?: string | number | boolean;
 	location: number;
 	encrypted?: boolean;
 	private?: boolean;

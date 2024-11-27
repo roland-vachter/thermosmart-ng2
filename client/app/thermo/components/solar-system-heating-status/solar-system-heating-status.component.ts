@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ThermoDataStoreService } from '../../services/thermo-data-store.service';
 import { isNumber } from '../../../shared/utils';
+import { SharedServerApiService } from '../../../shared/shared-server-api.service';
 
 @Component({
   selector: 'thermo-solar-system-heating-status',
@@ -12,7 +13,8 @@ export class SolarSystemHeatingStatusComponent implements OnInit {
   consumption: number | string = 0;
 
   constructor(
-    public dataStore: ThermoDataStoreService
+    public dataStore: ThermoDataStoreService,
+    private serverApiService: SharedServerApiService
   ) {
     this.radiators = [];
     for (let i = 0; i < this.dataStore.solarHeatingStatus?.numberOfRadiators; i++) {
@@ -41,5 +43,9 @@ export class SolarSystemHeatingStatusComponent implements OnInit {
     if (isNumber(this.dataStore.solarHeatingStatus?.gridInjection) && isNumber(this.dataStore.solarHeatingStatus?.solarProduction)) {
       this.consumption = this.dataStore.solarHeatingStatus.solarProduction - this.dataStore.solarHeatingStatus.gridInjection;
     }
+  }
+
+  toggleStatus() {
+    this.serverApiService.changeConfig('solarHeatingDisabled', !this.dataStore.config.solarHeatingDisabled).subscribe()
   }
 }

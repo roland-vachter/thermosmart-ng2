@@ -67,8 +67,15 @@
           [ngClass]="{ 'color-olive': r.isOn, 'color-dark-gray': !r.isOn }"></i>
 
         <div class="row">
-          <div class="col-12 heating-duration">
+          <div class="col-6 heating-duration">
             <i class="icon-timer color-gold"></i> {{ dataStore?.solarHeatingDuration | duration }}
+          </div>
+          <div class="col-6 switch-wrapper">
+            <label class="switch">
+              <input #powerSwitch type="checkbox" class="switch-input" [checked]="!dataStore.config.solarHeatingDisabled" (change)="toggleStatus()">
+              <span class="switch-label" data-on="On" data-off="Off"></span>
+              <span class="switch-handle"></span>
+            </label>
           </div>
         </div>
       </div>

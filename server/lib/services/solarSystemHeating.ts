@@ -66,6 +66,7 @@ interface SolarSystemStatus {
   numberOfRunningRadiators: number;
   solarProduction: number;
   gridInjection: number;
+  isOn: boolean;
 }
 
 type SolarSystemEvents = {
@@ -214,9 +215,10 @@ async function getHuaweiActivePower(apiUrl: string, authToken: string, deviceTyp
 }
 
 async function calculateNumberOfRunningRadiators(locationId: number) {
-  const [radiatorPower, targetTemperatureConfig] = await Promise.all([
+  const [radiatorPower, targetTemperatureConfig, solarHeatingDisabled] = await Promise.all([
     await getConfig('solarSystemRadiatorPower', locationId),
-    await getConfig('solarSystemHeatingTemperature', locationId)
+    await getConfig('solarSystemHeatingTemperature', locationId),
+    await getConfig('solarHeatingDisabled', locationId)
   ]);
 
   let targetTemp = 24;
@@ -226,26 +228,20 @@ async function calculateNumberOfRunningRadiators(locationId: number) {
 
   const insideCondition = getAvgByLocation(locationId);
 
-  if (insideCondition.temperature > targetTemp) {
-    return 0;
-  }
-
-  // on holiday
-  if (getTargetTempByLocation(locationId)?._id === 3) {
-    return 0;
-  }
-
   const locationStatus = statusByLocations[locationId];
   const correctedGridInjectionValue = locationStatus?.gridInjection?.value + locationStatus.numberOfRunningRadiatorsReported * (radiatorPower?.value as number);
 
-  if (radiatorPower?.value && correctedGridInjectionValue > 0 && (radiatorPower?.value as number) > 0) {
-    return Math.floor(correctedGridInjectionValue / (radiatorPower?.value as number));
-  }
+  if (radiatorPower?.value && correctedGridInjectionValue > 0 && (radiatorPower?.value as number) > 0 && !(
+    insideCondition.temperature > targetTemp ||
+    solarHeatingDisabled?.value === true ||
+    getTargetTempByLocation(locationId)?._id === 3 // on holiday
+  )) {
+    const newValue = Math.floor(correctedGridInjectionValue / (radiatorPower?.value as number));
 
-  solarSystemEvts.emit('change', {
-    ...getStatusByLocation(locationId),
-    location: locationId
-  });
+    locationStatus.gridInjection.value += (locationStatus.numberOfRunningRadiatorsReported - newValue) * (radiatorPower?.value as number);
+
+    return newValue;
+  }
 
   return 0;
 }
@@ -333,22 +329,26 @@ async function updateByLocation(locationId: number) {
   locationStatus.numberOfRunningRadiators = await calculateNumberOfRunningRadiators(locationId);
 };
 
-export function getStatusByLocation(locationId: number): SolarSystemStatus {
+export async function getStatusByLocation(locationId: number): Promise<SolarSystemStatus> {
+  const solarHeatingDisabled = await getConfig('solarHeatingDisabled', locationId);
   const locationStatus = statusByLocations[locationId];
   if (locationStatus) {
     return {
       numberOfRadiators: locationStatus.numberOfRadiators || 0,
       numberOfRunningRadiators: locationStatus.numberOfRunningRadiators || 0,
       solarProduction: locationStatus.solarProduction?.value || 0,
-      gridInjection: locationStatus.gridInjection?.value || 0
+      gridInjection: locationStatus.gridInjection?.value || 0,
+      isOn: solarHeatingDisabled?.value !== true
     };
   }
 
   return null;
 }
 
-export function isSolarHeatingOn(locationId: number) {
-  return getStatusByLocation(locationId)?.numberOfRunningRadiators > 0;
+export async function isSolarHeatingOn(locationId: number) {
+  const status = await getStatusByLocation(locationId);
+
+  return status?.numberOfRunningRadiators > 0 && status?.isOn;
 }
 
 let updateTimeout: ReturnType<typeof setTimeout>;
@@ -382,7 +382,7 @@ export async function updateRunningRadiators(locationId: number, numberOfRadiato
 
   solarSystemEvts.emit('change', {
     location: locationId,
-    ...getStatusByLocation(locationId)
+    ...await getStatusByLocation(locationId)
   });
 
   if (updateTimeout) {
