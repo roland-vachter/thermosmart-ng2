@@ -72,7 +72,7 @@
           </div>
           <div class="col-6 switch-wrapper">
             <label class="switch">
-              <input #powerSwitch type="checkbox" class="switch-input" [checked]="!dataStore.config.solarHeatingDisabled?.value" (change)="toggleStatus()">
+              <input #powerSwitch type="checkbox" class="switch-input" [checked]="dataStore.config.solarHeatingDisabled?.value !== true" (change)="toggleStatus()">
               <span class="switch-label" data-on="On" data-off="Off"></span>
               <span class="switch-handle"></span>
             </label>

@@ -46,6 +46,8 @@ export class SolarSystemHeatingStatusComponent implements OnInit {
   }
 
   toggleStatus() {
-    this.serverApiService.changeConfig('solarHeatingDisabled', !this.dataStore.config.solarHeatingDisabled).subscribe()
+    this.serverApiService.changeConfig('solarHeatingDisabled', !this.dataStore.config.solarHeatingDisabled?.value).subscribe(() => {
+      this.dataStore.config.solarHeatingDisabled.value = !!this.dataStore.config.solarHeatingDisabled?.value;
+    });
   }
 }
