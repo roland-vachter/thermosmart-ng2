@@ -238,7 +238,7 @@ async function calculateNumberOfRunningRadiators(locationId: number) {
   )) {
     const newValue = Math.floor(correctedGridInjectionValue / (radiatorPower?.value as number));
 
-    locationStatus.gridInjection.value += (locationStatus.numberOfRunningRadiatorsReported - newValue) * (radiatorPower?.value as number);
+    // locationStatus.gridInjection.value += (locationStatus.numberOfRunningRadiatorsReported - newValue) * (radiatorPower?.value as number);
 
     return newValue;
   }
