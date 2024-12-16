@@ -10,6 +10,7 @@ import moment from 'moment-timezone';
 import { LOCATION_FEATURE, TemperatureDirection } from '../types/generic';
 import { hasLocationFeatureById } from './location';
 import { getStatusByLocation } from './solarSystemHeating';
+import { deepEqual } from '../utils/utils';
 
 interface Heating {
 	isOn: boolean;
@@ -45,6 +46,7 @@ const defaultValues: Heating = {
 	shouldIgnoreHoldConditions: false
 };
 const statusByLocation: Record<number, Heating> = {};
+const lastLocationStatus: Record<number, Heating> = {};
 
 const initLocation = (locationId: number) => {
 	if (!statusByLocation[locationId]) {
@@ -191,13 +193,17 @@ function emitConditionStatusChange(locationId: number) {
 	initLocation(locationId);
 	const locationStatus = statusByLocation[locationId];
 
-	heatingEvts.emit('conditionStatusChange', {
-		hasIncreasingTrend: locationStatus.hasIncreasingTrend,
-		hasFavorableWeatherForecast: locationStatus.hasFavorableWeatherForecast,
-		hasWindowOpen: locationStatus.hasWindowOpen,
-		location: locationId,
-		shouldIgnoreHoldConditions: locationStatus.shouldIgnoreHoldConditions
-	});
+	if (!lastLocationStatus[locationId] || !deepEqual(lastLocationStatus[locationId], locationStatus)) {
+		heatingEvts.emit('conditionStatusChange', {
+			hasIncreasingTrend: locationStatus.hasIncreasingTrend,
+			hasFavorableWeatherForecast: locationStatus.hasFavorableWeatherForecast,
+			hasWindowOpen: locationStatus.hasWindowOpen,
+			location: locationId,
+			shouldIgnoreHoldConditions: locationStatus.shouldIgnoreHoldConditions
+		});
+
+		lastLocationStatus[locationId] = locationStatus;
+	}
 }
 
 function turnHeatingOn (locationId: number) {

@@ -257,6 +257,7 @@ export class ThermoDataStoreService {
 		if (data.solarHeatingStatus) {
 			this.solarHeatingStatus.numberOfRadiators = data.solarHeatingStatus.numberOfRadiators;
 			this.solarHeatingStatus.numberOfRunningRadiators = data.solarHeatingStatus.numberOfRunningRadiators;
+			this.solarHeatingStatus.numberOfRunningRadiatorsReported = data.solarHeatingStatus.numberOfRunningRadiatorsReported;
 			this.solarHeatingStatus.solarProduction = data.solarHeatingStatus.solarProduction;
 			this.solarHeatingStatus.gridInjection = data.solarHeatingStatus.gridInjection;
 		}

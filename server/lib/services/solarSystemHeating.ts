@@ -8,6 +8,7 @@ import { LOCATION_FEATURE, LocationBasedEvent } from '../types/generic';
 import { hasLocationFeature } from './location';
 import { getAvgByLocation } from './insideConditions';
 import { getTargetTempByLocation } from './targetTemp';
+import { deepEqual } from '../utils/utils';
 
 enum DEVICE_TYPE {
   INVERTER = 'INVERTER',
@@ -78,6 +79,7 @@ export const solarSystemEvts = new EventEmitter() as TypedEventEmitter<SolarSyst
 
 
 const statusByLocations: Record<number, SolarSystemHeatingStatus> = {};
+const lastSentStatusByLocations: Record<number, SolarSystemStatus> = {};
 
 async function updateAllLocations () {
   const locations = await Location
@@ -382,10 +384,16 @@ export async function updateRunningRadiators(locationId: number, numberOfRadiato
   locationStatus.numberOfRadiators = numberOfRadiators;
   locationStatus.numberOfRunningRadiatorsReported = numberOfRunningRadiators;
 
-  solarSystemEvts.emit('change', {
-    location: locationId,
-    ...await getStatusByLocation(locationId)
-  });
+  const newLocationStatus = await getStatusByLocation(locationId);
+
+  if (!lastSentStatusByLocations[locationId] || !deepEqual(lastSentStatusByLocations[locationId], newLocationStatus)) {
+    solarSystemEvts.emit('change', {
+      location: locationId,
+      ...newLocationStatus
+    });
+
+    lastSentStatusByLocations[locationId] = newLocationStatus;
+  }
 
   if (updateTimeout) {
     clearTimeout(updateTimeout);
