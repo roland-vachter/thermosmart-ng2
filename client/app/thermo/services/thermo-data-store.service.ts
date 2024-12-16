@@ -60,6 +60,7 @@ export class ThermoDataStoreService {
 	solarHeatingStatus: SolarHeatingStatus = {
 		numberOfRadiators: 0,
 		numberOfRunningRadiators: 0,
+		numberOfRunningRadiatorsReported: 0,
 		gridInjection: 0,
 		solarProduction: 0
 	};
@@ -112,6 +113,7 @@ export class ThermoDataStoreService {
 		this.solarHeatingStatus = {
 			numberOfRadiators: 0,
 			numberOfRunningRadiators: 0,
+			numberOfRunningRadiatorsReported: 0,
 			gridInjection: 0,
 			solarProduction: 0
 		};

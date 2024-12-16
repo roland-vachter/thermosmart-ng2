@@ -228,6 +228,7 @@ export interface HeatingDefaultPlanInitUpdate {
 export interface SolarHeatingStatus {
   numberOfRadiators: number;
   numberOfRunningRadiators: number;
+  numberOfRunningRadiatorsReported: number;
   solarProduction?: number;
   gridInjection?: number;
 }

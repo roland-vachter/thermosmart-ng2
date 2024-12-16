@@ -64,6 +64,7 @@ interface HuaweiDeviceResponse {
 interface SolarSystemStatus {
   numberOfRadiators: number;
   numberOfRunningRadiators: number;
+  numberOfRunningRadiatorsReported: number;
   solarProduction: number;
   gridInjection: number;
   isOn: boolean;
@@ -336,6 +337,7 @@ export async function getStatusByLocation(locationId: number): Promise<SolarSyst
     return {
       numberOfRadiators: locationStatus.numberOfRadiators || 0,
       numberOfRunningRadiators: locationStatus.numberOfRunningRadiators || 0,
+      numberOfRunningRadiatorsReported: locationStatus.numberOfRunningRadiatorsReported || 0,
       solarProduction: locationStatus.solarProduction?.value || 0,
       gridInjection: locationStatus.gridInjection?.value || 0,
       isOn: solarHeatingDisabled?.value !== true

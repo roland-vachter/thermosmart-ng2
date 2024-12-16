@@ -19,7 +19,7 @@ export class SolarSystemHeatingStatusComponent implements OnInit {
     this.radiators = [];
     for (let i = 0; i < this.dataStore.solarHeatingStatus?.numberOfRadiators; i++) {
       this.radiators.push({
-        isOn: i < this.dataStore?.solarHeatingStatus?.numberOfRunningRadiators
+        isOn: i < this.dataStore?.solarHeatingStatus?.numberOfRunningRadiatorsReported
       });
     }
   }
@@ -29,7 +29,7 @@ export class SolarSystemHeatingStatusComponent implements OnInit {
       this.radiators = [];
       for (let i = 0; i < this.dataStore.solarHeatingStatus?.numberOfRadiators; i++) {
         this.radiators.push({
-          isOn: i < this.dataStore?.solarHeatingStatus?.numberOfRunningRadiators
+          isOn: i < this.dataStore?.solarHeatingStatus?.numberOfRunningRadiatorsReported
         });
       }
 
