@@ -12,7 +12,14 @@ import { hasLocationFeatureById } from './location';
 import { getStatusByLocation } from './solarSystemHeating';
 import { deepEqual } from '../utils/utils';
 
-interface Heating {
+interface HeatingConditions {
+	hasIncreasingTrend: boolean;
+	hasFavorableWeatherForecast: boolean;
+	hasWindowOpen: boolean;
+	shouldIgnoreHoldConditions: boolean;
+}
+
+interface Heating extends HeatingConditions {
 	isOn: boolean;
 	lastStatusReadBySensor: boolean;
 	lastChangeEventStatus: boolean | null;
@@ -21,13 +28,9 @@ interface Heating {
 		humidity: number;
 	};
 	poweredOn: boolean;
-	hasWindowOpen: boolean;
-	hasIncreasingTrend: boolean;
-	hasFavorableWeatherForecast: boolean;
 	until?: Date;
 	suspendTimeout?: NodeJS.Timeout;
 	initialized: boolean;
-	shouldIgnoreHoldConditions: boolean;
 }
 
 const defaultValues: Heating = {
@@ -46,7 +49,7 @@ const defaultValues: Heating = {
 	shouldIgnoreHoldConditions: false
 };
 const statusByLocation: Record<number, Heating> = {};
-const lastLocationStatus: Record<number, Heating> = {};
+const lastLocationConditionStatus: Record<number, HeatingConditions> = {};
 
 const initLocation = (locationId: number) => {
 	if (!statusByLocation[locationId]) {
@@ -192,17 +195,18 @@ export const endIgnoringHoldConditions = async (locationId: number) => {
 function emitConditionStatusChange(locationId: number) {
 	initLocation(locationId);
 	const locationStatus = statusByLocation[locationId];
+	const locationHeatingCondition = {
+		hasIncreasingTrend: locationStatus.hasIncreasingTrend,
+		hasFavorableWeatherForecast: locationStatus.hasFavorableWeatherForecast,
+		hasWindowOpen: locationStatus.hasWindowOpen,
+		location: locationId,
+		shouldIgnoreHoldConditions: locationStatus.shouldIgnoreHoldConditions
+	};
 
-	if (!lastLocationStatus[locationId] || !deepEqual(lastLocationStatus[locationId], locationStatus)) {
-		heatingEvts.emit('conditionStatusChange', {
-			hasIncreasingTrend: locationStatus.hasIncreasingTrend,
-			hasFavorableWeatherForecast: locationStatus.hasFavorableWeatherForecast,
-			hasWindowOpen: locationStatus.hasWindowOpen,
-			location: locationId,
-			shouldIgnoreHoldConditions: locationStatus.shouldIgnoreHoldConditions
-		});
+	if (!lastLocationConditionStatus[locationId] || !deepEqual(lastLocationConditionStatus[locationId], locationHeatingCondition)) {
+		heatingEvts.emit('conditionStatusChange', locationHeatingCondition);
 
-		lastLocationStatus[locationId] = locationStatus;
+		lastLocationConditionStatus[locationId] = locationHeatingCondition;
 	}
 }
 
