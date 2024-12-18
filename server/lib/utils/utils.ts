@@ -7,7 +7,7 @@ export const isNumber = (n: any) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isPrimitive =(obj: any) => {
-  return ['undefined', 'number', 'string'].includes(typeof obj) || obj === null;
+  return ['undefined', 'number', 'string', 'boolean', 'bigint', 'symbol'].includes(typeof obj) || obj === null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
