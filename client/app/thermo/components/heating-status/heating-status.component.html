@@ -29,14 +29,21 @@
             </div>
         </div>
         <div class="thermo-status--wrapper">
-            <button type="button" class="thermo-target--button thermo-target--decrease" (click)="tempAdjust(-0.1)"></button>
-            <button type="button" class="thermo-target--button thermo-target--increase" (click)="tempAdjust(0.1)"></button>
+            <button type="button" class="thermo--raised-button thermo-target--button thermo-target--decrease" (click)="tempAdjust(-0.1)"></button>
+            <button type="button" class="thermo--raised-button thermo-target--button thermo-target--increase" (click)="tempAdjust(0.1)"></button>
             <div class="thermo-status" [ngClass]="{ 'thermo-status--idle': !dataStore.heatingStatus, 'thermo-status--heating': dataStore.heatingStatus }">                
                 <div class="thermo-heating--power">
                   <div class="smart-features-ignored" title="End ignoring smart features" (click)="endIgnoringSmartFeatures()" *ngIf="dataStore?.heatingConditions?.shouldIgnoreHoldConditions">
                     <i class="icon-temperature-arrow"></i>
                     <div class="ignore">/</div>
                   </div>
+
+                  <button class="thermo--raised-button change-power-off-time decrease-power-off"
+                    (click)="decreasePowerOff()"
+                    *ngIf="!dataStore.heatingPower.status && timeLeftSeconds > 5 * 60">-5</button>
+                  <button class="thermo--raised-button change-power-off-time increase-power-off"
+                    (click)="increasePowerOff()"
+                    *ngIf="!dataStore.heatingPower.status && timeLeftSeconds < 55 * 60">+5</button>
 
                   <label class="switch">
                     <input #powerSwitch type="checkbox" class="switch-input" [ngClass]="{'on-hold': onHold && dataStore.heatingPower.status}" [checked]="dataStore.heatingPower.status && !onHold" (change)="toggleStatus()">

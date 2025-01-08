@@ -16,6 +16,7 @@ export class HeatingStatusComponent implements OnInit {
 	@ViewChild('powerSwitch') powerSwitchEl: ElementRef<HTMLInputElement>;
 
 	public timerString: string;
+	public timeLeftSeconds: number;
 	onHold: boolean = true;
 	private heatingPowerOffInterval: number;
 	private lastHeatingPowerStatus = false;
@@ -119,6 +120,7 @@ export class HeatingStatusComponent implements OnInit {
 				const seconds = Math.floor((untilTime - nowTime) / 1000 % 60);
 				const secondsPad2 = ('0' + seconds).slice(-2);
 
+				this.timeLeftSeconds = (untilTime - nowTime) / 1000;
 				this.timerString =
 					`${hours ? hoursPad2 + ':' : ''}${seconds || minutes || hours ? minutesPad2 + ':' : ''}${seconds || minutes || hours ? secondsPad2 : ''}`;
 			}, 1000);
@@ -142,6 +144,20 @@ export class HeatingStatusComponent implements OnInit {
 	endIgnoringSmartFeatures() {
 		this.serverApiService.endIgnoringHoldConditions().subscribe(res => {
 			this.dataStore.handleServerData(res?.data);
+		});
+	}
+
+	decreasePowerOff() {
+		this.serverApiService.decreasePowerOffTime().subscribe(res => {
+			this.dataStore.handleServerData(res?.data);
+			this.updateHeatingPower();
+		});
+	}
+
+	increasePowerOff() {
+		this.serverApiService.increasePowerOffTime().subscribe(res => {
+			this.dataStore.handleServerData(res?.data);
+			this.updateHeatingPower();
 		});
 	}
 }

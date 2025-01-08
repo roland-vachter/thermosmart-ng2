@@ -10,7 +10,7 @@ import { getAllConfigs } from '../../services/config';
 import { getOutsideConditions } from '../../services/outsideConditions';
 import { changeSensorSettings as insideConditionsChangeSensorSettings, getLocationBySensorId, getSensors, disableSensorWindowOpen as insideConditionsDisableSensorWindowOpen,
 	setSensorInput, toggleSensorStatus as insideConditionsToggleSensorStatus } from '../../services/insideConditions';
-import { endIgnoringHoldConditions, getHeatingConditions, getPowerStatus, ignoreHoldConditions, isHeatingOn, togglePower } from '../../services/heating';
+import { decreasePowerOffTime, endIgnoringHoldConditions, getHeatingConditions, getPowerStatus, ignoreHoldConditions, increasePowerOffTime, isHeatingOn, togglePower } from '../../services/heating';
 import moment from 'moment-timezone';
 import { getRestartStatus, initiateRestart } from '../../services/restartSensor';
 import { isNumber } from '../../utils/utils';
@@ -332,6 +332,52 @@ export const toggleHeatingPower = async (req: Request, res: Response) => {
 	const location = parseInt(req.body.location, 10);
 
 	await togglePower(location);
+
+	res.json({
+		status: 'ok',
+		data: {
+			heatingPower: {
+				status: getPowerStatus(location).poweredOn,
+				until: getPowerStatus(location).until
+			}
+		}
+	});
+};
+
+export const decreasePowerOff = (req: Request, res: Response) => {
+	if (!isNumber(req.body.location)) {
+		return res.status(400).json({
+			status: RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	const location = parseInt(req.body.location, 10);
+
+	decreasePowerOffTime(location);
+
+	res.json({
+		status: 'ok',
+		data: {
+			heatingPower: {
+				status: getPowerStatus(location).poweredOn,
+				until: getPowerStatus(location).until
+			}
+		}
+	});
+};
+
+export const increasePowerOff = (req: Request, res: Response) => {
+	if (!isNumber(req.body.location)) {
+		return res.status(400).json({
+			status: RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	const location = parseInt(req.body.location, 10);
+
+	increasePowerOffTime(location);
 
 	res.json({
 		status: 'ok',

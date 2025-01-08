@@ -30,6 +30,8 @@ router.get('/heating/planoverride/list', apiFlagMiddleware, loginMiddleware, cor
 router.get('/sensorpolling', apiKeyMiddleware, cors(), handleErrors(heatingApiCtrl.sensorPolling));
 router.get('/statistics', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.statistics));
 router.post('/toggleheatingpower', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.toggleHeatingPower));
+router.post('/decreasepowerofftime', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.decreasePowerOff));
+router.post('/increasepowerofftime', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.increasePowerOff));
 router.post('/disablesensorwindowopen', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.disableSensorWindowOpen));
 router.post('/ignoreholdconditions', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.ignoreHeatingHoldConditions));
 router.post('/endignoringholdconditions', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.endIgnoringHeatingHoldConditions));

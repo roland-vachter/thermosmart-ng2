@@ -155,6 +155,36 @@ export const togglePower = async (locationId: number) => {
 	await updateHeatingStatusByLocation(locationId);
 };
 
+export const decreasePowerOffTime = (locationId: number) => {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
+	if (!locationStatus.poweredOn && locationStatus.until.getTime() - Date.now() > 5 * 60 * 1000) {
+		locationStatus.until = new Date(locationStatus.until.getTime() - 5 * 60 * 1000);
+
+		heatingEvts.emit('changeHeatingPower', {
+			location: locationId,
+			poweredOn: locationStatus.poweredOn,
+			until: locationStatus.until
+		});
+	}
+}
+
+export const increasePowerOffTime = (locationId: number) => {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
+	if (!locationStatus.poweredOn && locationStatus.until.getTime() - Date.now() < 55 * 60 * 1000) {
+		locationStatus.until = new Date(locationStatus.until.getTime() + 5 * 60 * 1000);
+
+		heatingEvts.emit('changeHeatingPower', {
+			location: locationId,
+			poweredOn: locationStatus.poweredOn,
+			until: locationStatus.until
+		});
+	}
+}
+
 export const getHeatingConditions = (locationId: number) => {
 	initLocation(locationId);
 	const locationStatus = statusByLocation[locationId];

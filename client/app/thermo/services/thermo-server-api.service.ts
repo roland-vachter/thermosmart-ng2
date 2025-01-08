@@ -39,6 +39,14 @@ export class ThermoServerApiService {
 		return this.http.post<ApiResult<HeatingPowerResponse>>('/api/toggleheatingpower', { location: this.locationService.getSelectedLocationId() });
 	}
 
+	decreasePowerOffTime() {
+		return this.http.post<ApiResult<HeatingPowerResponse>>('/api/decreasepowerofftime', { location: this.locationService.getSelectedLocationId() });
+	}
+
+	increasePowerOffTime() {
+		return this.http.post<ApiResult<HeatingPowerResponse>>('/api/increasepowerofftime', { location: this.locationService.getSelectedLocationId() });
+	}
+
 	ignoreHoldConditions(): Observable<ApiResult<HeatingConditionsResponse>> {
 		return this.http.post<ApiResult<HeatingConditionsResponse>>('/api/ignoreholdconditions', { location: this.locationService.getSelectedLocationId() });
 	}
