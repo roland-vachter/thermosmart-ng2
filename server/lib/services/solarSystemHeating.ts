@@ -236,14 +236,17 @@ async function calculateNumberOfRunningRadiators(locationId: number) {
 
   if (radiatorPower?.value && correctedGridInjectionValue > 0 && (radiatorPower?.value as number) > 0 && !(
     insideCondition.temperature > targetTemp ||
-    solarHeatingDisabled?.value === true ||
-    getTargetTempByLocation(locationId)?._id === 3 // on holiday
+    solarHeatingDisabled?.value === true
   )) {
     const newValue = Math.floor(correctedGridInjectionValue / (radiatorPower?.value as number));
 
     // locationStatus.gridInjection.value += (locationStatus.numberOfRunningRadiatorsReported - newValue) * (radiatorPower?.value as number);
 
+    console.log('SOLAR HEATING', newValue);
+
     return newValue;
+  } else {
+    console.log('SOLAR OFF', insideCondition.temperature > targetTemp ? 'temp over target' : solarHeatingDisabled?.value === true ? 'disabled' : 'unknown');
   }
 
   return 0;
