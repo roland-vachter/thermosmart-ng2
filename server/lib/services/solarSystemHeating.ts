@@ -7,7 +7,6 @@ import TypedEventEmitter from 'typed-emitter';
 import { LOCATION_FEATURE, LocationBasedEvent } from '../types/generic';
 import { hasLocationFeature } from './location';
 import { getAvgByLocation } from './insideConditions';
-import { getTargetTempByLocation } from './targetTemp';
 import { deepEqual } from '../utils/utils';
 
 enum DEVICE_TYPE {
