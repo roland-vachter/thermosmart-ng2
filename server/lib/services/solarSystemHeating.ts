@@ -233,6 +233,10 @@ async function calculateNumberOfRunningRadiators(locationId: number) {
   const locationStatus = statusByLocations[locationId];
   const correctedGridInjectionValue = locationStatus?.gridInjection?.value + locationStatus.numberOfRunningRadiatorsReported * (radiatorPower?.value as number);
 
+  console.log('grid injection', locationStatus?.gridInjection?.value);
+  console.log('radiators reported', locationStatus.numberOfRunningRadiatorsReported);
+  console.log('corrected grid injection', correctedGridInjectionValue);
+
   if (radiatorPower?.value && correctedGridInjectionValue > 0 && (radiatorPower?.value as number) > 0 && !(
     insideCondition.temperature > targetTemp ||
     solarHeatingDisabled?.value === true
