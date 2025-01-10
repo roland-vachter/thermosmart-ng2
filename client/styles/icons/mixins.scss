@@ -2,7 +2,7 @@
 
 @mixin icon ($name) {
 	&:before {
-		content: map-get($icons, $name);
+		content: map-get($icons, $name) !important;
 
 		/* use !important to prevent issues with browser extensions that change fonts */
 		font-family: 'icomoon' !important;
