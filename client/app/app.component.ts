@@ -92,8 +92,8 @@ export class AppComponent implements OnInit {
 	}
 
 	ngOnInit () {
-		// setTimeout(this.updateFreshnessStatus.bind(this), 60000);
-		// setTimeout(this.checkLoginStatus.bind(this), 5 * 60 * 1000);
+		setTimeout(this.updateFreshnessStatus.bind(this), 60000);
+		setTimeout(this.checkLoginStatus.bind(this), 5 * 60 * 1000);
 
 		// document.addEventListener("visibilitychange", (() => {
 		// 	if (document.visibilityState === 'visible') {
