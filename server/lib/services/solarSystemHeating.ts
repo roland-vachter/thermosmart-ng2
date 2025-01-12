@@ -233,6 +233,7 @@ async function calculateNumberOfRunningRadiators(locationId: number) {
   const locationStatus = statusByLocations[locationId];
   const correctedGridInjectionValue = locationStatus?.gridInjection?.value + locationStatus.numberOfRunningRadiatorsReported * (radiatorPower?.value as number);
 
+  console.log('solar production', locationStatus?.solarProduction?.value);
   console.log('grid injection', locationStatus?.gridInjection?.value);
   console.log('radiators reported', locationStatus.numberOfRunningRadiatorsReported);
   console.log('corrected grid injection', correctedGridInjectionValue);
