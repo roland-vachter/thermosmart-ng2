@@ -93,21 +93,21 @@ export class AppComponent implements OnInit {
 
 	ngOnInit () {
 		setTimeout(this.updateFreshnessStatus.bind(this), 60000);
-		setTimeout(this.checkLoginStatus.bind(this), 5 * 60 * 1000);
+		// setTimeout(this.checkLoginStatus.bind(this), 5 * 60 * 1000);
 
-		// document.addEventListener("visibilitychange", (() => {
-		// 	if (document.visibilityState === 'visible') {
-		// 		console.log('visibility change');
-		// 		this.checkLoginStatus();
-		// 		this.updateFreshnessStatus();
+		document.addEventListener("visibilitychange", (() => {
+			if (document.visibilityState === 'visible') {
+				console.log('visibility change');
+				this.checkLoginStatus();
+				this.updateFreshnessStatus();
 				
-		// 		if ((this.updateStatus === 'outdated' || new Date().getTime() - this.lastVisible.getTime() > 10 * 60 * 1000)) {
-		// 			this.refresh();
-		// 		}
+				if ((this.updateStatus === 'outdated' || new Date().getTime() - this.lastVisible.getTime() > 10 * 60 * 1000)) {
+					this.refresh();
+				}
 
-		// 		this.lastVisible = new Date();
-		// 	}
-		// }).bind(this));
+				this.lastVisible = new Date();
+			}
+		}).bind(this));
 
 		this.userService.getUser().subscribe(user => {
 			this.user = user;
