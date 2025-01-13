@@ -161,6 +161,10 @@ export const decreasePowerOffTime = (locationId: number) => {
 
 	if (!locationStatus.poweredOn && locationStatus.until.getTime() - Date.now() > 5 * 60 * 1000) {
 		locationStatus.until = new Date(locationStatus.until.getTime() - 5 * 60 * 1000);
+		clearTimeout(locationStatus.suspendTimeout);
+		locationStatus.suspendTimeout = setTimeout(() => {
+			void togglePower(locationId);
+		}, Date.now() - locationStatus.until.getTime());
 
 		heatingEvts.emit('changeHeatingPower', {
 			location: locationId,
@@ -176,6 +180,10 @@ export const increasePowerOffTime = (locationId: number) => {
 
 	if (!locationStatus.poweredOn && locationStatus.until.getTime() - Date.now() < 55 * 60 * 1000) {
 		locationStatus.until = new Date(locationStatus.until.getTime() + 5 * 60 * 1000);
+		clearTimeout(locationStatus.suspendTimeout);
+		locationStatus.suspendTimeout = setTimeout(() => {
+			void togglePower(locationId);
+		}, Date.now() - locationStatus.until.getTime());
 
 		heatingEvts.emit('changeHeatingPower', {
 			location: locationId,
