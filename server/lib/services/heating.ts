@@ -164,7 +164,7 @@ export const decreasePowerOffTime = (locationId: number) => {
 		clearTimeout(locationStatus.suspendTimeout);
 		locationStatus.suspendTimeout = setTimeout(() => {
 			void togglePower(locationId);
-		}, Date.now() - locationStatus.until.getTime());
+		}, locationStatus.until.getTime() - Date.now());
 
 		heatingEvts.emit('changeHeatingPower', {
 			location: locationId,
@@ -183,7 +183,7 @@ export const increasePowerOffTime = (locationId: number) => {
 		clearTimeout(locationStatus.suspendTimeout);
 		locationStatus.suspendTimeout = setTimeout(() => {
 			void togglePower(locationId);
-		}, Date.now() - locationStatus.until.getTime());
+		}, locationStatus.until.getTime() - Date.now());
 
 		heatingEvts.emit('changeHeatingPower', {
 			location: locationId,
