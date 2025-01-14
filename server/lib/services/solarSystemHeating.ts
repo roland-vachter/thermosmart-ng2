@@ -380,6 +380,8 @@ export async function updateRunningRadiators(locationId: number, numberOfRadiato
     }
   }
 
+  console.log('solar radiators reported', locationStatus.numberOfRunningRadiatorsReported, numberOfRunningRadiators);
+
   if (locationStatus.numberOfRunningRadiatorsReported !== numberOfRunningRadiators) {
     await new SolarSystemHeatingHistory({
       location: locationId,
@@ -394,6 +396,7 @@ export async function updateRunningRadiators(locationId: number, numberOfRadiato
   const newLocationStatus = await getStatusByLocation(locationId);
 
   if (!lastSentStatusByLocations[locationId] || !deepEqual(lastSentStatusByLocations[locationId], newLocationStatus)) {
+    console.log('emit solar event');
     solarSystemEvts.emit('change', {
       location: locationId,
       ...newLocationStatus
@@ -416,5 +419,5 @@ export const init = () => {
 
   setInterval(() => {
     void updateAllLocations();
-  }, 4.1 * 60 * 1000);
+  }, 5 * 60 * 1000);
 }
