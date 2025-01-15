@@ -75,7 +75,7 @@ export class StatisticsModalComponent implements OnInit {
 					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
 						response.data.solarHeatingForToday) {
 							datasets.push({
-								label: 'Solar radiator heating status',
+								label: 'Radiator heating',
 								data: response.data.solarHeatingForToday.map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
 									y: item.noOfRunningRadiators * 3
@@ -279,7 +279,7 @@ export class StatisticsModalComponent implements OnInit {
 					const maxAvgOutsideTemp = Math.max(...response.data.statisticsForLastMonth.map(item => item.avgOutsideTemp));
 
 					const datasets = [{
-						label: 'Heating running time',
+						label: 'Heating time',
 						yAxisID: "duration",
 						data: [
 							...response.data.statisticsForLastMonth.map(item => ({
@@ -303,7 +303,7 @@ export class StatisticsModalComponent implements OnInit {
 						pointRadius: 3,
 						pointHitRadius: 5,
 					}, {
-						label: 'Avg target temperature',
+						label: 'Avg target temp.',
 						yAxisID: "temp",
 						data: [
 							...response.data.statisticsForLastMonth.map(item => ({
@@ -327,7 +327,7 @@ export class StatisticsModalComponent implements OnInit {
 						pointHitRadius: 5,
 						fill: false,
 					}, {
-						label: 'Avg outside temperature',
+						label: 'Avg out temp.',
 						yAxisID: "temp",
 						data: [
 							...response.data.statisticsForLastMonth.map(item => ({
@@ -351,8 +351,8 @@ export class StatisticsModalComponent implements OnInit {
 						pointHitRadius: 5,
 						fill: false,
 					}, {
-						label: 'Sunshine duration',
-						yAxisID: "duration2",
+						label: 'Sunshine',
+						yAxisID: "duration",
 						data: [
 							...response.data.statisticsForLastMonth.map(item => ({
 								x: moment(item.date).startOf('day'),
@@ -378,7 +378,7 @@ export class StatisticsModalComponent implements OnInit {
 
 					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
 						datasets.push({
-							label: 'Solar radiator heating time',
+							label: 'Radiator heating',
 							yAxisID: "duration",
 							data: [
 								...response.data.statisticsForLastMonth.map(item => ({
@@ -472,22 +472,6 @@ export class StatisticsModalComponent implements OnInit {
 										min: 0
 									}
 								}, {
-									id: "duration2",
-									ticks: {
-										callback: value => {
-											let str = '';
-
-											const duration = moment.duration(value * 60 * 1000);
-
-											str += `${duration.hours() || 0}h `;
-											str += `${duration.minutes() || 0}m`;
-
-											return str.trim();
-										},
-										fixedStepSize: 60,
-										min: 0
-									}
-								}, {
 									id: "temp",
 									ticks: {
 										callback: value => value,
@@ -510,7 +494,7 @@ export class StatisticsModalComponent implements OnInit {
 					const maxAvgOutsideTemp = Math.max(...response.data.statisticsByMonth.map(item => item.avgOutsideTemp));
 
 					const datasets = [{
-						label: 'Avg heating running time',
+						label: 'Avg heating time',
 						yAxisID: "duration",
 						data: [
 							...response.data.statisticsByMonth.map(item => ({
@@ -534,7 +518,7 @@ export class StatisticsModalComponent implements OnInit {
 						pointRadius: 3,
 						pointHitRadius: 5,
 					}, {
-						label: 'Avg target temperature',
+						label: 'Avg target temp.',
 						yAxisID: "temp",
 						data: [
 							...response.data.statisticsByMonth.map(item => ({
@@ -558,7 +542,7 @@ export class StatisticsModalComponent implements OnInit {
 						pointHitRadius: 5,
 						fill: false,
 					}, {
-						label: 'Avg outside temperature',
+						label: 'Avg out temp.',
 						yAxisID: "temp",
 						data: [
 							...response.data.statisticsByMonth.map(item => ({
@@ -582,8 +566,8 @@ export class StatisticsModalComponent implements OnInit {
 						pointHitRadius: 5,
 						fill: false,
 					}, {
-						label: 'Avg sunshine per day',
-						yAxisID: "duration2",
+						label: 'Avg sunshine/day',
+						yAxisID: "duration",
 						data: [
 							...response.data.statisticsByMonth.map(item => ({
 								x: moment(item.date).startOf('month'),
@@ -609,8 +593,8 @@ export class StatisticsModalComponent implements OnInit {
 
 					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
 						datasets.push({
-							label: 'Avg solar radiator heating time',
-							yAxisID: "duration2",
+							label: 'Avg radiator heating',
+							yAxisID: "duration",
 							data: [
 								...response.data.statisticsByMonth.map(item => ({
 									x: moment(item.date).startOf('month'),
@@ -703,22 +687,6 @@ export class StatisticsModalComponent implements OnInit {
 										min: 0
 									}
 								}, {
-									id: "duration2",
-									ticks: {
-										callback: value => {
-											let str = '';
-
-											const duration = moment.duration(value * 60 * 1000);
-
-											str += `${duration.hours() || 0}h `;
-											str += `${duration.minutes() || 0}m`;
-
-											return str.trim();
-										},
-										fixedStepSize: 60,
-										min: 0
-									}
-								}, {
 									id: "temp",
 									ticks: {
 										callback: value => value,
@@ -742,7 +710,7 @@ export class StatisticsModalComponent implements OnInit {
 					const maxAvgOutsideTemp = Math.max(...response.data.statisticsByYear.map(item => item.avgOutsideTemp));
 
 					const datasets = [{
-						label: 'Avg heating running time',
+						label: 'Avg heating time',
 						yAxisID: "duration",
 						data: [
 							...response.data.statisticsByYear.map(item => ({
@@ -766,7 +734,7 @@ export class StatisticsModalComponent implements OnInit {
 						pointRadius: 3,
 						pointHitRadius: 5,
 					}, {
-						label: 'Avg target temperature',
+						label: 'Avg target temp.',
 						yAxisID: "temp",
 						data: [
 							...response.data.statisticsByYear.map(item => ({
@@ -790,7 +758,7 @@ export class StatisticsModalComponent implements OnInit {
 						pointHitRadius: 5,
 						fill: false,
 					}, {
-						label: 'Avg outside temperature',
+						label: 'Avg out temp.',
 						yAxisID: "temp",
 						data: [
 							...response.data.statisticsByYear.map(item => ({
@@ -814,8 +782,8 @@ export class StatisticsModalComponent implements OnInit {
 						pointHitRadius: 5,
 						fill: false,
 					}, {
-						label: 'Avg sunshine per day',
-						yAxisID: "duration2",
+						label: 'Avg sunshine/day',
+						yAxisID: "duration",
 						data: [
 							...response.data.statisticsByYear.map(item => ({
 								x: moment(item.year, 'YYYY').startOf('year'),
@@ -841,7 +809,7 @@ export class StatisticsModalComponent implements OnInit {
 
 					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
 						datasets.push({
-							label: 'Avg solar radiator heating time',
+							label: 'Avg radiator heating',
 							yAxisID: "duration",
 							data: [
 								...response.data.statisticsByYear.map(item => ({
@@ -920,22 +888,6 @@ export class StatisticsModalComponent implements OnInit {
 								}],
 								yAxes: [{
 									id: "duration",
-									ticks: {
-										callback: value => {
-											let str = '';
-
-											const duration = moment.duration(value * 60 * 1000);
-
-											str += `${duration.hours() || 0}h `;
-											str += `${duration.minutes() || 0}m`;
-
-											return str.trim();
-										},
-										fixedStepSize: 60,
-										min: 0
-									}
-								}, {
-									id: "duration2",
 									ticks: {
 										callback: value => {
 											let str = '';
