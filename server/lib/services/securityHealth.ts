@@ -110,6 +110,8 @@ const updateCameraHealthByLocation = (locationId: number) => {
 		}
 	});
 
+	const lastCameraHealth = cameraHealthByLocation[locationId];
+
 	if (allHealthy) {
 		cameraHealthByLocation[locationId] = HEALTH.OK;
 	} else if (noneHealthy) {
@@ -118,10 +120,12 @@ const updateCameraHealthByLocation = (locationId: number) => {
 		cameraHealthByLocation[locationId] = HEALTH.PARTIAL;
 	}
 
-	securityHealthEvents.emit('camera-health', {
-		health: cameraHealthByLocation[locationId],
-		location: locationId
-	});
+	if (lastCameraHealth !== cameraHealthByLocation[locationId]) {
+		securityHealthEvents.emit('camera-health', {
+			health: cameraHealthByLocation[locationId],
+			location: locationId
+		});
+	}
 };
 
 const updateCameraHealth = () => {
@@ -140,6 +144,8 @@ const updateControllerHealthByLocation = (locationId: number) => {
 		}
 	});
 
+	const lastControllerHealth = controllerHealthByLocation[locationId];
+
 	if (allHealthy) {
 		controllerHealthByLocation[locationId] = HEALTH.OK;
 	} else if (noneHealthy) {
@@ -148,10 +154,12 @@ const updateControllerHealthByLocation = (locationId: number) => {
 		controllerHealthByLocation[locationId] = HEALTH.PARTIAL;
 	}
 
-	securityHealthEvents.emit('controller-health', {
-		health: controllerHealthByLocation[locationId],
-		location: locationId
-	});
+	if (lastControllerHealth !== controllerHealthByLocation[locationId]) {
+		securityHealthEvents.emit('controller-health', {
+			health: controllerHealthByLocation[locationId],
+			location: locationId
+		});
+	}
 };
 
 const updateControllerHealth = () => {
@@ -172,6 +180,8 @@ const updateMotionSensorHealth = async (locationId: number) => {
 		}
 	});
 
+	const lastMotionSensorHealth = motionSensorHealthByLocation[locationId];
+
 	if (allHealthy && Object.keys(motionSensorsByLocations[locationId]).length === motionSensorCount) {
 		motionSensorHealthByLocation[locationId] = HEALTH.OK;
 	} else if (noneHealthy) {
@@ -180,17 +190,24 @@ const updateMotionSensorHealth = async (locationId: number) => {
 		motionSensorHealthByLocation[locationId] = HEALTH.PARTIAL;
 	}
 
-	securityHealthEvents.emit('motion-sensor-health', {
-		health: motionSensorHealthByLocation[locationId],
-		location: locationId
-	});
+	if (lastMotionSensorHealth !== motionSensorHealthByLocation[locationId]) {
+		securityHealthEvents.emit('motion-sensor-health', {
+			health: motionSensorHealthByLocation[locationId],
+			location: locationId
+		});
+	}
 };
 
-const updateKeypadHealth = (locationId: number) => {
-	securityHealthEvents.emit('keypad-health', {
-		health: keypadHealthByLocation[locationId],
-		location: locationId
-	});
+const updateKeypadHealth = (locationId: number, health: boolean) => {
+	const lastHealth = keypadHealthByLocation[locationId];
+	keypadHealthByLocation[locationId] = health ? HEALTH.OK : HEALTH.FAIL;
+
+	if (lastHealth !== keypadHealthByLocation[locationId]) {
+		securityHealthEvents.emit('keypad-health', {
+			health: keypadHealthByLocation[locationId],
+			location: locationId
+		});
+	}
 };
 
 setInterval(() => {
@@ -237,8 +254,7 @@ setInterval(() => {
 			if (securityControllersByLocations[l]) {
 				securityControllersByLocations[l].forEach(() => {
 					if (lastKeypadHealthUpdateByLocation[l] !== null && Date.now() - lastKeypadHealthUpdateByLocation[l] > 180000) {
-						keypadHealthByLocation[l] = HEALTH.FAIL;
-						updateKeypadHealth(l);
+						updateKeypadHealth(l, false);
 					}
 				});
 			}
@@ -482,10 +498,9 @@ export const securityKeypad = {
 				motionSensorsByLocations[securityControllerData.location] = {};
 			}
 
-			keypadHealthByLocation[securityControllerData.location] = health ? HEALTH.OK : HEALTH.FAIL;
 			lastKeypadHealthUpdateByLocation[securityControllerData.location] = Date.now();
 
-			updateKeypadHealth(securityControllerData.location);
+			updateKeypadHealth(securityControllerData.location, health);
 		}
 	},
 	getHealth: (location: number) => keypadHealthByLocation[location]
