@@ -161,7 +161,7 @@ async function getHuaweiDeviceList(apiUrl: string, authToken: string, stationCod
         console.warn(resJson.failCode, resJson.message);
         return resJson.message;
       } else {
-        console.log('-> device list successful');
+        console.log('SOLAR: -> device list successful');
         devices = {};
         resJson?.data?.forEach(d => {
           switch (d.devTypeId) {
@@ -205,7 +205,7 @@ async function getHuaweiActivePower(apiUrl: string, authToken: string, deviceTyp
         console.warn(deviceType, resJson.failCode, resJson.message);
         return resJson.message;
       } else {
-        console.log(deviceType, 'successful');
+        console.log('SOLAR:', deviceType, 'successful');
         power = resJson.data.length ? resJson.data[0]?.dataItemMap?.active_power : 0;
       }
     }
@@ -231,12 +231,15 @@ async function calculateNumberOfRunningRadiators(locationId: number) {
   const insideCondition = getAvgByLocation(locationId);
 
   const locationStatus = statusByLocations[locationId];
-  const correctedGridInjectionValue = locationStatus?.gridInjection?.value + locationStatus.numberOfRunningRadiatorsReported * (radiatorPower?.value as number);
+  const correctedGridInjectionValue = Math.min(
+    locationStatus?.gridInjection?.value + locationStatus.numberOfRunningRadiatorsReported * (radiatorPower?.value as number),
+    locationStatus?.solarProduction?.value || 0
+  );
 
-  console.log('solar production', locationStatus?.solarProduction?.value);
-  console.log('grid injection', locationStatus?.gridInjection?.value);
-  console.log('radiators reported', locationStatus.numberOfRunningRadiatorsReported);
-  console.log('corrected grid injection', correctedGridInjectionValue);
+  console.log('SOLAR: production', locationStatus?.solarProduction?.value);
+  console.log('SOLAR: grid injection', locationStatus?.gridInjection?.value);
+  console.log('SOLAR: radiators reported', locationStatus.numberOfRunningRadiatorsReported);
+  console.log('SOLAR: corrected grid injection', correctedGridInjectionValue);
 
   if (radiatorPower?.value && correctedGridInjectionValue > 0 && (radiatorPower?.value as number) > 0 && !(
     insideCondition.temperature > targetTemp ||
@@ -246,11 +249,11 @@ async function calculateNumberOfRunningRadiators(locationId: number) {
 
     // locationStatus.gridInjection.value += (locationStatus.numberOfRunningRadiatorsReported - newValue) * (radiatorPower?.value as number);
 
-    console.log('SOLAR HEATING', newValue);
+    console.log('SOLAR: radiator command', newValue);
 
     return newValue;
   } else {
-    console.log('SOLAR OFF', insideCondition.temperature > targetTemp ? 'temp over target' : solarHeatingDisabled?.value === true ? 'disabled' : 'unknown');
+    console.log('SOLAR: OFF', insideCondition.temperature > targetTemp ? 'temp over target' : solarHeatingDisabled?.value === true ? 'disabled' : 'unknown');
   }
 
   return 0;
@@ -380,7 +383,7 @@ export async function updateRunningRadiators(locationId: number, numberOfRadiato
     }
   }
 
-  console.log('solar radiators reported', locationStatus.numberOfRunningRadiatorsReported, numberOfRunningRadiators);
+  console.log('SOLAR: radiators reported', locationStatus.numberOfRunningRadiatorsReported, numberOfRunningRadiators);
 
   if (locationStatus.numberOfRunningRadiatorsReported !== numberOfRunningRadiators) {
     await new SolarSystemHeatingHistory({
@@ -396,7 +399,7 @@ export async function updateRunningRadiators(locationId: number, numberOfRadiato
   const newLocationStatus = await getStatusByLocation(locationId);
 
   if (!lastSentStatusByLocations[locationId] || !deepEqual(lastSentStatusByLocations[locationId], newLocationStatus)) {
-    console.log('emit solar event');
+    console.log('SOLAR: emit solar event');
     solarSystemEvts.emit('change', {
       location: locationId,
       ...newLocationStatus
