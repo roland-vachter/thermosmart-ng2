@@ -65,11 +65,11 @@ export class AppComponent implements OnInit {
 			this.loginStatusService.check().subscribe({
 				next: res => {
 					if (res.status !== 200) {
-						window.location.href = '';
+						this.reload();
 					}
 				},
 				error: () => {
-					window.location.href = '';
+            this.reload();
 				}
 			});
 		}
