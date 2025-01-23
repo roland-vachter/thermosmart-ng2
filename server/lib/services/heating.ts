@@ -342,8 +342,6 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				targetValue -= 0.1 * solarSystemHeatingStatus.numberOfRunningRadiators;
 			}
 
-			console.log('targetValue', targetValue, outsideConditions.sunshineForecast);
-
 			if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions &&
 					targetValue < outsideConditions.temperature) {
 				console.log(`[${locationId}] turn off because target temperature is below outside temperature.`);
