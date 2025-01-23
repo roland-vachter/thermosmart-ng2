@@ -130,7 +130,11 @@ export const setSensorInput = async (data: SensorInput) => {
 			sensor.humidity = humidity;
 
 			sensor.lastUpdate = new Date();
+
 			sensor.active = true;
+			if (isNaN(data.temperature) && isNaN(data.humidity) || (!data.temperature && !data.humidity)) {
+				sensor.active = false;
+			}
 
 			sensor.label = sensorSetting?.label;
 			sensor.tempAdjust = sensorSetting?.tempAdjust;
@@ -153,7 +157,7 @@ export const setSensorInput = async (data: SensorInput) => {
 				}
 			}
 
-			if (!sensor.savedTempHistory.length || sensor.savedTempHistory[0] !== sensor.temperature) {
+			if ((!sensor.savedTempHistory.length || sensor.savedTempHistory[0] !== sensor.temperature) && sensor.temperature) {
 				await new HeatingSensorHistory({
 					sensor: id,
 					t: sensor.temperature,
