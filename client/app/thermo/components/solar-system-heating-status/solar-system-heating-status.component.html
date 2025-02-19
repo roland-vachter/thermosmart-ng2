@@ -65,13 +65,13 @@
         <div *ngIf="!dataStore.solarHeatingStatus?.numberOfRadiators && !dataStore.solarHeatingStatus?.wattHourConsumption">No radiators</div>
 
         <div class="row" *ngIf="dataStore.solarHeatingStatus?.numberOfRadiators || dataStore.solarHeatingStatus?.wattHourConsumption">
-          <div class="col-6">
+          <div class="col-6 radiators">
             <i class="icon-radiator"
               [ngClass]="{ 'color-olive': dataStore.solarHeatingStatus?.wattHourConsumption, 'color-dark-gray': !dataStore.solarHeatingStatus?.wattHourConsumption }"></i>
           </div>
-          <div class="col-6">
+          <div class="col-6 radiators">
             <span [ngClass]="{ 'color-olive': dataStore.solarHeatingStatus?.wattHourConsumption, 'color-dark-gray': !dataStore.solarHeatingStatus?.wattHourConsumption }">
-              {{ consumption }} W
+              {{ dataStore.solarHeatingStatus?.wattHourConsumption }} W
             </span>
           </div>
         </div>

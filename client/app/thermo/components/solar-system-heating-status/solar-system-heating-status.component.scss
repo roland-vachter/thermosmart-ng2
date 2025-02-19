@@ -35,7 +35,7 @@ i {
 
 .radiators {
 	height: 100%;
-	align-items: center;
+	flex-direction: column;
 }
 
 .radiators i {

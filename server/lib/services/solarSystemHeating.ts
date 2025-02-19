@@ -349,7 +349,7 @@ export async function getStatusByLocation(locationId: number): Promise<SolarSyst
       numberOfRadiators: locationStatus.numberOfRadiators || 0,
       solarProduction: locationStatus.solarProduction?.value || 0,
       gridInjection: locationStatus.gridInjection?.value || 0,
-      isOn: solarHeatingDisabled?.value === true
+      isOn: solarHeatingDisabled?.value !== true
     };
   }
 
