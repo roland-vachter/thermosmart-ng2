@@ -341,8 +341,6 @@ export async function getStatusByLocation(locationId: number): Promise<SolarSyst
   if (locationStatus) {
     const solarHeatingDisabled = await getConfig('solarHeatingDisabled', locationId);
 
-    console.log('SOLAR:', 'wattHourAvailable', locationStatus.wattHourAvailable);
-
     return {
       wattHourConsumption: locationStatus.wattHourConsumption || 0,
       wattHourAvailable: locationStatus.wattHourAvailable || 0,
@@ -387,7 +385,7 @@ export async function updateRadiatorConsumption(locationId: number, numberOfRadi
     await new SolarSystemHeatingHistory({
       location: locationId,
       datetime: new Date(),
-      wattHoursConsumption: wattHourConsumptionReported
+      wattHourConsumption: wattHourConsumptionReported
     }).save();
   }
 
