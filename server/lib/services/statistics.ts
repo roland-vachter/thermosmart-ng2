@@ -542,16 +542,13 @@ const saveStatisticsForADayByLocation = async (locationId: number) => {
 
 			await SolarSystemHeatingHistory
 				.find({
-					location: locationId,
-					noOfRunningRadiators: {
-						$gt: 0
-					}
+					location: locationId
 				})
 				.exec()
 				.then(result => {
 					result.forEach(async r => {
 						if (!r.wattHourConsumption) {
-							r.wattHourConsumption = r.noOfRunningRadiators * 750;
+							r.wattHourConsumption = r.noOfRunningRadiators * 750 || 0;
 							await r.save();
 						}
 					});

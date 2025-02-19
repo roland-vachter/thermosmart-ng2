@@ -720,11 +720,11 @@ export const statistics = async (req: Request, res: Response) => {
 
 	solarHeatingForToday.unshift({
 		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
-		noOfRunningRadiators: lastSolarHeatingHistory ? lastSolarHeatingHistory.noOfRunningRadiators : 0
+		wattHourConsumption: lastSolarHeatingHistory ? lastSolarHeatingHistory.wattHourConsumption : 0
 	} as HydratedDocument<ISolarSystemHeatingHistory>);
 	solarHeatingForToday.push({
 		datetime: new Date(moment().tz(location.timezone).toISOString()),
-		noOfRunningRadiators: solarHeatingForToday.length ? solarHeatingForToday[solarHeatingForToday.length - 1].noOfRunningRadiators : 0
+		wattHourConsumption: solarHeatingForToday.length ? solarHeatingForToday[solarHeatingForToday.length - 1].wattHourConsumption : 0
 	} as HydratedDocument<ISolarSystemHeatingHistory>);
 
 	powerOffForToday.unshift({
