@@ -234,10 +234,14 @@ export class StatisticsModalComponent implements OnInit {
 							tooltips: {
 								callbacks: {
 									label: function(tooltipItem, data) {
-										if (tooltipItem.yLabel > 0) {
-											return `${data.datasets[tooltipItem.datasetIndex].label}: ON`;
+										if (data.datasets[tooltipItem.datasetIndex].yAxisID === 'watts') {
+											return `${data.datasets[tooltipItem.datasetIndex].label}: ${tooltipItem.yLabel}W`;
 										} else {
-											return `${data.datasets[tooltipItem.datasetIndex].label}: OFF`;
+											if (tooltipItem.yLabel > 0) {
+												return `${data.datasets[tooltipItem.datasetIndex].label}: ON`;
+											} else {
+												return `${data.datasets[tooltipItem.datasetIndex].label}: OFF`;
+											}
 										}
 									}
 								}

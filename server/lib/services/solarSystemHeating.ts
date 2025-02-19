@@ -337,9 +337,9 @@ async function updateByLocation(locationId: number) {
 };
 
 export async function getStatusByLocation(locationId: number): Promise<SolarSystemStatus> {
-  const solarHeatingDisabled = await getConfig('solarHeatingDisabled', locationId);
   const locationStatus = statusByLocations[locationId];
   if (locationStatus) {
+    const solarHeatingDisabled = await getConfig('solarHeatingDisabled', locationId);
     const insideCondition = getAvgByLocation(locationId);
 
     const targetTemperatureConfig = await getConfig('solarSystemHeatingTemperature', locationId);
@@ -351,11 +351,11 @@ export async function getStatusByLocation(locationId: number): Promise<SolarSyst
 
     return {
       wattHourConsumption: locationStatus.wattHourConsumption || 0,
-      wattHourAvailable: locationStatus.wattHourAvailable || 0,
+      wattHourAvailable: insideCondition.temperature < targetTemp ? locationStatus.wattHourAvailable || 0 : 0,
       numberOfRadiators: locationStatus.numberOfRadiators || 0,
       solarProduction: locationStatus.solarProduction?.value || 0,
       gridInjection: locationStatus.gridInjection?.value || 0,
-      isOn: insideCondition.temperature > targetTemp || solarHeatingDisabled?.value === true
+      isOn: solarHeatingDisabled?.value === true
     };
   }
 
