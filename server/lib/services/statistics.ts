@@ -170,13 +170,13 @@ async function calculateSolarHeatingDuration(location: HydratedDocument<ILocatio
 			.exec()
 	])
 
-	if (!history?.length && !lastHistory?.noOfRunningRadiators) {
+	if (!history?.length && !lastHistory?.wattHourConsumption) {
 		return 0;
 	}
 
 	history.unshift({
 		datetime: moment(date).tz(location.timezone).startOf('day').toDate(),
-		noOfRunningRadiators: lastHistory ? lastHistory.noOfRunningRadiators : 0,
+		wattHourConsumption: lastHistory ? lastHistory.wattHourConsumption : 0,
 		location: location._id
 	} as HydratedDocument<ISolarSystemHeatingHistory>);
 
@@ -187,7 +187,7 @@ async function calculateSolarHeatingDuration(location: HydratedDocument<ILocatio
 				moment(date).tz(location.timezone).endOf('day').valueOf()
 			)
 		),
-		noOfRunningRadiators: 0,
+		wattHourConsumption: 0,
 		location: location._id
 	} as HydratedDocument<ISolarSystemHeatingHistory>);
 
@@ -196,11 +196,11 @@ async function calculateSolarHeatingDuration(location: HydratedDocument<ILocatio
 
 	history.forEach(entry => {
 		if (lastEntry) {
-			if (lastEntry.noOfRunningRadiators > 0 && entry.noOfRunningRadiators === 0) {
+			if (lastEntry.wattHourConsumption > 0 && entry.wattHourConsumption === 0) {
 				heatingDuration += (moment(entry.datetime).tz(location.timezone).valueOf() - moment(lastEntry.datetime).tz(location.timezone).valueOf()) / 60000;
 			}
 
-			if ((lastEntry.noOfRunningRadiators > 0) !== (entry.noOfRunningRadiators > 0)) {
+			if ((lastEntry.wattHourConsumption > 0) !== (entry.wattHourConsumption > 0)) {
 				lastEntry = entry;
 			}
 		} else {
@@ -523,6 +523,40 @@ const saveStatisticsForADayByLocation = async (locationId: number) => {
 			.catch(e => {
 				console.error('Failed to cleanup heating hold condition history with error:', e);
 			});
+
+		if (hasLocationFeature(location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+			await SolarSystemHeatingHistory
+				.deleteMany({
+					location: locationId,
+					datetime: {
+						$lt: moment(currentDate).subtract(2, 'month').toDate()
+					}
+				})
+				.exec()
+				.then(result => {
+					console.log('Successfully cleaned up solar heating history, deleted count:', result.deletedCount);
+				})
+				.catch(e => {
+					console.error('Failed to cleanup solar heating history with error:', e);
+				});
+
+			await SolarSystemHeatingHistory
+				.find({
+					location: locationId,
+					noOfRunningRadiators: {
+						$gt: 0
+					}
+				})
+				.exec()
+				.then(result => {
+					result.forEach(async r => {
+						if (!r.wattHourConsumption) {
+							r.wattHourConsumption = r.noOfRunningRadiators * 750;
+							await r.save();
+						}
+					});
+				});
+		}
 	}
 };
 

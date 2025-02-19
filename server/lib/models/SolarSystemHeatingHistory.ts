@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 
 export interface ISolarSystemHeatingHistory {
 	datetime: Date;
+	wattHourConsumption: number;
 	noOfRunningRadiators: number;
 	location: number;
 }
@@ -11,6 +12,7 @@ const solarSystemHeatingHistorySchema = new Schema<ISolarSystemHeatingHistory>({
 		type: Date,
 		index: true
 	},
+	wattHourConsumption: Number,
 	noOfRunningRadiators: Number,
 	location: {
 		type: Number,

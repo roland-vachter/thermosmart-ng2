@@ -59,8 +59,7 @@ export class ThermoDataStoreService {
 	heatingPlanOverrides: HeatingPlanOverride[] = [];
 	solarHeatingStatus: SolarHeatingStatus = {
 		numberOfRadiators: 0,
-		numberOfRunningRadiators: 0,
-		numberOfRunningRadiatorsReported: 0,
+		wattHourConsumption: 0,
 		gridInjection: 0,
 		solarProduction: 0
 	};
@@ -112,8 +111,7 @@ export class ThermoDataStoreService {
 		this.heatingPlanOverrides = [];
 		this.solarHeatingStatus = {
 			numberOfRadiators: 0,
-			numberOfRunningRadiators: 0,
-			numberOfRunningRadiatorsReported: 0,
+			wattHourConsumption: 0,
 			gridInjection: 0,
 			solarProduction: 0
 		};
@@ -256,8 +254,7 @@ export class ThermoDataStoreService {
 
 		if (data.solarHeatingStatus) {
 			this.solarHeatingStatus.numberOfRadiators = data.solarHeatingStatus.numberOfRadiators;
-			this.solarHeatingStatus.numberOfRunningRadiators = data.solarHeatingStatus.numberOfRunningRadiators;
-			this.solarHeatingStatus.numberOfRunningRadiatorsReported = data.solarHeatingStatus.numberOfRunningRadiatorsReported;
+			this.solarHeatingStatus.wattHourConsumption = data.solarHeatingStatus.wattHourConsumption;
 			this.solarHeatingStatus.solarProduction = data.solarHeatingStatus.solarProduction;
 			this.solarHeatingStatus.gridInjection = data.solarHeatingStatus.gridInjection;
 		}

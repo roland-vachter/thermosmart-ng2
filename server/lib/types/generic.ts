@@ -137,8 +137,9 @@ export interface HeatingPlanIntervalInitUpdate {
 }
 
 export interface SolarHeatingStatus {
-  numberOfRadiators: number;
-  numberOfRunningRadiators: number;
+  numberOfRadiators?: number;
+  numberOfRunningRadiators?: number;
+  wattHourConsumed: number;
   solarProduction?: number;
   gridInjection?: number;
 }

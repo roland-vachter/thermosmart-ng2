@@ -62,9 +62,19 @@
   <div class="col-12 col-md-6">
     <div class="component">
       <div class="radiators">
-        <div *ngIf="!radiators?.length">No radiators</div>
-        <i class="icon-radiator" *ngFor="let r of radiators"
-          [ngClass]="{ 'color-olive': r.isOn, 'color-dark-gray': !r.isOn }"></i>
+        <div *ngIf="!dataStore.solarHeatingStatus?.numberOfRadiators && !dataStore.solarHeatingStatus?.wattHourConsumption">No radiators</div>
+
+        <div class="row" *ngIf="dataStore.solarHeatingStatus?.numberOfRadiators || dataStore.solarHeatingStatus?.wattHourConsumption">
+          <div class="col-6">
+            <i class="icon-radiator"
+              [ngClass]="{ 'color-olive': dataStore.solarHeatingStatus?.wattHourConsumption, 'color-dark-gray': !dataStore.solarHeatingStatus?.wattHourConsumption }"></i>
+          </div>
+          <div class="col-6">
+            <span [ngClass]="{ 'color-olive': dataStore.solarHeatingStatus?.wattHourConsumption, 'color-dark-gray': !dataStore.solarHeatingStatus?.wattHourConsumption }">
+              {{ consumption }} W
+            </span>
+          </div>
+        </div>
 
         <div class="row">
           <div class="col-6 heating-duration">

@@ -47,6 +47,7 @@ export class StatisticsModalComponent implements OnInit {
 					if (response.data.heatingForToday) {
 						datasets.push({
 							label: 'Heating status',
+							yAxisID: "activeStatus",
 							data: response.data.heatingForToday.map(item => ({
 								x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
 								y: item.status ? 10 : 0
@@ -76,9 +77,10 @@ export class StatisticsModalComponent implements OnInit {
 						response.data.solarHeatingForToday) {
 							datasets.push({
 								label: 'Radiator heating',
+								yAxisID: "watts",
 								data: response.data.solarHeatingForToday.map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
-									y: item.noOfRunningRadiators * 3
+									y: item.wattHourConsumption
 								})),
 								steppedLine: true,
 								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
@@ -105,6 +107,7 @@ export class StatisticsModalComponent implements OnInit {
 						if (response.data.heatingConditionsForToday[HeatingHoldConditionTypes.POWERED_OFF]) {
 							datasets.push({
 								label: 'Power off',
+								yAxisID: "activeStatus",
 								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.POWERED_OFF].map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
 									y: item.status ? 5 : 0
@@ -133,6 +136,7 @@ export class StatisticsModalComponent implements OnInit {
 						if (response.data.heatingConditionsForToday[HeatingHoldConditionTypes.WINDOW_OPEN]) {
 							datasets.push({
 								label: 'Window open',
+								yAxisID: "activeStatus",
 								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.WINDOW_OPEN].map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
 									y: item.status ? 5 : 0
@@ -162,6 +166,7 @@ export class StatisticsModalComponent implements OnInit {
 								response.data.heatingConditionsForToday[HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST]) {
 							datasets.push({
 								label: 'Favorable weather',
+								yAxisID: "activeStatus",
 								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST].map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
 									y: item.status ? 5 : 0
@@ -191,6 +196,7 @@ export class StatisticsModalComponent implements OnInit {
 								response.data.heatingConditionsForToday[HeatingHoldConditionTypes.INCREASING_TREND]) {
 							datasets.push({
 								label: 'Increasing trend',
+								yAxisID: "activeStatus",
 								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.INCREASING_TREND].map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
 									y: item.status ? 5 : 0
@@ -257,6 +263,7 @@ export class StatisticsModalComponent implements OnInit {
 									}
 								}],
 								yAxes: [{
+									id: "activeStatus",
 									ticks: {
 										callback: function(value) {
 											return value === 0 ? 'OFF' : value === 5 ? 'ACTIVE' : value === 10 ? 'ON' : '';
@@ -264,6 +271,14 @@ export class StatisticsModalComponent implements OnInit {
 										fixedStepSize: 1,
 										min: 0,
 										max: 10
+									}
+								},
+								{
+									id: "watts",
+									ticks: {
+										callback: value => value,
+										min: 0,
+										max: 2600
 									}
 								}]
 							}

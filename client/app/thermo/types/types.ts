@@ -145,7 +145,7 @@ export interface SolarSystemHeatingHistory {
   _id: string;
   datetime: string;
   location: number;
-  noOfRunningRadiators: number;
+  wattHourConsumption: number;
 }
 
 export interface HeatingHoldConditionHistory {
@@ -227,8 +227,7 @@ export interface HeatingDefaultPlanInitUpdate {
 
 export interface SolarHeatingStatus {
   numberOfRadiators: number;
-  numberOfRunningRadiators: number;
-  numberOfRunningRadiatorsReported: number;
+  wattHourConsumption: number;
   solarProduction?: number;
   gridInjection?: number;
 }

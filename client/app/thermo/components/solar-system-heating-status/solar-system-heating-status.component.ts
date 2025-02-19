@@ -9,30 +9,16 @@ import { SharedServerApiService } from '../../../shared/shared-server-api.servic
   styleUrls: ['./solar-system-heating-status.component.scss']
 })
 export class SolarSystemHeatingStatusComponent implements OnInit {
-  radiators: { isOn: boolean }[] = [];
   consumption: number | string = 0;
 
   constructor(
     public dataStore: ThermoDataStoreService,
     private serverApiService: SharedServerApiService
   ) {
-    this.radiators = [];
-    for (let i = 0; i < this.dataStore.solarHeatingStatus?.numberOfRadiators; i++) {
-      this.radiators.push({
-        isOn: i < this.dataStore?.solarHeatingStatus?.numberOfRunningRadiatorsReported
-      });
-    }
   }
 
   ngOnInit() {
 		this.dataStore.evt.subscribe(() => {
-      this.radiators = [];
-      for (let i = 0; i < this.dataStore.solarHeatingStatus?.numberOfRadiators; i++) {
-        this.radiators.push({
-          isOn: i < this.dataStore?.solarHeatingStatus?.numberOfRunningRadiatorsReported
-        });
-      }
-
       this.calculateConsumption();
 		});
 

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Location from '../../models/Location';
 import { RESPONSE_STATUS } from '../../types/generic';
-import { getStatusByLocation, updateRunningRadiators } from '../../services/solarSystemHeating';
+import { getStatusByLocation, updateRadiatorConsumption } from '../../services/solarSystemHeating';
 
 export const statusAndUpdate = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.query.location) {
@@ -24,14 +24,9 @@ export const statusAndUpdate = async (req: Request, res: Response, next: NextFun
 		});
 	}
 
-	let numberOfRunningRadiators = 0;
-	let numberOfRadiators = 0;
-	if (req.query.runningradiators && req.query.radiators) {
-		numberOfRunningRadiators = parseInt(req.query.runningradiators as string, 10);
-		numberOfRadiators = parseInt(req.query.radiators as string, 10);
+	if (req.query.watthourconsumption && req.query.numberofradiators) {
+		await updateRadiatorConsumption(location.id, parseInt(req.query.numberofradiators as string, 10), parseInt(req.query.watthourconsumption as string, 10));
 	}
-
-	await updateRunningRadiators(location.id, numberOfRadiators, numberOfRunningRadiators);
 
   try {
     res.json({
