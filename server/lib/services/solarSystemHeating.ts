@@ -97,7 +97,7 @@ async function updateAllLocations () {
 function initLocation(locationId: number) {
   if (!statusByLocations[locationId]) {
     statusByLocations[locationId] = {
-      wattHourConsumption: null,
+      wattHourConsumption: 0,
       wattHourAvailable: 0,
       numberOfRadiators: 0,
       solarProduction: {
@@ -298,7 +298,7 @@ async function updateByLocation(locationId: number) {
 
           if (typeof resInverter === 'number') {
             locationStatus.solarProduction = {
-              value: resInverter * 1000,
+              value: Math.round(resInverter * 1000),
               lastUpdate: moment()
             };
           }
@@ -316,7 +316,7 @@ async function updateByLocation(locationId: number) {
 
           if (typeof resSmartMeter === 'number') {
             locationStatus.gridInjection = {
-              value: resSmartMeter,
+              value: Math.round(resSmartMeter),
               lastUpdate: moment()
             }
           }
