@@ -339,7 +339,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 			}
 
 			if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) && solarSystemHeatingStatus.wattHourConsumption) {
-				targetValue -= 0.1 * solarSystemHeatingStatus.wattHourConsumption;
+				targetValue -= 0.1 * solarSystemHeatingStatus.wattHourConsumption / 700;
 			}
 
 			if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions &&
