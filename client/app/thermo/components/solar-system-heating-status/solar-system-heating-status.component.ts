@@ -9,7 +9,7 @@ import { SharedServerApiService } from '../../../shared/shared-server-api.servic
   styleUrls: ['./solar-system-heating-status.component.scss']
 })
 export class SolarSystemHeatingStatusComponent implements OnInit {
-  consumption: number | string = 0;
+  consumption: number = 0;
 
   constructor(
     public dataStore: ThermoDataStoreService,

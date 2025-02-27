@@ -61,9 +61,14 @@ i {
 			top: 50%;
 			left: 50%;
 			transform: translateX(-50%) translateY(-50%);
+			overflow: hidden;
+		}
+
+		.direction-content {
+			width: 200%;
 			display: flex;
 			justify-content: space-around;
-			font-size: 1.2rem;
+			font-size: 0.9rem;
 		}
 	}
 
@@ -86,4 +91,33 @@ i {
 .switch-wrapper {
 	display: flex;
 	justify-content: center;
+}
+
+
+.animate-left {
+	animation: 6s animate-left infinite linear;
+}
+
+.animate-right {
+	animation: 6s animate-right infinite linear;
+}
+
+@keyframes animate-right {
+	0% {
+		transform: translate(-34%);
+	}
+
+	100% {
+		transform: translate(0);
+	}
+}
+
+@keyframes animate-left {
+	0% {
+		transform: translate(0);
+	}
+
+	100% {
+		transform: translate(-34%);
+	}
 }
