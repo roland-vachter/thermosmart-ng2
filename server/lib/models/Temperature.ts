@@ -2,16 +2,18 @@ import { Schema, model } from 'mongoose';
 import EventEmitter from 'events';
 import TypedEventEmitter from 'typed-emitter';
 
+export interface TemperatureValue {
+	value: number;
+	location: number;
+}
+
 export interface ITemperature {
 	_id: number;
 	name: string;
 	iconClass: string;
 	color: string;
 	defaultValue: number;
-	values: {
-		value: number;
-		location: number;
-	}[];
+	values: TemperatureValue[];
 }
 
 const temperatureSchema = new Schema<ITemperature>({

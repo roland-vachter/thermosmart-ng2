@@ -29,6 +29,7 @@ router.post('/heating/planoverride/remove', apiFlagMiddleware, loginMiddleware, 
 router.get('/heating/planoverride/list', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.listHeatingPlanOverride));
 router.get('/sensorpolling', apiKeyMiddleware, cors(), handleErrors(heatingApiCtrl.sensorPolling));
 router.get('/statistics', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.statistics));
+router.get('/statistics/custom', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.statisticsCustom));
 router.post('/toggleheatingpower', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.toggleHeatingPower));
 router.post('/decreasepowerofftime', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.decreasePowerOff));
 router.post('/increasepowerofftime', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(heatingApiCtrl.increasePowerOff));

@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { RESPONSE_STATUS, ApiResponse, ThermoInitUpdateData, Statistics, LOCATION_FEATURE } from '../../types/generic';
-import Temperature, { triggerTemperatureChange } from '../../models/Temperature';
-import HeatingDefaultPlan, { triggerHeatingDefaultPlanChange } from '../../models/HeatingDefaultPlan';
+import Temperature, { TemperatureValue, triggerTemperatureChange } from '../../models/Temperature';
+import HeatingDefaultPlan, { IHeatingPlanWithLocation, triggerHeatingDefaultPlanChange } from '../../models/HeatingDefaultPlan';
 import HeatingPlan from '../../models/HeatingPlan';
 import HeatingPlanOverrides, { triggerHeatingPlanOverridesChange } from '../../models/HeatingPlanOverrides';
-import { getStatisticsByDay, getStatisticsByMonth, getStatisticsByYear, getStatisticsForToday } from '../../services/statistics';
+import { getAverageByCustomPeriod, getStatisticsByDay, getStatisticsByMonth, getStatisticsByYear, getStatisticsForToday } from '../../services/statistics';
 import { getTargetTempByLocation, updateTargetTemp } from '../../services/targetTemp';
 import { getAllConfigs } from '../../services/config';
 import { getOutsideConditions } from '../../services/outsideConditions';
@@ -100,13 +100,13 @@ export const initHeating = async (req: Request, res: Response) => {
 			temperatures: (temps || []).map(t => ({
 				...t,
 				value: t.values?.find(v => v.location === location._id)?.value || t.defaultValue,
-				values: null
+				values: null as TemperatureValue[]
 			})),
 			heatingPlans: heatingPlans || [],
 			heatingDefaultPlans: (heatingDefaultPlans || []).map(hdp => ({
 				...hdp,
 				plan: hdp.plans?.find(p => p.location === location._id)?.plan || hdp.defaultPlan,
-				plans: null
+				plans: null as IHeatingPlanWithLocation[]
 			})),
 			heatingPlanOverrides: heatingPlanOverrides.map(hp => {
 				hp.date = moment(hp.date).tz(location.timezone).startOf('day').valueOf();
@@ -538,6 +538,45 @@ export const sensorPolling = async (req: Request, res: Response) => {
 		restart: getRestartStatus()
 	}), 200);
 };
+
+export const statisticsCustom = async (req: Request, res: Response) => {
+	if (!req.query.location) {
+		return res.status(400).json({
+			status: RESPONSE_STATUS.ERROR,
+			reason: 'Location parameter is missing'
+		});
+	}
+
+	if (!req.query.startDate && !req.query.endDate) {
+		return res.status(400).json({
+			status: RESPONSE_STATUS.ERROR,
+			reason: 'Date interval not specified'
+		});
+	}
+
+	const location = await Location
+		.findOne({
+			_id: parseInt(req.query.location as string, 10)
+		})
+		.exec();
+
+	if (!location) {
+		return res.status(400).json({
+			status: RESPONSE_STATUS.ERROR,
+			reason: 'Location not found'
+		});
+	}
+
+	const customStatistics = await getAverageByCustomPeriod(
+		location._id,
+		new Date(moment(req.query.startDate as string).tz(location.timezone).startOf('day').toISOString()),
+		new Date(moment(req.query.endDate as string).tz(location.timezone).toISOString()));
+
+	return res.json({
+		status: 'ok',
+		data: customStatistics
+	});
+}
 
 export const statistics = async (req: Request, res: Response) => {
 	if (!req.query.location) {

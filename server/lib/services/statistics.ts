@@ -16,7 +16,7 @@ import { LOCATION_FEATURE } from '../types/generic';
 
 
 interface Total {
-	date: Moment;
+	date?: Moment;
 	daysRunningMinutes: number;
 	runningMinutesTotal: number;
 	daysTargetTemp: number;
@@ -29,7 +29,7 @@ interface Total {
 }
 
 interface Average {
-	date: string;
+	date?: string;
 	totalRunningMinutes: number;
 	avgRunningMinutes: number;
 	avgRadiatorRunningMinutes?: number;
@@ -76,7 +76,7 @@ async function calculateHeatingDuration(location: HydratedDocument<ILocation>, d
 		HeatingHistory
 			.findOne({
 				datetime: {
-					$lt: moment(date).tz(location.timezone).startOf('day')
+					$lte: moment(date).tz(location.timezone).startOf('day')
 				},
 				location: location._id
 			})
@@ -87,8 +87,8 @@ async function calculateHeatingDuration(location: HydratedDocument<ILocation>, d
 		HeatingHistory
 			.find({
 				datetime: {
-					$gt: moment(date).tz(location.timezone).startOf('day'),
-					$lt: moment(date).tz(location.timezone).endOf('day')
+					$gte: moment(date).tz(location.timezone).startOf('day'),
+					$lte: moment(date).tz(location.timezone).endOf('day')
 				},
 				location: location._id
 			})
@@ -148,7 +148,7 @@ async function calculateSolarHeatingDuration(location: HydratedDocument<ILocatio
 		SolarSystemHeatingHistory
 			.findOne({
 				datetime: {
-					$lt: moment(date).tz(location.timezone).startOf('day')
+					$lte: moment(date).tz(location.timezone).startOf('day')
 				},
 				location: location._id
 			})
@@ -159,8 +159,8 @@ async function calculateSolarHeatingDuration(location: HydratedDocument<ILocatio
 			SolarSystemHeatingHistory
 			.find({
 				datetime: {
-					$gt: moment(date).tz(location.timezone).startOf('day'),
-					$lt: moment(date).tz(location.timezone).endOf('day')
+					$gte: moment(date).tz(location.timezone).startOf('day'),
+					$lte: moment(date).tz(location.timezone).endOf('day')
 				},
 				location: location._id
 			})
@@ -220,7 +220,7 @@ async function calculateAvgTargetTemp (location: HydratedDocument<ILocation>, da
 		TargetTempHistory
 			.findOne({
 				datetime: {
-					$lt: moment(date).tz(location.timezone).startOf('day').toDate()
+					$lte: moment(date).tz(location.timezone).startOf('day').toDate()
 				},
 				location: location._id
 			})
@@ -231,8 +231,8 @@ async function calculateAvgTargetTemp (location: HydratedDocument<ILocation>, da
 		TargetTempHistory
 			.find({
 				datetime: {
-					$gt: moment(date).tz(location.timezone).startOf('day').toDate(),
-					$lt: moment(date).tz(location.timezone).endOf('day').toDate()
+					$gte: moment(date).tz(location.timezone).startOf('day').toDate(),
+					$lte: moment(date).tz(location.timezone).endOf('day').toDate()
 				},
 				location: location._id
 			})
@@ -289,7 +289,7 @@ async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation
 		OutsideConditionHistory
 			.findOne({
 				datetime: {
-					$lt: momentDate.tz(location.timezone).startOf('day').toDate()
+					$lte: momentDate.tz(location.timezone).startOf('day').toDate()
 				}
 			})
 			.sort({
@@ -299,8 +299,8 @@ async function calculateAvgOutsideCondition(location: HydratedDocument<ILocation
 		OutsideConditionHistory
 			.find({
 				datetime: {
-					$gt: momentDate.tz(location.timezone).startOf('day').toDate(),
-					$lt: momentDate.tz(location.timezone).endOf('day').toDate()
+					$gte: momentDate.tz(location.timezone).startOf('day').toDate(),
+					$lte: momentDate.tz(location.timezone).endOf('day').toDate()
 				}
 			})
 			.sort({
@@ -603,8 +603,8 @@ export const getStatisticsByDay = async (locationId: number, dateStart: Date, da
 	const heatingStatistics = await HeatingStatistics
 		.find({
 			date: {
-				$gt: mStartDate.toDate(),
-				$lt: mEndDate.toDate()
+				$gte: mStartDate.toDate(),
+				$lte: mEndDate.toDate()
 			},
 			location: locationId
 		})
@@ -639,6 +639,77 @@ export const getStatisticsByDay = async (locationId: number, dateStart: Date, da
 	return heatingStatistics.map(hs => ({ ...hs, date: moment(hs.date).tz('utc').format('YYYY-MM-DD') })) || [];
 };
 
+
+export const getAverageByCustomPeriod = async (locationId: number, dateStart: Date, dateEnd: Date) => {
+	const location = await Location
+		.findOne({
+			_id: locationId
+		})
+		.exec();
+
+	if (!location) {
+		throw new Error("Location not found");
+	}
+
+	const heatingStatistics = await HeatingStatistics
+		.find({
+			date: {
+				$gte: toSameDateInUTC(dateStart, location.timezone).startOf('day').toDate(),
+				$lte: toSameDateInUTC(dateEnd, location.timezone).endOf('day').toDate()
+			},
+			location: locationId
+		})
+		.exec();
+
+	const total: Total = {
+		daysRunningMinutes: 0,
+		runningMinutesTotal: 0,
+		daysTargetTemp: 0,
+		targetTempTotal: 0,
+		daysOutsideCondition: 0,
+		outsideTempTotal: 0,
+		outsideHumiTotal: 0,
+		sunshineMinutesTotal: 0,
+		radiatorRunningMinutesTotal: 0
+	};
+
+	heatingStatistics.forEach(statistic => {
+		total.daysRunningMinutes++;
+
+		if (statistic.runningMinutes) {
+			total.runningMinutesTotal += statistic.runningMinutes;
+		}
+
+		if (statistic.radiatorRunningMinutes) {
+			total.radiatorRunningMinutesTotal += statistic.radiatorRunningMinutes;
+		}
+
+		if (statistic.avgTargetTemp) {
+			total.daysTargetTemp++;
+			total.targetTempTotal += statistic.avgTargetTemp;
+		}
+
+		if (statistic.avgOutsideTemp) {
+			total.daysOutsideCondition++;
+			total.outsideTempTotal += statistic.avgOutsideTemp;
+			total.outsideHumiTotal += statistic.avgOutsideHumi;
+			total.sunshineMinutesTotal += statistic.sunshineMinutes || 0;
+		}
+	});
+
+	const avg: Average = {
+		totalRunningMinutes: total.runningMinutesTotal,
+		avgRunningMinutes: total.daysRunningMinutes ? total.runningMinutesTotal / total.daysRunningMinutes : 0,
+		avgRadiatorRunningMinutes: total.daysRunningMinutes ? total.radiatorRunningMinutesTotal / total.daysRunningMinutes : 0,
+		avgTargetTemp: total.targetTempTotal / total.daysTargetTemp,
+		avgOutsideTemp: total.outsideTempTotal / total.daysOutsideCondition,
+		avgOutsideHumi: total.outsideHumiTotal / total.daysOutsideCondition,
+		avgSunshineMinutes: (total.sunshineMinutesTotal / total.daysOutsideCondition) || null
+	};
+
+	return avg;
+}
+
 export const getStatisticsByMonth = async (locationId: number, dateStart: Date, dateEnd: Date) => {
 	const location = await Location
 		.findOne({
@@ -653,8 +724,8 @@ export const getStatisticsByMonth = async (locationId: number, dateStart: Date, 
 	const heatingStatistics = await HeatingStatistics
 		.find({
 			date: {
-				$gt: toSameDateInUTC(dateStart, location.timezone).startOf('month').toDate(),
-				$lt: toSameDateInUTC(dateEnd, location.timezone).endOf('month').toDate()
+				$gte: toSameDateInUTC(dateStart, location.timezone).startOf('month').toDate(),
+				$lte: toSameDateInUTC(dateEnd, location.timezone).endOf('month').toDate()
 			},
 			location: locationId
 		})
