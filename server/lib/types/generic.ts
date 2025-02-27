@@ -168,16 +168,20 @@ export interface ThermoInitUpdateData {
   solarHeatingStatus?: SolarHeatingStatus;
 }
 
-
 export interface StatisticsByMonth {
+  date?: string;
   avgOutsideHumi: number;
   avgOutsideTemp: number;
   avgRunningMinutes: number;
   avgTargetTemp: number;
-  date: string;
   totalRunningMinutes: number;
   avgSunshineMinutes: number;
 }
+
+export interface Average extends StatisticsByMonth {
+	avgRadiatorRunningMinutes?: number;
+}
+
 
 export interface StatisticsByYear {
   avgOutsideHumi: number;

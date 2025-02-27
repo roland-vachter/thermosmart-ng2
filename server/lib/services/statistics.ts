@@ -12,7 +12,7 @@ import { toSameDateInUTC } from './timezoneConversion';
 import HeatingHoldConditionHistory, { HeatingHoldConditionTypes } from '../models/HeatingHoldConditionHistory';
 import SolarSystemHeatingHistory, { ISolarSystemHeatingHistory } from '../models/SolarSystemHeatingHistory';
 import { hasLocationFeature } from './location';
-import { LOCATION_FEATURE } from '../types/generic';
+import { Average, LOCATION_FEATURE } from '../types/generic';
 
 
 interface Total {
@@ -26,17 +26,6 @@ interface Total {
 	outsideHumiTotal: number;
 	sunshineMinutesTotal: number;
 	radiatorRunningMinutesTotal: number;
-}
-
-interface Average {
-	date?: string;
-	totalRunningMinutes: number;
-	avgRunningMinutes: number;
-	avgRadiatorRunningMinutes?: number;
-	avgTargetTemp: number;
-	avgOutsideTemp: number;
-	avgOutsideHumi: number;
-	avgSunshineMinutes: number;
 }
 
 
