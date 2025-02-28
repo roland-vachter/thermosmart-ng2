@@ -54,9 +54,9 @@
 
           <span [ngClass]="{
             'color-olive': dataStore?.solarHeatingStatus?.gridVoltage > 225 && dataStore?.solarHeatingStatus?.gridVoltage < 235,
-            'color-orange': (dataStore?.solarHeatingStatus?.gridInjection <= 225 && dataStore?.solarHeatingStatus?.gridInjection > 215) ||
-              (dataStore?.solarHeatingStatus?.gridVoltage >= 235 && dataStore?.solarHeatingStatus?.gridInjection < 245),
-            'color-vermillion': dataStore?.solarHeatingStatus?.gridInjection <= 215 || dataStore?.solarHeatingStatus?.gridVoltage >= 245
+            'color-orange': (dataStore?.solarHeatingStatus?.gridVoltage <= 225 && dataStore?.solarHeatingStatus?.gridVoltage > 215) ||
+              (dataStore?.solarHeatingStatus?.gridVoltage >= 235 && dataStore?.solarHeatingStatus?.gridVoltage < 245),
+            'color-vermillion': dataStore?.solarHeatingStatus?.gridVoltage <= 215 || dataStore?.solarHeatingStatus?.gridVoltage >= 245
           }">
             {{ dataStore?.solarHeatingStatus?.gridVoltage }} V
         </span>
