@@ -319,7 +319,7 @@ async function updateByLocation(locationId: number) {
             lastUpdate: moment()
           }
 
-          locationStatus.gridVoltage = resSmartMeter?.meter_u;
+          locationStatus.gridVoltage = Math.round(resSmartMeter?.meter_u || 0);
         }
       }
     }
