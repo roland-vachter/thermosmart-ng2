@@ -31,6 +31,7 @@ interface SolarSystemHeatingStatus {
     value?: number;
     lastUpdate?: Moment;
   }
+  gridVoltage?: number;
   authToken?: string;
   deviceList?: HuaweiDeviceList;
 }
@@ -56,6 +57,7 @@ interface HuaweiDeviceResponse {
   data: {
     dataItemMap: {
       active_power: number;
+      meter_u: number;
     }
   }[];
 }
@@ -67,6 +69,7 @@ interface SolarSystemStatus {
   numberOfRadiators: number;
   solarProduction: number;
   gridInjection: number;
+  gridVoltage: number;
   isOn: boolean;
 }
 
@@ -107,7 +110,8 @@ function initLocation(locationId: number) {
       gridInjection: {
         value: 0,
         lastUpdate: moment()
-      }
+      },
+      gridVoltage: 0
     };
   }
 }
@@ -182,9 +186,7 @@ async function getHuaweiDeviceList(apiUrl: string, authToken: string, stationCod
   return devices;
 }
 
-async function getHuaweiActivePower(apiUrl: string, authToken: string, deviceType: DEVICE_TYPE, deviceId: string) {
-  let power: number;
-
+async function getHuaweiData(apiUrl: string, authToken: string, deviceType: DEVICE_TYPE, deviceId: string) {
   try {
     const resDevList = await fetch(`${apiUrl}/thirdData/getDevRealKpi`, {
       method: 'POST',
@@ -203,17 +205,17 @@ async function getHuaweiActivePower(apiUrl: string, authToken: string, deviceTyp
     if (resJson) {
       if (!resJson.success) {
         console.warn(deviceType, resJson.failCode, resJson.message);
-        return resJson.message;
+        return null;
       } else {
         console.log('SOLAR:', deviceType, 'successful');
-        power = resJson.data.length ? resJson.data[0]?.dataItemMap?.active_power : 0;
+        return resJson.data.length && resJson.data[0]?.dataItemMap || null;
       }
     }
   } catch (e) {
     console.warn(e);
   }
 
-  return power;
+  return null;
 }
 
 async function calculateWattHourAvailable(locationId: number) {
@@ -289,37 +291,35 @@ async function updateByLocation(locationId: number) {
         }
 
         if (locationStatus.deviceList instanceof Object && locationStatus.deviceList[DEVICE_TYPE.INVERTER]) {
-          let resInverter = await getHuaweiActivePower(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.INVERTER, locationStatus.deviceList[DEVICE_TYPE.INVERTER]);
+          let resInverter = await getHuaweiData(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.INVERTER, locationStatus.deviceList[DEVICE_TYPE.INVERTER]);
 
           if (typeof resInverter === 'string' && resInverter === 'USER_MUST_RELOGIN') {
             locationStatus.authToken = await getAuthToken(apiUrl.value as string, username.value as string, password.value as string);
-            resInverter = await getHuaweiActivePower(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.INVERTER, locationStatus.deviceList[DEVICE_TYPE.INVERTER]);
+            resInverter = await getHuaweiData(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.INVERTER, locationStatus.deviceList[DEVICE_TYPE.INVERTER]);
           }
 
-          if (typeof resInverter === 'number') {
-            locationStatus.solarProduction = {
-              value: Math.round(resInverter * 1000),
-              lastUpdate: moment()
-            };
-          }
+          locationStatus.solarProduction = {
+            value: Math.round((resInverter?.active_power || 0) * 1000),
+            lastUpdate: moment()
+          };
         }
 
         await new Promise(resolve => setTimeout(resolve, 10000));
 
         if (locationStatus.deviceList instanceof Object && locationStatus.deviceList[DEVICE_TYPE.SMART_METER]) {
-          let resSmartMeter = await getHuaweiActivePower(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.SMART_METER, locationStatus.deviceList[DEVICE_TYPE.SMART_METER]);
+          let resSmartMeter = await getHuaweiData(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.SMART_METER, locationStatus.deviceList[DEVICE_TYPE.SMART_METER]);
 
           if (typeof resSmartMeter === 'string' && resSmartMeter === 'USER_MUST_RELOGIN') {
             locationStatus.authToken = await getAuthToken(apiUrl.value as string, username.value as string, password.value as string);
-            resSmartMeter = await getHuaweiActivePower(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.SMART_METER, locationStatus.deviceList[DEVICE_TYPE.SMART_METER]);
+            resSmartMeter = await getHuaweiData(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.SMART_METER, locationStatus.deviceList[DEVICE_TYPE.SMART_METER]);
           }
 
-          if (typeof resSmartMeter === 'number') {
-            locationStatus.gridInjection = {
-              value: Math.round(resSmartMeter),
-              lastUpdate: moment()
-            }
+          locationStatus.gridInjection = {
+            value: Math.round(resSmartMeter?.active_power || 0),
+            lastUpdate: moment()
           }
+
+          locationStatus.gridVoltage = resSmartMeter?.meter_u;
         }
       }
     }
@@ -347,6 +347,7 @@ export async function getStatusByLocation(locationId: number): Promise<SolarSyst
       numberOfRadiators: locationStatus.numberOfRadiators || 0,
       solarProduction: locationStatus.solarProduction?.value || 0,
       gridInjection: locationStatus.gridInjection?.value || 0,
+      gridVoltage: locationStatus.gridVoltage || 0,
       isOn: solarHeatingDisabled?.value !== true
     };
   }

@@ -230,6 +230,7 @@ export interface SolarHeatingStatus {
   wattHourConsumption: number;
   solarProduction?: number;
   gridInjection?: number;
+  gridVoltage?: number;
 }
 
 export interface ThermoInitUpdateData {

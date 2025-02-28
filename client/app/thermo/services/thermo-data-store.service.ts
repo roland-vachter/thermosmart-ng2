@@ -61,6 +61,7 @@ export class ThermoDataStoreService {
 		numberOfRadiators: 0,
 		wattHourConsumption: 0,
 		gridInjection: 0,
+		gridVoltage: 0,
 		solarProduction: 0
 	};
 
@@ -113,6 +114,7 @@ export class ThermoDataStoreService {
 			numberOfRadiators: 0,
 			wattHourConsumption: 0,
 			gridInjection: 0,
+			gridVoltage: 0,
 			solarProduction: 0
 		};
 	}
@@ -257,6 +259,7 @@ export class ThermoDataStoreService {
 			this.solarHeatingStatus.wattHourConsumption = data.solarHeatingStatus.wattHourConsumption;
 			this.solarHeatingStatus.solarProduction = data.solarHeatingStatus.solarProduction;
 			this.solarHeatingStatus.gridInjection = data.solarHeatingStatus.gridInjection;
+			this.solarHeatingStatus.gridVoltage = data.solarHeatingStatus.gridVoltage;
 		}
 
 		this.updateTodaysPlan();
