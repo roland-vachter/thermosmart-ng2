@@ -270,21 +270,23 @@ export class StatisticsModalComponent implements OnInit {
 									id: "activeStatus",
 									ticks: {
 										callback: function(value) {
-											return value === 0 ? 'OFF' : value === 5 ? 'ACTIVE' : value === 10 ? 'ON' : '';
+											return value === 0 ? 'OFF' : value === 10 ? 'ON' : '';
 										},
 										fixedStepSize: 1,
 										min: 0,
 										max: 10
 									}
 								},
-								{
-									id: "watts",
-									ticks: {
-										callback: value => value,
-										min: 0,
-										max: 2600
-									}
-								}]
+								this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
+									response.data.solarHeatingForToday ? {
+										id: "watts",
+										ticks: {
+											callback: value => value,
+											min: 0,
+											max: 2500
+										}
+									} : null
+								].filter(a => a)
 							}
 						}
 					});
