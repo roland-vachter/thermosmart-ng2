@@ -155,8 +155,8 @@ async function update () {
 
 						return acc;
 					}, 0);
-					lastValues.sunshineNextConsecutiveHours = forecast.reduce((acc, v) => {
-						if (v.weather[0].main === 'Clear' && acc.consecutive && v.dt * 1000 >= sunrise && v.dt * 1000 < sunset) {
+					lastValues.sunshineNextConsecutiveHours = lastValues.sunshineForecast.reduce((acc, v) => {
+						if (v && acc.consecutive) {
 							acc.count++;
 						} else {
 							acc.consecutive = false;
