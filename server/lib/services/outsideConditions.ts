@@ -8,6 +8,8 @@ import { ErrorWithResponse } from '../types/generic';
 import TypedEmitter from 'typed-emitter';
 import moment from 'moment-timezone';
 
+const CLOUD_THRESHOLD = 20;
+
 interface Forecast {
 	dt: number;
 	temp: number;
@@ -135,7 +137,7 @@ async function update () {
 					lastValues.backgroundImage = getBackgroundImage(weatherType, daytime);
 					lastValues.sunrise = sunrise;
 					lastValues.sunny = daytime === DAYTIME.day &&
-						(jsonWeather.current.weather[0].main === 'Clear' || jsonWeather.current.clouds < 25);
+						(jsonWeather.current.weather[0].main === 'Clear' || jsonWeather.current.clouds < CLOUD_THRESHOLD);
 				}
 
 				if (jsonWeather.hourly) {
@@ -147,7 +149,7 @@ async function update () {
 					});
 
 					lastValues.highestExpectedTemperature = forecast.reduce((acc, v) => v.temp > acc ? v.temp : acc, forecast.length && forecast[0].temp || 0);
-					lastValues.sunshineForecast = forecast.map(v => (v.weather[0].main === 'Clear' || v.clouds < 25) && v.dt * 1000 >= sunrise && v.dt * 1000 < sunset);
+					lastValues.sunshineForecast = forecast.map(v => (v.weather[0].main === 'Clear' || v.clouds < CLOUD_THRESHOLD) && v.dt * 1000 >= sunrise && v.dt * 1000 < sunset);
 					lastValues.totalNumberOfSunshineExpected = lastValues.sunshineForecast.reduce((acc, v) => {
 						if (v) {
 							acc++;
