@@ -287,7 +287,6 @@ export class StatisticsModalComponent implements OnInit {
 								x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
 								y: item.solarProduction
 							})),
-							steppedLine: true,
 							backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
 							borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 							borderCapStyle: 'butt',
@@ -314,7 +313,6 @@ export class StatisticsModalComponent implements OnInit {
 								x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
 								y: item.consumption
 							})),
-							steppedLine: true,
 							backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
 							borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 							borderCapStyle: 'butt',
@@ -374,8 +372,7 @@ export class StatisticsModalComponent implements OnInit {
 									id: "watts",
 									ticks: {
 										callback: value => value,
-										min: 0,
-										max: 2500
+										min: 0
 									}
 								}]
 							}
