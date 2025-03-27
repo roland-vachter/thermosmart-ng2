@@ -8,6 +8,7 @@ import { LOCATION_FEATURE, LocationBasedEvent } from '../types/generic';
 import { hasLocationFeature } from './location';
 import { getAvgByLocation } from './insideConditions';
 import { deepEqual } from '../utils/utils';
+import SolarSystemHistory from '../models/SolarSystemHistory';
 
 enum DEVICE_TYPE {
   INVERTER = 'INVERTER',
@@ -260,6 +261,9 @@ async function updateByLocation(locationId: number) {
 
   const locationStatus = statusByLocations[locationId];
 
+  const lastSolarProduction = locationStatus?.solarProduction?.value || 0;
+  const lastGridInjection = locationStatus?.gridInjection?.value || 0;
+
   const [inverterType, apiUrl, username, password, stationCode] = await Promise.all([
     getConfig('solarSystemInverterType', locationId),
     getConfig('solarSystemApiUrl', locationId),
@@ -333,7 +337,30 @@ async function updateByLocation(locationId: number) {
     locationStatus.gridInjection.value = 0;
   }
 
+  locationStatus.solarProduction.value = 1802;
+  locationStatus.gridInjection.value = 1520;
+
   locationStatus.wattHourAvailable = await calculateWattHourAvailable(locationId);
+
+  if (locationStatus.solarProduction.value !== lastSolarProduction || locationStatus.gridInjection.value !== lastGridInjection) {
+    await new SolarSystemHistory({
+      location: locationId,
+      datetime: new Date(),
+      solarProduction: locationStatus.solarProduction.value,
+      consumption: locationStatus.solarProduction.value - locationStatus.gridInjection.value
+    }).save();
+  }
+
+  const newLocationStatus = await getStatusByLocation(locationId);
+  if (!lastSentStatusByLocations[locationId] || !deepEqual(lastSentStatusByLocations[locationId], newLocationStatus)) {
+    console.log('SOLAR: emit solar event');
+    solarSystemEvts.emit('change', {
+      location: locationId,
+      ...newLocationStatus
+    });
+
+    lastSentStatusByLocations[locationId] = newLocationStatus;
+  }
 };
 
 export async function getStatusByLocation(locationId: number): Promise<SolarSystemStatus> {
@@ -370,7 +397,8 @@ export async function updateRadiatorConsumption(locationId: number, numberOfRadi
 
   if (typeof locationStatus.wattHourConsumption !== 'number') {
     const lastSavedStatus = await SolarSystemHeatingHistory.findOne({
-      location: locationId
+      location: locationId,
+      wattHourConsumption: { $gte: 0 }
     }).sort({
       datetime: -1
     });

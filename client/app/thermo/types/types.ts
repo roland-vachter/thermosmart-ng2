@@ -148,6 +148,15 @@ export interface SolarSystemHeatingHistory {
   wattHourConsumption: number;
 }
 
+export interface SolarSystemHistory {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: string;
+  datetime: string;
+  location: number;
+  solarProduction: number;
+  consumption: number;
+}
+
 export interface HeatingHoldConditionHistory {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   _id: string;
@@ -167,6 +176,7 @@ export interface Statistics {
     [key: string]: HeatingHoldConditionHistory[]
   }
   solarHeatingForToday?: SolarSystemHeatingHistory[];
+  solarForToday?: SolarSystemHistory[];
 }
 
 export enum HeatingHoldConditionTypes {

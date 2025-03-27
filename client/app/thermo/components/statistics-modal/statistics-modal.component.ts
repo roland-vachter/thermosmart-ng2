@@ -23,6 +23,7 @@ export class StatisticsModalComponent implements OnInit {
 		[199, 152, 16],
 		[63, 76, 107]
 	];
+	hasSolarFeature = this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING);
 
 	constructor(
 		private serverApiService: ThermoServerApiService,
@@ -37,10 +38,7 @@ export class StatisticsModalComponent implements OnInit {
 
 		this.serverApiService.statistics().subscribe(response => {
 			if (response.data) {
-				if (response.data.heatingForToday || response.data.heatingConditionsForToday || (
-					this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
-						response.data.solarHeatingForToday
-				)) {
+				if (response.data.heatingForToday || response.data.heatingConditionsForToday) {
 					const datasets = [];
 					let colorIndex = 0;
 
@@ -71,36 +69,6 @@ export class StatisticsModalComponent implements OnInit {
 						});
 
 						colorIndex++;
-					}
-
-					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
-						response.data.solarHeatingForToday) {
-							datasets.push({
-								label: 'Radiator heating',
-								yAxisID: "watts",
-								data: response.data.solarHeatingForToday.map(item => ({
-									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
-									y: item.wattHourConsumption
-								})),
-								steppedLine: true,
-								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
-								borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
-								borderCapStyle: 'butt',
-								borderDash: [],
-								borderDashOffset: 0.0,
-								borderJoinStyle: 'miter',
-								pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
-								pointBackgroundColor: "#fff",
-								pointBorderWidth: 1,
-								pointHoverRadius: 6,
-								pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
-								pointHoverBorderColor: "rgba(220,220,220,1)",
-								pointHoverBorderWidth: 2,
-								pointRadius: 3,
-								pointHitRadius: 5,
-							});
-
-							colorIndex++;
 					}
 
 					if (response.data.heatingConditionsForToday) {
@@ -234,14 +202,10 @@ export class StatisticsModalComponent implements OnInit {
 							tooltips: {
 								callbacks: {
 									label: function(tooltipItem, data) {
-										if (data.datasets[tooltipItem.datasetIndex].yAxisID === 'watts') {
-											return `${data.datasets[tooltipItem.datasetIndex].label}: ${tooltipItem.yLabel}W`;
+										if (tooltipItem.yLabel > 0) {
+											return `${data.datasets[tooltipItem.datasetIndex].label}: ON`;
 										} else {
-											if (tooltipItem.yLabel > 0) {
-												return `${data.datasets[tooltipItem.datasetIndex].label}: ON`;
-											} else {
-												return `${data.datasets[tooltipItem.datasetIndex].label}: OFF`;
-											}
+											return `${data.datasets[tooltipItem.datasetIndex].label}: OFF`;
 										}
 									}
 								}
@@ -276,17 +240,144 @@ export class StatisticsModalComponent implements OnInit {
 										min: 0,
 										max: 10
 									}
-								},
-								this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
-									response.data.solarHeatingForToday ? {
-										id: "watts",
-										ticks: {
-											callback: value => value,
-											min: 0,
-											max: 2500
+								}]
+							}
+						}
+					});
+				}
+
+				if (this.hasSolarFeature && (response.data.solarHeatingForToday || response.data.solarForToday)) {
+					const datasets = [];
+					let colorIndex = 0;
+
+					if (response.data.solarHeatingForToday) {
+						datasets.push({
+							label: 'Radiator heating',
+							yAxisID: "watts",
+							data: response.data.solarHeatingForToday.map(item => ({
+								x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
+								y: item.wattHourConsumption
+							})),
+							steppedLine: true,
+							backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
+							borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+							borderCapStyle: 'butt',
+							borderDash: [],
+							borderDashOffset: 0.0,
+							borderJoinStyle: 'miter',
+							pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+							pointBackgroundColor: "#fff",
+							pointBorderWidth: 1,
+							pointHoverRadius: 6,
+							pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+							pointHoverBorderColor: "rgba(220,220,220,1)",
+							pointHoverBorderWidth: 2,
+							pointRadius: 3,
+							pointHitRadius: 5,
+						});
+
+						colorIndex++;
+					}
+
+					if (response.data.solarForToday) {
+						datasets.push({
+							label: 'Solar production',
+							yAxisID: "watts",
+							data: response.data.solarForToday.map(item => ({
+								x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
+								y: item.solarProduction
+							})),
+							steppedLine: true,
+							backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
+							borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+							borderCapStyle: 'butt',
+							borderDash: [],
+							borderDashOffset: 0.0,
+							borderJoinStyle: 'miter',
+							pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+							pointBackgroundColor: "#fff",
+							pointBorderWidth: 1,
+							pointHoverRadius: 6,
+							pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+							pointHoverBorderColor: "rgba(220,220,220,1)",
+							pointHoverBorderWidth: 2,
+							pointRadius: 3,
+							pointHitRadius: 5,
+						});
+
+						colorIndex++;
+
+						datasets.push({
+							label: 'Consumption',
+							yAxisID: "watts",
+							data: response.data.solarForToday.map(item => ({
+								x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
+								y: item.consumption
+							})),
+							steppedLine: true,
+							backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
+							borderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+							borderCapStyle: 'butt',
+							borderDash: [],
+							borderDashOffset: 0.0,
+							borderJoinStyle: 'miter',
+							pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+							pointBackgroundColor: "#fff",
+							pointBorderWidth: 1,
+							pointHoverRadius: 6,
+							pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
+							pointHoverBorderColor: "rgba(220,220,220,1)",
+							pointHoverBorderWidth: 2,
+							pointRadius: 3,
+							pointHitRadius: 5,
+						});
+
+						colorIndex++;
+					}
+
+					new Chart(document.querySelector('#solarHistoryChart'), {
+						type: 'line',
+						data: {
+							datasets
+						},
+						options: {
+							maintainAspectRatio: false,
+							responsive: true,
+							tooltips: {
+								callbacks: {
+									label: function(tooltipItem, data) {
+										return `${data.datasets[tooltipItem.datasetIndex].label}: ${tooltipItem.yLabel}W`;
+									}
+								}
+							},
+							scales: {
+								xAxes: [{
+									type: 'time',
+									time: {
+										unit: 'hour',
+										tooltipFormat: 'MMM Do, HH:mm',
+										unitStepSize: 1,
+										displayFormats: {
+											millisecond: 'SSS [ms]',
+											second: 'h:mm:ss a',
+											minute: 'h:mm:ss a',
+											hour: 'HH:mm',
+											day: 'MMM D',
+											week: 'll',
+											month: 'MMM YYYY',
+											quarter: '[Q]Q - YYYY',
+											year: 'YYYY'
 										}
-									} : null
-								].filter(a => a)
+									}
+								}],
+								yAxes: [{
+									id: "watts",
+									ticks: {
+										callback: value => value,
+										min: 0,
+										max: 2500
+									}
+								}]
 							}
 						}
 					});
@@ -397,7 +488,7 @@ export class StatisticsModalComponent implements OnInit {
 						fill: false,
 					}];
 
-					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+					if (this.hasSolarFeature) {
 						datasets.push({
 							label: 'Radiator heating',
 							yAxisID: "duration",
@@ -612,7 +703,7 @@ export class StatisticsModalComponent implements OnInit {
 						fill: false,
 					}];
 
-					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+					if (this.hasSolarFeature) {
 						datasets.push({
 							label: 'Avg radiator heating',
 							yAxisID: "duration",
@@ -828,7 +919,7 @@ export class StatisticsModalComponent implements OnInit {
 						fill: false,
 					}];
 
-					if (this.locationService.hasFeature(this.locationService.getSelectedLocation(), LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
+					if (this.hasSolarFeature) {
 						datasets.push({
 							label: 'Avg radiator heating',
 							yAxisID: "duration",

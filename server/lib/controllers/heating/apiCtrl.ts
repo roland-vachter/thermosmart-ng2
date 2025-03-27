@@ -23,6 +23,7 @@ import HeatingHoldConditionHistory, { HeatingHoldConditionTypes, IHeatingHoldCon
 import { getStatusByLocation as getSolarHeatingStatusByLocation } from '../../services/solarSystemHeating';
 import SolarSystemHeatingHistory, { ISolarSystemHeatingHistory } from '../../models/SolarSystemHeatingHistory';
 import { hasLocationFeature } from '../../services/location';
+import SolarSystemHistory, { ISolarSystemHistory } from '../../models/SolarSystemHistory';
 
 type HeatingHistoryWithSensor = HydratedDocument<IHeatingSensorHistory & { sensor: ISensorSetting }>;
 
@@ -603,7 +604,8 @@ export const statistics = async (req: Request, res: Response) => {
 		lastPowerOffHistory, powerOffForToday,
 		lastFavorableWeatherForecastHistory, favorableWeatherForecastForToday,
 		lastIncreasingTrendHistory, increasingTrendForToday,
-		lastWindowOpenHistory, windowOpenForToday, lastSolarHeatingHistory, solarHeatingForToday
+		lastWindowOpenHistory, windowOpenForToday, lastSolarHeatingHistory, solarHeatingForToday,
+		lastSolarHistory, solarForToday
 	] = await Promise.all([
 		HeatingHistory
 			.findOne({
@@ -746,6 +748,25 @@ export const statistics = async (req: Request, res: Response) => {
 				location
 			})
 			.exec(),
+		SolarSystemHistory
+			.findOne({
+				datetime: {
+					$lt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				location
+			})
+			.sort({
+				datetime: -1
+			})
+			.exec(),
+		SolarSystemHistory
+			.find({
+				datetime: {
+					$gt: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString())
+				},
+				location
+			})
+			.exec(),
 	]);
 
 	heatingForToday.unshift({
@@ -765,6 +786,17 @@ export const statistics = async (req: Request, res: Response) => {
 		datetime: new Date(moment().tz(location.timezone).toISOString()),
 		wattHourConsumption: solarHeatingForToday.length ? solarHeatingForToday[solarHeatingForToday.length - 1].wattHourConsumption : 0
 	} as HydratedDocument<ISolarSystemHeatingHistory>);
+
+	solarForToday.unshift({
+		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
+		solarProduction: lastSolarHistory ? lastSolarHistory.solarProduction : 0,
+		consumption: lastSolarHistory ? lastSolarHistory.consumption : 0,
+	} as HydratedDocument<ISolarSystemHistory>);
+	solarForToday.push({
+		datetime: new Date(moment().tz(location.timezone).toISOString()),
+		solarProduction: solarForToday.length ? solarForToday[solarForToday.length - 1].solarProduction : 0,
+		consumption: solarForToday.length ? solarForToday[solarForToday.length - 1].consumption : 0
+	} as HydratedDocument<ISolarSystemHistory>);
 
 	powerOffForToday.unshift({
 		datetime: new Date(moment().tz(location.timezone).subtract(1, 'day').toISOString()),
@@ -837,6 +869,7 @@ export const statistics = async (req: Request, res: Response) => {
 
 	if (hasLocationFeature(location, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING)) {
 		statisticsResponse.solarHeatingForToday = solarHeatingForToday;
+		statisticsResponse.solarForToday = solarForToday;
 	}
 
 	return res.json({

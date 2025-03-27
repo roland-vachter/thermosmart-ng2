@@ -8,6 +8,13 @@
 		<canvas id="heatingHistoryChart" width="600" height="250"></canvas>
 	</div>
 
+	<ng-container *ngIf="hasSolarFeature">
+		<h2>Solar today</h2>
+		<div class="thermo-statistics--chart-container">
+			<canvas id="solarHistoryChart" width="600" height="250"></canvas>
+		</div>
+	</ng-container>
+
 	<h2>Sensor temperature history today</h2>
 	<div class="thermo-statistics--chart-container">
 		<canvas id="sensorTempHistoryChart" width="600" height="300"></canvas>
