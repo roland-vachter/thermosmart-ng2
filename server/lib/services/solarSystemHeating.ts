@@ -337,9 +337,6 @@ async function updateByLocation(locationId: number) {
     locationStatus.gridInjection.value = 0;
   }
 
-  locationStatus.solarProduction.value = 1802;
-  locationStatus.gridInjection.value = 1520;
-
   locationStatus.wattHourAvailable = await calculateWattHourAvailable(locationId);
 
   if (locationStatus.solarProduction.value !== lastSolarProduction || locationStatus.gridInjection.value !== lastGridInjection) {
