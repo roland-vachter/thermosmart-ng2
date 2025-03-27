@@ -13,6 +13,7 @@ import HeatingHoldConditionHistory, { HeatingHoldConditionTypes } from '../model
 import SolarSystemHeatingHistory, { ISolarSystemHeatingHistory } from '../models/SolarSystemHeatingHistory';
 import { hasLocationFeature } from './location';
 import { Average, LOCATION_FEATURE } from '../types/generic';
+import SolarSystemHistory from '../models/SolarSystemHistory';
 
 
 interface Total {
@@ -529,18 +530,19 @@ const saveStatisticsForADayByLocation = async (locationId: number) => {
 					console.error('Failed to cleanup solar heating history with error:', e);
 				});
 
-			await SolarSystemHeatingHistory
-				.find({
-					location: locationId
+			await SolarSystemHistory
+				.deleteMany({
+					location: locationId,
+					datetime: {
+						$lt: moment(currentDate).subtract(2, 'month').toDate()
+					}
 				})
 				.exec()
 				.then(result => {
-					result.forEach(async r => {
-						if (!r.wattHourConsumption) {
-							r.wattHourConsumption = r.noOfRunningRadiators * 750 || 0;
-							await r.save();
-						}
-					});
+					console.log('Successfully cleaned up solar history, deleted count:', result.deletedCount);
+				})
+				.catch(e => {
+					console.error('Failed to cleanup solar history with error:', e);
 				});
 		}
 	}
