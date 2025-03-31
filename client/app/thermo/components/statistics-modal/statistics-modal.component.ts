@@ -79,7 +79,7 @@ export class StatisticsModalComponent implements OnInit {
 								yAxisID: "activeStatus",
 								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.POWERED_OFF].map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
-									y: item.status ? 5 : 0
+									y: item.status ? 8 : 0
 								})),
 								steppedLine: true,
 								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
@@ -97,8 +97,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 2,
-								pointHitRadius: 3,
-								fill: false
+								pointHitRadius: 3
 							});
 
 							colorIndex++;
@@ -110,7 +109,7 @@ export class StatisticsModalComponent implements OnInit {
 								yAxisID: "activeStatus",
 								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.WINDOW_OPEN].map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
-									y: item.status ? 5 : 0
+									y: item.status ? 6 : 0
 								})),
 								steppedLine: true,
 								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
@@ -128,8 +127,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 2,
-								pointHitRadius: 3,
-								fill: false
+								pointHitRadius: 3
 							});
 
 							colorIndex++;
@@ -142,7 +140,7 @@ export class StatisticsModalComponent implements OnInit {
 								yAxisID: "activeStatus",
 								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.FAVORABLE_WEATHER_FORECAST].map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
-									y: item.status ? 5 : 0
+									y: item.status ? 4 : 0
 								})),
 								steppedLine: true,
 								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
@@ -160,8 +158,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 2,
-								pointHitRadius: 3,
-								fill: false
+								pointHitRadius: 3
 							});
 
 							colorIndex++;
@@ -174,7 +171,7 @@ export class StatisticsModalComponent implements OnInit {
 								yAxisID: "activeStatus",
 								data: response.data.heatingConditionsForToday[HeatingHoldConditionTypes.INCREASING_TREND].map(item => ({
 									x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
-									y: item.status ? 5 : 0
+									y: item.status ? 2 : 0
 								})),
 								steppedLine: true,
 								backgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},0.4)`,
@@ -192,8 +189,7 @@ export class StatisticsModalComponent implements OnInit {
 								pointHoverBorderColor: "rgba(220,220,220,1)",
 								pointHoverBorderWidth: 2,
 								pointRadius: 2,
-								pointHitRadius: 3,
-								fill: false
+								pointHitRadius: 3
 							});
 
 							colorIndex++;
