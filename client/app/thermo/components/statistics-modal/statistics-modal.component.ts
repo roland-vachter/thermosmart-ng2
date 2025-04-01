@@ -302,13 +302,13 @@ export class StatisticsModalComponent implements OnInit {
 							borderWidth: 1,
 							pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 							pointBackgroundColor: "#fff",
-							pointBorderWidth: 1,
-							pointHoverRadius: 3,
+							pointBorderWidth: 0,
+							pointHoverRadius: 0,
 							pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 							pointHoverBorderColor: "rgba(220,220,220,1)",
-							pointHoverBorderWidth: 2,
-							pointRadius: 1,
-							pointHitRadius: 3,
+							pointHoverBorderWidth: 0,
+							pointRadius: 0,
+							pointHitRadius: 0,
 							fill: false
 						});
 
@@ -330,13 +330,13 @@ export class StatisticsModalComponent implements OnInit {
 							borderWidth: 1,
 							pointBorderColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 							pointBackgroundColor: "#fff",
-							pointBorderWidth: 1,
-							pointHoverRadius: 3,
+							pointBorderWidth: 0,
+							pointHoverRadius: 0,
 							pointHoverBackgroundColor: `rgba(${this.colors[colorIndex][0]},${this.colors[colorIndex][1]},${this.colors[colorIndex][2]},1)`,
 							pointHoverBorderColor: "rgba(220,220,220,1)",
-							pointHoverBorderWidth: 2,
-							pointRadius: 1,
-							pointHitRadius: 3,
+							pointHoverBorderWidth: 0,
+							pointRadius: 0,
+							pointHitRadius: 0,
 							fill: false
 						});
 
