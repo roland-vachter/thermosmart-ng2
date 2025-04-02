@@ -54,12 +54,14 @@ interface HuaweiDeviceListResponse {
   data: HuaweiDevice[];
 }
 
+interface HuaweiData {
+  active_power: number;
+  meter_u: number;
+}
+
 interface HuaweiDeviceResponse {
   data: {
-    dataItemMap: {
-      active_power: number;
-      meter_u: number;
-    }
+    dataItemMap: HuaweiData;
   }[];
 }
 
@@ -163,7 +165,7 @@ async function getHuaweiDeviceList(apiUrl: string, authToken: string, stationCod
 
     if (resJson) {
       if (!resJson.success) {
-        console.warn(resJson.failCode, resJson.message);
+        console.warn('SOLAR:', resJson.failCode, resJson.message);
         return resJson.message;
       } else {
         console.log('SOLAR: -> device list successful');
@@ -205,8 +207,8 @@ async function getHuaweiData(apiUrl: string, authToken: string, deviceType: DEVI
 
     if (resJson) {
       if (!resJson.success) {
-        console.warn(deviceType, resJson.failCode, resJson.message);
-        return null;
+        console.warn('SOLAR:', deviceType, resJson.failCode, resJson.message);
+        return resJson.message;
       } else {
         console.log('SOLAR:', deviceType, 'successful');
         return resJson.data.length && resJson.data[0]?.dataItemMap || null;
@@ -302,6 +304,8 @@ async function updateByLocation(locationId: number) {
             resInverter = await getHuaweiData(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.INVERTER, locationStatus.deviceList[DEVICE_TYPE.INVERTER]);
           }
 
+          resInverter = resInverter as HuaweiData;
+
           locationStatus.solarProduction = {
             value: Math.round((resInverter?.active_power || 0) * 1000),
             lastUpdate: moment()
@@ -317,6 +321,8 @@ async function updateByLocation(locationId: number) {
             locationStatus.authToken = await getAuthToken(apiUrl.value as string, username.value as string, password.value as string);
             resSmartMeter = await getHuaweiData(apiUrl?.value as string, locationStatus.authToken, DEVICE_TYPE.SMART_METER, locationStatus.deviceList[DEVICE_TYPE.SMART_METER]);
           }
+
+          resSmartMeter = resSmartMeter as HuaweiData;
 
           locationStatus.gridInjection = {
             value: Math.round(resSmartMeter?.active_power || 0),
