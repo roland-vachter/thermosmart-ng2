@@ -366,7 +366,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 						locationStatus.hasFavorableWeatherForecast = true;
 					} else if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
 							((outsideConditions.sunrise && moment().valueOf() > outsideConditions.sunrise &&
-							outsideConditions.sunshineNextConsecutiveHours >= 3) || solarSystemHeatingStatus.wattHourConsumption > 0) &&
+							outsideConditions.sunshineNextConsecutiveHours >= 3) || solarSystemHeatingStatus.wattHourConsumption > 0 || solarSystemHeatingStatus.solarProduction >= 1500) &&
 							target.value - locationStatus.avgValues.temperature - (switchThresholdBelow.value as number) < 0.6) {
 						conditionToStart = false;
 						locationStatus.hasFavorableWeatherForecast = true;
