@@ -430,7 +430,7 @@ export class StatisticsModalComponent implements OnInit {
 							tooltips: {
 								callbacks: {
 									label: function(tooltipItem, data) {
-										return `${data.datasets[tooltipItem.datasetIndex].label}: ${tooltipItem.yLabel}W`;
+										return `${data.datasets[tooltipItem.datasetIndex].label}: ${tooltipItem.yLabel}V`;
 									}
 								}
 							},
