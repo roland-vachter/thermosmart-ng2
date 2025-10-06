@@ -155,6 +155,15 @@ export interface SolarSystemHistory {
   location: number;
   solarProduction: number;
   consumption: number;
+  gridVoltage: number;
+}
+
+export interface GridVoltageHistory {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _id: string;
+  datetime: string;
+  location: number;
+  gridVoltage: number;
 }
 
 export interface HeatingHoldConditionHistory {
@@ -177,6 +186,7 @@ export interface Statistics {
   }
   solarHeatingForToday?: SolarSystemHeatingHistory[];
   solarForToday?: SolarSystemHistory[];
+  gridVoltageForToday?: GridVoltageHistory[];
 }
 
 export enum HeatingHoldConditionTypes {

@@ -9,6 +9,7 @@ import { hasLocationFeature } from './location';
 import { getAvgByLocation } from './insideConditions';
 import { deepEqual } from '../utils/utils';
 import SolarSystemHistory from '../models/SolarSystemHistory';
+import GridVoltageHistory from '../models/GridVoltageHistory';
 
 enum DEVICE_TYPE {
   INVERTER = 'INVERTER',
@@ -265,6 +266,7 @@ async function updateByLocation(locationId: number) {
 
   const lastSolarProduction = locationStatus?.solarProduction?.value || 0;
   const lastGridInjection = locationStatus?.gridInjection?.value || 0;
+  const lastGridVoltage = locationStatus?.gridVoltage || 0;
 
   const [inverterType, apiUrl, username, password, stationCode] = await Promise.all([
     getConfig('solarSystemInverterType', locationId),
@@ -351,6 +353,14 @@ async function updateByLocation(locationId: number) {
       datetime: new Date(),
       solarProduction: locationStatus.solarProduction.value,
       consumption: locationStatus.solarProduction.value - locationStatus.gridInjection.value
+    }).save();
+  }
+
+  if (locationStatus.gridVoltage !== lastGridVoltage) {
+    await new GridVoltageHistory({
+      location: locationId,
+      datetime: new Date(),
+      gridVoltage: locationStatus.gridVoltage
     }).save();
   }
 

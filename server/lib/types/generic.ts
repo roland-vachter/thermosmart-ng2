@@ -11,6 +11,7 @@ import { IHeatingHoldConditionHistory } from '../models/HeatingHoldConditionHist
 import { ISolarSystemHeatingHistory } from '../models/SolarSystemHeatingHistory';
 import { IHeatingSensorHistory } from '../models/HeatingSensorHistory';
 import { ISolarSystemHistory } from '../models/SolarSystemHistory';
+import { IGridVoltageHistory } from '../models/GridVoltageHistory';
 
 export interface ApiResponse {
   status?: RESPONSE_STATUS;
@@ -215,6 +216,7 @@ export interface Statistics {
   },
   solarHeatingForToday?: ISolarSystemHeatingHistory[];
   solarForToday?: ISolarSystemHistory[];
+  gridVoltageForToday?: IGridVoltageHistory[];
 }
 
 export enum LOCATION_FEATURE {

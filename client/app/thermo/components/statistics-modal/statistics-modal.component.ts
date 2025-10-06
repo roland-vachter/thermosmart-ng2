@@ -390,6 +390,82 @@ export class StatisticsModalComponent implements OnInit {
 					});
 				}
 
+				if (this.hasSolarFeature && response.data.gridVoltageForToday) {
+					const datasets = [];
+
+					datasets.push({
+						label: 'Grid Voltage',
+						yAxisID: "voltage",
+						data: response.data.gridVoltageForToday.map(item => ({
+							x: this.timezoneService.toSameDateInCurrentTimezone(item.datetime, location.timezone),
+							y: item.gridVoltage
+						})),
+						backgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},0.4)`,
+						borderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						borderCapStyle: 'butt',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						borderWidth: 1,
+						pointBorderColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 0,
+						pointHoverRadius: 2,
+						pointRadius: 0,
+						pointHitRadius: 3,
+						pointHoverBackgroundColor: `rgba(${this.colors[0][0]},${this.colors[0][1]},${this.colors[0][2]},1)`,
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 1,
+						fill: false
+					});
+
+					new Chart(document.querySelector('#gridVoltage'), {
+						type: 'line',
+						data: {
+							datasets
+						},
+						options: {
+							maintainAspectRatio: false,
+							responsive: true,
+							tooltips: {
+								callbacks: {
+									label: function(tooltipItem, data) {
+										return `${data.datasets[tooltipItem.datasetIndex].label}: ${tooltipItem.yLabel}W`;
+									}
+								}
+							},
+							scales: {
+								xAxes: [{
+									type: 'time',
+									time: {
+										unit: 'hour',
+										tooltipFormat: 'MMM Do, HH:mm',
+										unitStepSize: 1,
+										displayFormats: {
+											millisecond: 'SSS [ms]',
+											second: 'h:mm:ss a',
+											minute: 'h:mm:ss a',
+											hour: 'HH:mm',
+											day: 'MMM D',
+											week: 'll',
+											month: 'MMM YYYY',
+											quarter: '[Q]Q - YYYY',
+											year: 'YYYY'
+										}
+									}
+								}],
+								yAxes: [{
+									id: "voltage",
+									ticks: {
+										callback: value => value,
+										min: 220
+									}
+								}]
+							}
+						}
+					});
+				}
+
 				if (response.data.statisticsForLastMonth) {
 					const minTargetTemp = Math.min(...response.data.statisticsForLastMonth.map(item => item.avgTargetTemp));
 					const maxTargetTemp = Math.max(...response.data.statisticsForLastMonth.map(item => item.avgTargetTemp));
