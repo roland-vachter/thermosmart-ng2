@@ -342,17 +342,26 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				targetValue -= 0.1 * solarSystemHeatingStatus.wattHourConsumption / 700;
 			}
 
+			let turnOffBecauseHighTemperature = false;
 			if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions &&
 					targetValue < outsideConditions.temperature) {
 				console.log(`[${locationId}] turn off because target temperature is below outside temperature.`);
+				turnOffBecauseHighTemperature = true;
 				turnHeatingOff(locationId);
 			}
 
 			if (!locationStatus.isOn) {
+				const conditionWouldStart = locationStatus.avgValues.temperature <= target?.value - (switchThresholdBelow.value as number);
 				let conditionToStart = locationStatus.avgValues.temperature <= targetValue - (switchThresholdBelow.value as number);
 
 				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
-					if (target?.value < outsideConditions.temperature) {
+					if (turnOffBecauseHighTemperature) {
+						conditionToStart = false;
+						locationStatus.hasFavorableWeatherForecast = true;
+					} else if (conditionWouldStart && !conditionToStart) {
+						conditionToStart = false;
+						locationStatus.hasFavorableWeatherForecast = true;
+					} else if (target?.value < outsideConditions.temperature) {
 						conditionToStart = false;
 						locationStatus.hasFavorableWeatherForecast = true;
 					} else if (target.value - locationStatus.avgValues.temperature - (switchThresholdBelow.value as number) < 0.4 &&
