@@ -160,12 +160,18 @@
 			<div class="thermo-temps--temp">
 				<div class="color-yellow">
 					<i class=""></i> <span class="thermo-temps--temp-name">Heating temperature</span>
-					<div class="thermo-temps--temp-control" data-id="">
+					<div class="thermo-temp--line" data-id="{{temp.key}}">
 						<button type="button" class="thermo-temps--temp-button thermo-temps--temp--decrease"
-							(click)="solarSystemHeatingTemperature = solarSystemHeatingTemperature - 0.1; saveSolarSystemHeatingTemperature()">-</button>
+							(click)="solarSystemHeatingTemperature = solarSystemHeatingTemperature - 0.1; saveSolarSystemHeatingTemperature()"
+						>
+							<i class="icon-minus-circle"></i>
+						</button>
 						<span class="thermo-temps--temp-value">{{solarSystemHeatingTemperature | integer}}<span class="decimal">.{{solarSystemHeatingTemperature | decimal}}</span> &deg;C</span>
 						<button type="button" class="thermo-temps--temp-button thermo-temps--temp--increase"
-							(click)="solarSystemHeatingTemperature = solarSystemHeatingTemperature + 0.1; saveSolarSystemHeatingTemperature()">+</button>
+							(click)="solarSystemHeatingTemperature = solarSystemHeatingTemperature + 0.1; saveSolarSystemHeatingTemperature()"
+						>
+							<i class="icon-plus-circle"></i>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -204,9 +210,9 @@
 				</div>
 				<div class="col-12 col-sm-6">
 					<div class="form-group">
-						<label for="radiator-power">Radiator power</label>
+						<label for="grid-power-allowance">Grid power allowance</label>
 						<div class="input-group">
-							<input type="number" class="form-control" id="radiator-power" name="radiator-power" [(ngModel)]="solarSystemRadiatorPower" (change)="saveRadiatorPower()" placeholder="e.g. 750">
+							<input type="number" class="form-control" id="grid-power-allowance" name="grid-power-allowance" [(ngModel)]="solarSystemGridPowerAllowance" (change)="saveGridPowerAllowance()" placeholder="e.g. 750">
 							<div class="input-group-append">
 								<span class="input-group-text">W</span>
 							</div>

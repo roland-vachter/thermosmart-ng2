@@ -223,9 +223,10 @@ async function getHuaweiData(apiUrl: string, authToken: string, deviceType: DEVI
 }
 
 async function calculateWattHourAvailable(locationId: number) {
-  const [targetTemperatureConfig, solarHeatingDisabled] = await Promise.all([
+  const [targetTemperatureConfig, solarHeatingDisabled, gridPowerAllowance] = await Promise.all([
     await getConfig('solarSystemHeatingTemperature', locationId),
-    await getConfig('solarHeatingDisabled', locationId)
+    await getConfig('solarHeatingDisabled', locationId),
+    await getConfig('solarSystemGridPowerAllowance', locationId)
   ]);
 
   let targetTemp = 24;
@@ -249,9 +250,10 @@ async function calculateWattHourAvailable(locationId: number) {
     insideCondition.temperature > targetTemp ||
     solarHeatingDisabled?.value === true
   )) {
-    console.log('SOLAR: Wh available', correctedGridInjectionValue);
+    const whAvailable = correctedGridInjectionValue + ((gridPowerAllowance?.value as number) || 0);
+    console.log('SOLAR: Wh available', whAvailable);
 
-    return correctedGridInjectionValue;
+    return whAvailable;
   } else {
     console.log('SOLAR: OFF', insideCondition.temperature > targetTemp ? 'temp over target' : solarHeatingDisabled?.value === true ? 'disabled' : 'unknown');
   }
@@ -383,7 +385,7 @@ export async function getStatusByLocation(locationId: number): Promise<SolarSyst
 
     return {
       wattHourConsumption: locationStatus.wattHourConsumption || 0,
-      wattHourAvailable: locationStatus.wattHourAvailable || 0,
+      wattHourAvailable: (locationStatus.wattHourAvailable || 0) ,
       numberOfRadiators: locationStatus.numberOfRadiators || 0,
       solarProduction: locationStatus.solarProduction?.value || 0,
       gridInjection: locationStatus.gridInjection?.value || 0,

@@ -48,7 +48,7 @@ export class ThermoConfigModalComponent {
 	solarSystemPassword: string = '';
 	solarSystemPasswordSet = false;
 	solarSystemStationCode: string;
-	solarSystemRadiatorPower: number;
+	solarSystemGridPowerAllowance: number;
 
 	constructor(
 		public bsModalRef: BsModalRef,
@@ -67,7 +67,7 @@ export class ThermoConfigModalComponent {
 			this.solarSystemUsername = this.dataStore.config.solarSystemUsername?.value as string;
 			this.solarSystemPasswordSet = this.dataStore.config.solarSystemPassword?.value as string === 'PRIVATE';
 			this.solarSystemStationCode = this.dataStore.config.solarSystemStationCode?.value as string;
-			this.solarSystemRadiatorPower = this.dataStore.config.solarSystemRadiatorPower?.value as number;
+			this.solarSystemGridPowerAllowance = this.dataStore.config.solarSystemGridPowerAllowance?.value as number;
 		}
 	}
 
@@ -252,16 +252,16 @@ export class ThermoConfigModalComponent {
 		}
 	}
 
-	saveRadiatorPower() {
-		this.sharedApiService.changeConfig('solarSystemRadiatorPower', this.solarSystemRadiatorPower).subscribe({
+	saveGridPowerAllowance() {
+		this.sharedApiService.changeConfig('solarSystemRadiatorPower', this.solarSystemGridPowerAllowance).subscribe({
 			next: () => {
-				this.dataStore.config.solarSystemRadiatorPower = {
-					name: 'radiatorPower',
-					value: this.solarSystemRadiatorPower
+				this.dataStore.config.solarSystemGridPowerAllowance = {
+					name: 'solarSystemGridPowerAllowance',
+					value: this.solarSystemGridPowerAllowance
 				};
 			},
 			error: () => {
-				this.solarSystemRadiatorPower = this.dataStore?.config?.solarSystemRadiatorPower?.value as number;
+				this.solarSystemGridPowerAllowance = this.dataStore?.config?.solarSystemGridPowerAllowance?.value as number;
 			}
 		})
 	}
