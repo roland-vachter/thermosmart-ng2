@@ -253,7 +253,7 @@ export class ThermoConfigModalComponent {
 	}
 
 	saveGridPowerAllowance() {
-		this.sharedApiService.changeConfig('solarSystemRadiatorPower', this.solarSystemGridPowerAllowance).subscribe({
+		this.sharedApiService.changeConfig('solarSystemGridPowerAllowance', this.solarSystemGridPowerAllowance).subscribe({
 			next: () => {
 				this.dataStore.config.solarSystemGridPowerAllowance = {
 					name: 'solarSystemGridPowerAllowance',
