@@ -106,7 +106,6 @@ export interface OutsideConditions {
   humidity: number;
   daytime: DAYTIME;
   color: string;
-  weatherDescription: string;
   weatherIconClass: string;
   backgroundImage: string;
 }

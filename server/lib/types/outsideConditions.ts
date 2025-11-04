@@ -20,7 +20,6 @@ export interface OutsideConditions {
   humidity: number;
   daytime: DAYTIME;
   color: string;
-  weatherDescription: string;
   weatherIconClass: string;
   backgroundImage: string;
   sunrise: number;
@@ -29,4 +28,21 @@ export interface OutsideConditions {
   sunshineNextConsecutiveHours: number;
   sunshineForecast: boolean[];
   totalNumberOfSunshineExpected: number;
+}
+
+
+export interface WeatherResponse {
+  current: {
+    weatherType: WEATHER_TYPE;
+    temperature: number;
+    humidity: number;
+    daytime: DAYTIME;
+    sunrise: number;
+    sunny: boolean;
+  };
+  forecast?: {
+    highestExpectedTemperature?: number;
+    sunshineForecast?: boolean[];
+    totalNumberOfSunshineExpected?: number;
+  }
 }

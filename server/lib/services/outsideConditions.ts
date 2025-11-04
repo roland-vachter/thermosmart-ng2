@@ -2,39 +2,12 @@
 
 import EventEmitter from 'events';
 import { getBackgroundImage } from './backgroundImage';
-import { fetch } from '../utils/fetch';
-import { DAYTIME, OutsideConditions, WEATHER_TYPE } from '../types/outsideConditions';
-import { ErrorWithResponse } from '../types/generic';
+import { DAYTIME, OutsideConditions, WEATHER_TYPE, WeatherResponse } from '../types/outsideConditions';
 import TypedEmitter from 'typed-emitter';
 import moment from 'moment-timezone';
+import { getWeatherData } from './weatherApi';
 
-const CLOUD_THRESHOLD = 20;
-
-interface Forecast {
-	dt: number;
-	temp: number;
-	clouds: number;
-	weather: {
-		main: string;
-	}[];
-}
-
-interface WeatherApiResponse {
-	current: {
-		temp: number;
-		humidity: number;
-		sunrise: number;
-		sunset: number;
-		clouds: number;
-		weather: {
-			icon: string;
-			main: string;
-		}[];
-	};
-	hourly: Forecast[];
-}
 const lastValues: OutsideConditions = {} as OutsideConditions;
-
 
 const weatherIconClassMapping: Record<DAYTIME, Record<WEATHER_TYPE, string>> = {
 	[DAYTIME.day]: {
@@ -61,17 +34,7 @@ const weatherIconClassMapping: Record<DAYTIME, Record<WEATHER_TYPE, string>> = {
 	}
 };
 
-const weatherTypeMapping: Record<number, WEATHER_TYPE> = {
-	1: WEATHER_TYPE.clear,
-	2: WEATHER_TYPE.partlycloudy,
-	3: WEATHER_TYPE.cloudy,
-	4: WEATHER_TYPE.verycloudy,
-	9: WEATHER_TYPE.rain,
-	10: WEATHER_TYPE.heavyrain,
-	11: WEATHER_TYPE.tstorms,
-	13: WEATHER_TYPE.snow,
-	50: WEATHER_TYPE.fog
-};
+
 
 const weatherColorMapping: Record<DAYTIME, Record<WEATHER_TYPE, string>> = {
 	[DAYTIME.day]: {
@@ -100,63 +63,28 @@ const weatherColorMapping: Record<DAYTIME, Record<WEATHER_TYPE, string>> = {
 
 async function update () {
 	try {
-		const resWeather = await fetch(`${process.env.WEATHER_API_URL}?appid=${process.env.WEATHER_API_KEY}&lat=${process.env.LOCATION_LAT}&lon=${process.env.LOCATION_LNG}&units=metric&exclude=minutely,daily,alerts`);
+		const weatherData: WeatherResponse = await getWeatherData();
 
-		if (!resWeather.ok) {
-			const err = new ErrorWithResponse(resWeather.status.toString(), resWeather);
-			throw err;
-		}
-
-		const jsonWeather: WeatherApiResponse = await resWeather.json() as WeatherApiResponse;
-
-		if (jsonWeather) {
-			if (jsonWeather.current) {
-				const temperature = jsonWeather.current.temp;
-				const humidity = jsonWeather.current.humidity;
-				const sunrise = jsonWeather.current.sunrise * 1000;
-				const sunset = jsonWeather.current.sunset * 1000;
-				const weatherType: WEATHER_TYPE = weatherTypeMapping[parseInt(jsonWeather.current.weather[0].icon.substring(0, 2), 10)];
-
-				let daytime;
-				if (Date.now() > sunrise && Date.now() < sunset) {
-					daytime = DAYTIME.day;
-				} else {
-					daytime = DAYTIME.night;
+		if (weatherData) {
+			if (weatherData.current) {
+				if (lastValues.temperature !== weatherData.current.temperature
+						|| lastValues.humidity !== weatherData.current.humidity
+						|| lastValues.weatherIconClass !== weatherIconClassMapping[weatherData.current.daytime][weatherData.current.weatherType]
+						|| lastValues.daytime !== weatherData.current.daytime) {
+					lastValues.temperature = weatherData.current.temperature;
+					lastValues.humidity = weatherData.current.humidity;
+					lastValues.daytime = weatherData.current.daytime;
+					lastValues.color = weatherColorMapping[weatherData.current.daytime][weatherData.current.weatherType];
+					lastValues.weatherIconClass = weatherIconClassMapping[weatherData.current.daytime][weatherData.current.weatherType];
+					lastValues.backgroundImage = getBackgroundImage(weatherData.current.weatherType, weatherData.current.daytime);
+					lastValues.sunrise = weatherData.current.sunrise;
+					lastValues.sunny = weatherData.current.sunny;
 				}
 
-				if (lastValues.temperature !== temperature
-						|| lastValues.humidity !== humidity
-						|| lastValues.weatherIconClass !== weatherIconClassMapping[daytime][weatherType]
-						|| lastValues.daytime !== daytime) {
-					lastValues.temperature = temperature;
-					lastValues.humidity = humidity;
-					lastValues.daytime = daytime;
-					lastValues.color = weatherColorMapping[daytime][weatherType];
-					lastValues.weatherDescription = jsonWeather.current.weather[0].main;
-					lastValues.weatherIconClass = weatherIconClassMapping[daytime][weatherType];
-					lastValues.backgroundImage = getBackgroundImage(weatherType, daytime);
-					lastValues.sunrise = sunrise;
-					lastValues.sunny = daytime === DAYTIME.day &&
-						(jsonWeather.current.weather[0].main === 'Clear' || jsonWeather.current.clouds < CLOUD_THRESHOLD);
-				}
-
-				if (jsonWeather.hourly) {
-					const forecast: Forecast[] = [];
-					jsonWeather.hourly.forEach(h => {
-						if (h.dt * 1000 <= moment().endOf('day').valueOf()) {
-							forecast.push(h);
-						}
-					});
-
-					lastValues.highestExpectedTemperature = forecast.reduce((acc, v) => v.temp > acc ? v.temp : acc, forecast.length && forecast[0].temp || 0);
-					lastValues.sunshineForecast = forecast.map(v => (v.weather[0].main === 'Clear' || v.clouds < CLOUD_THRESHOLD) && v.dt * 1000 >= sunrise && v.dt * 1000 < sunset);
-					lastValues.totalNumberOfSunshineExpected = lastValues.sunshineForecast.reduce((acc, v) => {
-						if (v) {
-							acc++;
-						}
-
-						return acc;
-					}, 0);
+				if (weatherData.forecast) {
+					lastValues.highestExpectedTemperature = weatherData.forecast.highestExpectedTemperature;
+					lastValues.sunshineForecast = weatherData.forecast.sunshineForecast;
+					lastValues.totalNumberOfSunshineExpected = weatherData.forecast.totalNumberOfSunshineExpected;
 					lastValues.sunshineNextConsecutiveHours = lastValues.sunshineForecast.reduce((acc, v) => {
 						if (v && acc.consecutive) {
 							acc.count++;
@@ -176,10 +104,10 @@ async function update () {
 }
 
 export const getOutsideConditions = (): OutsideConditions => {
-	const sunrise = lastValues?.sunrise ? moment(lastValues?.sunrise) : null;
+	const sunrise = lastValues?.sunrise ? moment(lastValues?.sunrise).tz('Europe/Bucharest') : null;
 	return {
 		...lastValues,
-		sunrise: sunrise ? moment().hour(sunrise.hour()).minute(sunrise.minute()).valueOf() : null
+		sunrise: sunrise ? moment().tz('Europe/Bucharest').hour(sunrise.hour()).minute(sunrise.minute()).valueOf() : null
 	};
 };
 
