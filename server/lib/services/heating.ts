@@ -330,15 +330,21 @@ async function updateHeatingStatusByLocation (locationId: number) {
 
 			let targetValue = target?.value;
 			const outsideConditions = getOutsideConditions();
-			if (weatherForecastFeature?.value) {
+			if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
+				let indexOffsetHour = 0;
+				if (moment().valueOf() < outsideConditions.sunrise) {
+					indexOffsetHour = (outsideConditions.sunrise - moment().valueOf()) / 1000 / 60 / 60;
+				}
+
 				outsideConditions.sunshineForecast.forEach((s, index) => {
 					if (s) {
-						targetValue -= 0.1 / (index + 1);
+						targetValue -= 0.1 / (index + indexOffsetHour + 1);
 					}
 				});
 			}
 
-			if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) && solarSystemHeatingStatus.wattHourConsumption) {
+			if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) && solarSystemHeatingStatus.wattHourConsumption &&
+					!locationStatus.shouldIgnoreHoldConditions) {
 				targetValue -= 0.1 * solarSystemHeatingStatus.wattHourConsumption / 700;
 			}
 
