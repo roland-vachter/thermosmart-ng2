@@ -457,7 +457,8 @@ export class StatisticsModalComponent implements OnInit {
 								yAxes: [{
 									id: "voltage",
 									ticks: {
-										callback: value => value
+										callback: value => value,
+										min: 200
 									}
 								}]
 							}
