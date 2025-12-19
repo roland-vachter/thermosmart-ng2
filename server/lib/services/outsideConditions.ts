@@ -107,11 +107,7 @@ async function update () {
 						const minutesFromPeakSunshine = Math.abs(f.timestamp / 1000 - peakSunshine) / 60;
 
 						if (f.sunny && minutesFromPeakSunshine < daytimeLengthMinutes / 2) {
-							if (f.temp <= 0) {
-								forecast.sunPower = 0.3;
-							} else {
-								forecast.sunPower = f.temp <= 0 ? 0.3 : 0.5 + 0.5 * ((daytimeLengthMinutes / 2 - minutesFromPeakSunshine) / (daytimeLengthMinutes / 2));
-							}
+							forecast.sunPower = 0.5 + 0.5 * ((daytimeLengthMinutes / 2 - minutesFromPeakSunshine) / (daytimeLengthMinutes / 2));
 						}
 
 						if (forecast.sunPower < 0 || !forecast.sunPower) {
