@@ -118,6 +118,7 @@ export async function getWeatherData() {
           humidity,
           daytime,
           sunrise,
+          sunset,
           sunny: (
             daytime === DAYTIME.day &&
             (weatherType === WEATHER_TYPE.clear || jsonWeather.current.cloud < CLOUD_THRESHOLD)
@@ -135,7 +136,11 @@ export async function getWeatherData() {
       });
 
       result.forecast.highestExpectedTemperature = forecast.reduce((acc, v) => v.temp_c > acc ? v.temp_c : acc, forecast.length && forecast[0].temp_c || 0);
-      result.forecast.sunshineForecast = forecast.map(v => (weatherTypeMapping[v.condition.code] === WEATHER_TYPE.clear || v.cloud < CLOUD_THRESHOLD) && v.time_epoch * 1000 >= sunrise && v.time_epoch * 1000 < sunset);
+      result.forecast.sunshineForecast = forecast.map(v => ({
+        sunny: (weatherTypeMapping[v.condition.code] === WEATHER_TYPE.clear || v.cloud < CLOUD_THRESHOLD) && v.time_epoch * 1000 >= sunrise && v.time_epoch * 1000 < sunset,
+        temp: v.temp_c,
+        timestamp: v.time_epoch * 1000
+      }));
       result.forecast.totalNumberOfSunshineExpected = result.forecast.sunshineForecast.reduce((acc, v) => {
         if (v) {
           acc++;

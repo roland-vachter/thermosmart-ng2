@@ -15,6 +15,16 @@ export enum WEATHER_TYPE {
 	'fog' = 'fog'
 }
 
+export interface SunshineForecast {
+  temp: number;
+  sunny: boolean;
+  timestamp: number;
+}
+
+export interface SunshineForecastWithPower extends SunshineForecast {
+  sunPower: number;
+}
+
 export interface OutsideConditions {
   temperature: number;
   humidity: number;
@@ -23,10 +33,11 @@ export interface OutsideConditions {
   weatherIconClass: string;
   backgroundImage: string;
   sunrise: number;
+  sunset: number;
   sunny: boolean;
   highestExpectedTemperature: number;
   sunshineNextConsecutiveHours: number;
-  sunshineForecast: boolean[];
+  sunshineForecast: SunshineForecastWithPower[];
   totalNumberOfSunshineExpected: number;
 }
 
@@ -38,11 +49,12 @@ export interface WeatherResponse {
     humidity: number;
     daytime: DAYTIME;
     sunrise: number;
+    sunset: number;
     sunny: boolean;
   };
   forecast?: {
     highestExpectedTemperature?: number;
-    sunshineForecast?: boolean[];
+    sunshineForecast?: SunshineForecast[];
     totalNumberOfSunshineExpected?: number;
   }
 }

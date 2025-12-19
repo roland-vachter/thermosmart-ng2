@@ -2,7 +2,7 @@
 
 import EventEmitter from 'events';
 import { getBackgroundImage } from './backgroundImage';
-import { DAYTIME, OutsideConditions, WEATHER_TYPE, WeatherResponse } from '../types/outsideConditions';
+import { DAYTIME, OutsideConditions, SunshineForecastWithPower, WEATHER_TYPE, WeatherResponse } from '../types/outsideConditions';
 import TypedEmitter from 'typed-emitter';
 import moment from 'moment-timezone';
 import { getWeatherData } from './weatherApi';
@@ -61,6 +61,21 @@ const weatherColorMapping: Record<DAYTIME, Record<WEATHER_TYPE, string>> = {
 	}
 };
 
+const SUN_POWER_BY_MONTH: Record<number, number> = {
+	'1': 0.7,
+	'2': 0.8,
+	'3': 0.9,
+	'4': 1,
+	'5': 1.1,
+	'6': 1.3,
+	'7': 1.5,
+	'8': 1.4,
+	'9': 1.1,
+	'10': 1,
+	'11': 0.9,
+	'12': 0.6
+};
+
 async function update () {
 	try {
 		const weatherData: WeatherResponse = await getWeatherData();
@@ -78,12 +93,27 @@ async function update () {
 					lastValues.weatherIconClass = weatherIconClassMapping[weatherData.current.daytime][weatherData.current.weatherType];
 					lastValues.backgroundImage = getBackgroundImage(weatherData.current.weatherType, weatherData.current.daytime);
 					lastValues.sunrise = weatherData.current.sunrise;
+					lastValues.sunset = weatherData.current.sunset;
 					lastValues.sunny = weatherData.current.sunny;
 				}
 
+				const daytimeLengthMinutes = (weatherData.current.sunset - weatherData.current.sunrise) / (60 * 1000);
+				const peakSunshine = weatherData.current.sunrise / 1000 + daytimeLengthMinutes / 2 * 60;
+
 				if (weatherData.forecast) {
 					lastValues.highestExpectedTemperature = weatherData.forecast.highestExpectedTemperature;
-					lastValues.sunshineForecast = weatherData.forecast.sunshineForecast;
+					lastValues.sunshineForecast = weatherData.forecast.sunshineForecast.map(f => {
+						const forecast = f as SunshineForecastWithPower;
+						const minutesFromPeakSunshine = Math.abs(f.timestamp / 1000 - peakSunshine) / 60;
+
+						forecast.sunPower = f.temp <= 0 ? 0.3 : 0.5 + 0.5 * ((daytimeLengthMinutes / 2 - minutesFromPeakSunshine) / (daytimeLengthMinutes / 2));
+						if (forecast.sunPower < 0) {
+							forecast.sunPower = 0;
+						}
+
+						forecast.sunPower = forecast.sunPower * SUN_POWER_BY_MONTH[moment(f.timestamp).tz('Europe/Bucharest').month() + 1];
+						return forecast;
+					});
 					lastValues.totalNumberOfSunshineExpected = weatherData.forecast.totalNumberOfSunshineExpected;
 					lastValues.sunshineNextConsecutiveHours = lastValues.sunshineForecast.reduce((acc, v) => {
 						if (v && acc.consecutive) {
