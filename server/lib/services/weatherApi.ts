@@ -142,7 +142,7 @@ export async function getWeatherData() {
         timestamp: v.time_epoch * 1000
       }));
       result.forecast.totalNumberOfSunshineExpected = result.forecast.sunshineForecast.reduce((acc, v) => {
-        if (v) {
+        if (v.sunny) {
           acc++;
         }
 

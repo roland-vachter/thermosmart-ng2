@@ -106,8 +106,15 @@ async function update () {
 						const forecast = f as SunshineForecastWithPower;
 						const minutesFromPeakSunshine = Math.abs(f.timestamp / 1000 - peakSunshine) / 60;
 
-						forecast.sunPower = f.temp <= 0 ? 0.3 : 0.5 + 0.5 * ((daytimeLengthMinutes / 2 - minutesFromPeakSunshine) / (daytimeLengthMinutes / 2));
-						if (forecast.sunPower < 0) {
+						if (f.sunny && minutesFromPeakSunshine < daytimeLengthMinutes / 2) {
+							if (f.temp <= 0) {
+								forecast.sunPower = 0.3;
+							} else {
+								forecast.sunPower = f.temp <= 0 ? 0.3 : 0.5 + 0.5 * ((daytimeLengthMinutes / 2 - minutesFromPeakSunshine) / (daytimeLengthMinutes / 2));
+							}
+						}
+
+						if (forecast.sunPower < 0 || !forecast.sunPower) {
 							forecast.sunPower = 0;
 						}
 
@@ -116,7 +123,7 @@ async function update () {
 					});
 					lastValues.totalNumberOfSunshineExpected = weatherData.forecast.totalNumberOfSunshineExpected;
 					lastValues.sunshineNextConsecutiveHours = lastValues.sunshineForecast.reduce((acc, v) => {
-						if (v && acc.consecutive) {
+						if (v.sunny && acc.consecutive) {
 							acc.count++;
 						} else {
 							acc.consecutive = false;
