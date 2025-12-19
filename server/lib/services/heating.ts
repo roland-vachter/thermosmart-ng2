@@ -343,8 +343,6 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				});
 			}
 
-			console.log(targetValue);
-
 			if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) && solarSystemHeatingStatus.wattHourConsumption &&
 					!locationStatus.shouldIgnoreHoldConditions) {
 				targetValue -= 0.1 * solarSystemHeatingStatus.wattHourConsumption / 700;
