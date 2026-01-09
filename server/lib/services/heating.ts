@@ -56,6 +56,11 @@ const initLocation = (locationId: number) => {
 		statusByLocation[locationId] = { ...defaultValues, avgValues: { ...defaultValues.avgValues } };
 		statusByLocation[locationId].initialized = true;
 	}
+
+	heatingEvts.emit('changeHeatingPower', {
+		location: locationId,
+		poweredOn: true
+	});
 };
 
 insideConditionsEvts.on('change', async (data) => {

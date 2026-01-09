@@ -29,31 +29,6 @@ interface Total {
 	radiatorRunningMinutesTotal: number;
 }
 
-async function initHeatingHoldCondition () {
-	const locations = await Location.find().exec()
-	locations.forEach(async l => {
-		const result = await HeatingHoldConditionHistory
-			.findOne({
-				location: l._id,
-				type: HeatingHoldConditionTypes.POWERED_OFF
-			})
-			.sort({
-				datetime: -1
-			})
-			.exec();
-
-		if (!result || result.status === false) {
-			await new HeatingHoldConditionHistory({
-				datetime: moment().toDate(),
-				location: l._id,
-				type: HeatingHoldConditionTypes.POWERED_OFF,
-				status: true
-			}).save();
-		}
-	});
-}
-void initHeatingHoldCondition();
-
 async function monitorTargetTemps () {
 	const locations = await Location.find().exec()
 	locations.forEach(l => monitorTargetTempByLocation(l._id));
