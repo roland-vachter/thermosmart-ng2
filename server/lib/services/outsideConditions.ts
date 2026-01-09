@@ -5,7 +5,8 @@ import { getBackgroundImage } from './backgroundImage';
 import { DAYTIME, OutsideConditions, SunshineForecastWithPower, WEATHER_TYPE, WeatherResponse } from '../types/outsideConditions';
 import TypedEmitter from 'typed-emitter';
 import moment from 'moment-timezone';
-import { getWeatherData } from './weatherApi';
+import { getWeatherData as getOpenWeatherData } from './openWeatherMap';
+import { getWeatherData as getWeatherApiData } from './weatherApi';
 
 const lastValues: OutsideConditions = {} as OutsideConditions;
 
@@ -78,7 +79,13 @@ const SUN_POWER_BY_MONTH: Record<number, number> = {
 
 async function update () {
 	try {
-		const weatherData: WeatherResponse = await getWeatherData();
+		let weatherData: WeatherResponse;
+
+		if (process.env.WEATHER_API_TYPE === 'WEATHER_API') {
+			weatherData = await getWeatherApiData();
+		} else {
+			weatherData = await getOpenWeatherData();
+		}
 
 		if (weatherData) {
 			if (weatherData.current) {
