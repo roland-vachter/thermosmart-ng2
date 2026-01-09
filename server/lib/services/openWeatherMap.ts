@@ -43,9 +43,7 @@ const weatherTypeMapping: Record<number, WEATHER_TYPE> = {
 
 
 export async function getWeatherData() {
-  const resWeather = await fetch(`${process.env.WEATHER_API_URL}?appid=${process.env.WEATHER_API_KEY}&lat=${process.env.LOCATION_LAT}&lon=${process.env.LOCATION_LNG}&units=metric&exclude=minutely,daily,alerts`);
-
-  console.log(`${process.env.WEATHER_API_URL}?appid=${process.env.WEATHER_API_KEY}&lat=${process.env.LOCATION_LAT}&lon=${process.env.LOCATION_LNG}&units=metric&exclude=minutely,daily,alerts`);
+  const resWeather = await fetch(`${process.env.OPEN_WEATHER_API_URL}?appid=${process.env.OPEN_WEATHER_API_KEY}&lat=${process.env.LOCATION_LAT}&lon=${process.env.LOCATION_LNG}&units=metric&exclude=minutely,daily,alerts`);
 
   if (!resWeather.ok) {
     const err = new ErrorWithResponse(resWeather.status.toString(), resWeather);
