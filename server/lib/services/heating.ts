@@ -338,7 +338,7 @@ async function updateHeatingStatusByLocation (locationId: number) {
 
 				outsideConditions.sunshineForecast.forEach((s, index) => {
 					if (s.sunny) {
-						targetValue -= 0.1 / (index + indexOffsetHour + 1) * s.sunPower;
+						targetValue -= 0.2 / (index + indexOffsetHour + 1) * s.sunPower;
 					}
 				});
 			}
