@@ -35,6 +35,7 @@ export interface OutsideConditions {
   sunrise: number;
   sunset: number;
   sunny: boolean;
+  sunPower: number;
   highestExpectedTemperature: number;
   sunshineNextConsecutiveHours: number;
   sunshineForecast: SunshineForecastWithPower[];

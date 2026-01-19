@@ -341,9 +341,13 @@ async function updateHeatingStatusByLocation (locationId: number) {
 					indexOffsetHour = (outsideConditions.sunrise - moment().valueOf()) / 1000 / 60 / 60;
 				}
 
+				if (outsideConditions.sunny) {
+					targetValue -= 0.3 * outsideConditions.sunPower;
+				}
+
 				outsideConditions.sunshineForecast.forEach((s, index) => {
 					if (s.sunny) {
-						targetValue -= 0.2 / (index + indexOffsetHour + 1) * s.sunPower;
+						targetValue -= 0.15 / (index + indexOffsetHour + 1) * s.sunPower;
 					}
 				});
 			}

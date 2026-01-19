@@ -106,6 +106,22 @@ async function update () {
 
 				const daytimeLengthMinutes = (weatherData.current.sunset - weatherData.current.sunrise) / (60 * 1000);
 				const peakSunshine = weatherData.current.sunrise / 1000 + daytimeLengthMinutes / 2 * 60;
+				let tempMultiplier = 1;
+				if (lastValues.temperature < -10) {
+					tempMultiplier = 0.3;
+				} else if (lastValues.temperature < 0) {
+					tempMultiplier = 0.6;
+				} else if (lastValues.temperature < 5) {
+					tempMultiplier = 0.8;
+				} else if (lastValues.temperature < 10) {
+					tempMultiplier = 1;
+				} else if (lastValues.temperature < 15) {
+					tempMultiplier = 1.2;
+				} else {
+					tempMultiplier = 1.5;
+				}
+
+				lastValues.sunPower = 0.5 + 0.5 * ((daytimeLengthMinutes / 2 - Math.abs(Date.now() / 1000 - peakSunshine) / 60) / (daytimeLengthMinutes / 2)) * tempMultiplier;
 
 				if (weatherData.forecast) {
 					lastValues.highestExpectedTemperature = weatherData.forecast.highestExpectedTemperature;
@@ -121,7 +137,23 @@ async function update () {
 							forecast.sunPower = 0;
 						}
 
-						forecast.sunPower = forecast.sunPower * SUN_POWER_BY_MONTH[moment(f.timestamp).tz('Europe/Bucharest').month() + 1];
+						tempMultiplier = 1;
+						if (forecast.temp < -10) {
+							tempMultiplier = 0.3;
+						} else if (forecast.temp < 0) {
+							tempMultiplier = 0.6;
+						} else if (forecast.temp < 5) {
+							tempMultiplier = 0.8;
+						} else if (forecast.temp < 10) {
+							tempMultiplier = 1;
+						} else if (forecast.temp < 15) {
+							tempMultiplier = 1.2;
+						} else {
+							tempMultiplier = 1.5;
+						}
+
+						forecast.sunPower = forecast.sunPower * SUN_POWER_BY_MONTH[moment(f.timestamp).tz('Europe/Bucharest').month() + 1] * tempMultiplier;
+
 						return forecast;
 					});
 					lastValues.totalNumberOfSunshineExpected = weatherData.forecast.totalNumberOfSunshineExpected;
