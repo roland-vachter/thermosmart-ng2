@@ -393,6 +393,8 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				const conditionWouldStart = locationStatus.avgValues.temperature <= target?.value - (switchThresholdBelow.value as number);
 				let conditionToStart = locationStatus.avgValues.temperature <= targetValue - (switchThresholdBelow.value as number);
 
+				console.log(`[${locationId}]`, conditionToStart, conditionWouldStart);
+
 				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
 					if (turnOffBecauseHighTemperature) {
 						conditionToStart = false;
@@ -404,12 +406,9 @@ async function updateHeatingStatusByLocation (locationId: number) {
 						conditionToStart = false;
 						locationStatus.hasFavorableWeatherForecast = true;
 					} else if (target.value - locationStatus.avgValues.temperature - (switchThresholdBelow.value as number) < 0.4 &&
-							outsideConditions.sunrise && moment().valueOf() > outsideConditions.sunrise &&
-								(
-									outsideConditions.highestExpectedTemperature > locationStatus.avgValues.temperature ||
-									outsideConditions.sunshineNextConsecutiveHours >= 2
-								)
-							) {
+						outsideConditions.sunrise && moment().valueOf() > outsideConditions.sunrise &&
+						outsideConditions.highestExpectedTemperature > locationStatus.avgValues.temperature
+					) {
 						conditionToStart = false;
 						locationStatus.hasFavorableWeatherForecast = true;
 					} else if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) &&
