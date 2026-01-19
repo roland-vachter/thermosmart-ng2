@@ -11,6 +11,8 @@ import { LOCATION_FEATURE, TemperatureDirection } from '../types/generic';
 import { hasLocationFeatureById } from './location';
 import { getStatusByLocation } from './solarSystemHeating';
 import { deepEqual } from '../utils/utils';
+import Location from '../models/Location';
+import { Orientation } from '../types/outsideConditions';
 
 interface HeatingConditions {
 	hasIncreasingTrend: boolean;
@@ -285,6 +287,11 @@ async function updateHeatingStatus () {
 async function updateHeatingStatusByLocation (locationId: number) {
 	initLocation(locationId);
 	const locationStatus = statusByLocation[locationId];
+	const location = await Location
+		.findOne({
+			_id: locationId
+		})
+		.exec();
 
 	try {
 		let [switchThresholdBelow, switchThresholdAbove] = await Promise.all([
@@ -341,13 +348,28 @@ async function updateHeatingStatusByLocation (locationId: number) {
 					indexOffsetHour = (outsideConditions.sunrise - moment().valueOf()) / 1000 / 60 / 60;
 				}
 
-				if (outsideConditions.sunny) {
-					targetValue -= 0.3 * outsideConditions.sunPower;
+				if (outsideConditions.sun.sunny) {
+					const sumOrientation = Object.values(Orientation).reduce((acc, o) => {
+						if (location.orientations.includes(o)) {
+							acc += outsideConditions.sun.orientations[o];
+						}
+
+						return acc;
+					}, 0);
+					targetValue -= 0.3 * outsideConditions.sun.sunPower * sumOrientation;
 				}
 
 				outsideConditions.sunshineForecast.forEach((s, index) => {
 					if (s.sunny) {
-						targetValue -= 0.15 / (index + indexOffsetHour + 1) * s.sunPower;
+						const sumOrientation = Object.values(Orientation).reduce((acc, o) => {
+							if (location.orientations.includes(o)) {
+								acc += s.orientations[o];
+							}
+
+							return acc;
+						}, 0);
+
+						targetValue -= 0.15 / (index + indexOffsetHour + 1) * s.sunPower * sumOrientation;
 					}
 				});
 			}

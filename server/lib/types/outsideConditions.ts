@@ -23,6 +23,7 @@ export interface SunshineForecast {
 
 export interface SunshineForecastWithPower extends SunshineForecast {
   sunPower: number;
+  orientations: Record<Orientation, number>;
 }
 
 export interface OutsideConditions {
@@ -34,8 +35,11 @@ export interface OutsideConditions {
   backgroundImage: string;
   sunrise: number;
   sunset: number;
-  sunny: boolean;
-  sunPower: number;
+  sun: {
+    sunny: boolean;
+    sunPower: number;
+    orientations: Record<Orientation, number>;
+  }
   highestExpectedTemperature: number;
   sunshineNextConsecutiveHours: number;
   sunshineForecast: SunshineForecastWithPower[];
@@ -58,4 +62,11 @@ export interface WeatherResponse {
     sunshineForecast?: SunshineForecast[];
     totalNumberOfSunshineExpected?: number;
   }
+}
+
+export enum Orientation {
+  N = 'N',
+  E = 'E',
+  W = 'W',
+  S = 'S'
 }
