@@ -833,7 +833,7 @@ export const initStatistics = () => {
 				datetime: moment().toDate(),
 				t: values.temperature,
 				h: values.humidity,
-				sunny: values.sunny
+				sunny: values.sun.sunny
 			}).save();
 		}
 	});
