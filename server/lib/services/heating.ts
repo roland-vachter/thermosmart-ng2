@@ -57,12 +57,12 @@ const initLocation = (locationId: number) => {
 	if (!statusByLocation[locationId]) {
 		statusByLocation[locationId] = { ...defaultValues, avgValues: { ...defaultValues.avgValues } };
 		statusByLocation[locationId].initialized = true;
-	}
 
-	heatingEvts.emit('changeHeatingPower', {
-		location: locationId,
-		poweredOn: true
-	});
+		heatingEvts.emit('changeHeatingPower', {
+			location: locationId,
+			poweredOn: true
+		});
+	}
 };
 
 insideConditionsEvts.on('change', async (data) => {

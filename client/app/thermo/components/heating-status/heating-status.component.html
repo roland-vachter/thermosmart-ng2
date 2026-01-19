@@ -21,17 +21,17 @@
             </div>
 
             <div class="thermo-inside--temp">
-                <temperature [value]="dataStore.insideConditions.temperature" [withIcon]="true"></temperature>
+                <temperature [value]="dataStore?.insideConditions?.temperature" [withIcon]="true"></temperature>
             </div>
         
             <div class="thermo-inside--humi">
-                <humidity [value]="dataStore.insideConditions.humidity" [withIcon]="true"></humidity>
+                <humidity [value]="dataStore?.insideConditions?.humidity" [withIcon]="true"></humidity>
             </div>
         </div>
         <div class="thermo-status--wrapper">
             <button type="button" class="thermo--raised-button thermo-target--button thermo-target--decrease" (click)="tempAdjust(-0.1)"></button>
             <button type="button" class="thermo--raised-button thermo-target--button thermo-target--increase" (click)="tempAdjust(0.1)"></button>
-            <div class="thermo-status" [ngClass]="{ 'thermo-status--idle': !dataStore.heatingStatus, 'thermo-status--heating': dataStore.heatingStatus }">                
+            <div class="thermo-status" [ngClass]="{ 'thermo-status--idle': !dataStore?.heatingStatus, 'thermo-status--heating': dataStore?.heatingStatus }">                
                 <div class="thermo-heating--power">
                   <div class="smart-features-ignored" title="End ignoring smart features" (click)="endIgnoringSmartFeatures()" *ngIf="dataStore?.heatingConditions?.shouldIgnoreHoldConditions">
                     <i class="icon-temperature-arrow"></i>
@@ -40,49 +40,49 @@
 
                   <button class="thermo--raised-button change-power-off-time decrease-power-off"
                     (click)="decreasePowerOff()"
-                    *ngIf="!dataStore.heatingPower.status && timeLeftSeconds > 5 * 60">-5</button>
+                    *ngIf="!dataStore?.heatingPower?.status && timeLeftSeconds > 5 * 60">-5</button>
                   <button class="thermo--raised-button change-power-off-time increase-power-off"
                     (click)="increasePowerOff()"
-                    *ngIf="!dataStore.heatingPower.status && timeLeftSeconds < 55 * 60">+5</button>
+                    *ngIf="!dataStore?.heatingPower?.status && timeLeftSeconds < 55 * 60">+5</button>
 
                   <label class="switch">
-                    <input #powerSwitch type="checkbox" class="switch-input" [ngClass]="{'on-hold': onHold && dataStore.heatingPower.status}" [checked]="dataStore.heatingPower.status && !onHold" (change)="toggleStatus()">
+                    <input #powerSwitch type="checkbox" class="switch-input" [ngClass]="{'on-hold': onHold && dataStore?.heatingPower?.status}" [checked]="dataStore?.heatingPower?.status && !onHold" (change)="toggleStatus()">
                     <span class="switch-label" data-on=" " data-off=" "></span>
                     <span class="switch-handle"></span>
                     <span class="thermo-heating--power-counter">{{timerString}}</span>
-                    <span class="thermo-heating--power-status-label" *ngIf="dataStore.heatingPower.status">
+                    <span class="thermo-heating--power-status-label" *ngIf="dataStore?.heatingPower?.status">
                       {{ onHold ? 'Hold' : 'On' }}
                     </span>
-                    <span class="thermo-heating--condition" *ngIf="onHold && dataStore.heatingPower.status">
-                      <i class="icon-window-open-icon" *ngIf="dataStore.heatingConditions.hasWindowOpen"></i>
-                      <i class="icon-sun-icon" *ngIf="!dataStore.heatingConditions.hasWindowOpen && dataStore.heatingConditions.hasFavorableWeatherForecast"></i>
-                      <i class="icon-temperature-arrow" *ngIf="!dataStore.heatingConditions.hasWindowOpen && !dataStore.heatingConditions.hasFavorableWeatherForecast && dataStore.heatingConditions.hasIncreasingTrend"></i>
+                    <span class="thermo-heating--condition" *ngIf="onHold && dataStore?.heatingPower?.status">
+                      <i class="icon-window-open-icon" *ngIf="dataStore?.heatingConditions?.hasWindowOpen"></i>
+                      <i class="icon-sun-icon" *ngIf="!dataStore?.heatingConditions?.hasWindowOpen && dataStore?.heatingConditions?.hasFavorableWeatherForecast"></i>
+                      <i class="icon-temperature-arrow" *ngIf="!dataStore?.heatingConditions?.hasWindowOpen && !dataStore?.heatingConditions?.hasFavorableWeatherForecast && dataStore?.heatingConditions?.hasIncreasingTrend"></i>
                     </span>
                   </label>
                 </div>
 
-                <div class="thermo-target--value color-{{ dataStore.temperatures[dataStore.targetTempId]?.color }}">
-                    <i class="{{ dataStore.temperatures[dataStore.targetTempId]?.iconClass }}"></i>
-                    <temperature [value]="dataStore.temperatures[dataStore.targetTempId]?.value" color="inherit"></temperature>
+                <div class="thermo-target--value color-{{ dataStore?.temperatures[dataStore?.targetTempId]?.color }}">
+                    <i class="{{ dataStore?.temperatures[dataStore?.targetTempId]?.iconClass }}"></i>
+                    <temperature [value]="dataStore?.temperatures[dataStore?.targetTempId]?.value" color="inherit"></temperature>
                     &deg;C
                 </div>
 
                 <div class="thermo-heating--duration">
-                    <i class="icon-fire color-gold"></i> {{ dataStore.heatingDuration | duration }}
+                    <i class="icon-fire color-gold"></i> {{ dataStore?.heatingDuration | duration }}
                 </div>
             </div>
         </div>
         <div class="thermo--outside">
-            <div class="thermo-outside--weather color-{{ dataStore.outsideConditions.color }}">
-                <i class="{{ dataStore.outsideConditions.weatherIconClass }}"></i>
+            <div class="thermo-outside--weather color-{{ dataStore?.outsideConditions?.color }}">
+                <i class="{{ dataStore?.outsideConditions?.weatherIconClass }}"></i>
             </div>
         
             <div class="thermo-outside--temp">
-                <temperature [value]="dataStore.outsideConditions.temperature" [withIcon]="true" [outside]="true"></temperature>
+                <temperature [value]="dataStore?.outsideConditions?.temperature" [withIcon]="true" [outside]="true"></temperature>
             </div>
         
             <div class="thermo-outside--humi">
-                <humidity [value]="dataStore.outsideConditions.humidity" [withIcon]="true"></humidity>
+                <humidity [value]="dataStore?.outsideConditions?.humidity" [withIcon]="true"></humidity>
             </div>
         </div>
     </div>

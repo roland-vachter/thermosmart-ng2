@@ -105,8 +105,8 @@ export class ThermoDataStoreService {
 		this.currentDate = null;
 		this.config = {};
 		this.heatingPower = {
-			status: false,
-			until: moment(Date.now() + 15 * 60 * 1000)
+			status: true,
+			until: null
 		};
 		this.sensorRestartInProgress = false;
 		this.heatingPlanOverrides = [];
