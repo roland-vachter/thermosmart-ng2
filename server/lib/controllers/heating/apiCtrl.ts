@@ -10,7 +10,7 @@ import { getAllConfigs } from '../../services/config';
 import { getOutsideConditions } from '../../services/outsideConditions';
 import { changeSensorSettings as insideConditionsChangeSensorSettings, getLocationBySensorId, getSensors, disableSensorWindowOpen as insideConditionsDisableSensorWindowOpen,
 	setSensorInput, toggleSensorStatus as insideConditionsToggleSensorStatus } from '../../services/insideConditions';
-import { decreasePowerOffTime, endIgnoringHoldConditions, getHeatingConditions, getPowerStatus, ignoreHoldConditions, increasePowerOffTime, isHeatingOn, togglePower } from '../../services/heating';
+import { decreasePowerOffTime, endIgnoringHoldConditions, getHeatingConditions, getPowerStatus, getTargetValue, ignoreHoldConditions, increasePowerOffTime, isHeatingOn, togglePower } from '../../services/heating';
 import moment from 'moment-timezone';
 import { getRestartStatus, initiateRestart } from '../../services/restartSensor';
 import { isNumber } from '../../utils/utils';
@@ -99,6 +99,7 @@ export const initHeating = async (req: Request, res: Response) => {
 			},
 			heatingConditions: getHeatingConditions(location._id),
 			targetTempId: targetTemp ? targetTemp._id : null,
+			targetTempValue: getTargetValue(location._id),
 			temperatures: (temps || []).map(t => ({
 				...t,
 				value: t.values?.find(v => v.location === location._id)?.value || t.defaultValue,

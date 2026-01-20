@@ -156,6 +156,7 @@ export interface ThermoInitUpdateData {
   };
   heatingConditions?: HeatingConditions;
   targetTempId?: number;
+  targetTempValue?: number;
   temperatures?: Temperature[];
   heatingPlans?: IHeatingPlan[];
   heatingDefaultPlans?: IHeatingDefaultPlan[];

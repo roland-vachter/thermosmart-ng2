@@ -88,7 +88,7 @@ export async function getWeatherData() {
 
         const forecast: Forecast[] = [];
         jsonWeather.hourly.forEach(h => {
-          if (h.dt * 1000 <= moment().endOf('day').valueOf()) {
+          if (h.dt * 1000 > Date.now() && h.dt * 1000 <= moment().endOf('day').valueOf()) {
             forecast.push(h);
           }
         });

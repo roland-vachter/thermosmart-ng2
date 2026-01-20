@@ -99,12 +99,12 @@ export class HeatingStatusComponent implements OnInit {
 	}
 
 	updateHeatingPower() {
-		this.lastHeatingPowerStatus = this.dataStore.heatingPower.status;
+		this.lastHeatingPowerStatus = this.dataStore?.heatingPower?.status;
 
-		if (!this.dataStore.heatingPower.status) {			
+		if (!this.dataStore?.heatingPower?.status) {
 			this.heatingPowerOffInterval = setInterval(() => {
 				const nowTime = new Date().getTime();
-				const untilTime = this.dataStore.heatingPower.until.valueOf();
+				const untilTime = this.dataStore?.heatingPower?.until?.valueOf();
 
 				if (untilTime < nowTime) {
 					this.timerString = '';

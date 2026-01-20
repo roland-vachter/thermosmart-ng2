@@ -23,6 +23,7 @@ interface HeatingConditions {
 
 interface Heating extends HeatingConditions {
 	isOn: boolean;
+	targetValue: number;
 	lastStatusReadBySensor: boolean;
 	lastChangeEventStatus: boolean | null;
 	avgValues: {
@@ -37,6 +38,7 @@ interface Heating extends HeatingConditions {
 
 const defaultValues: Heating = {
 	isOn: false,
+	targetValue: null,
 	lastStatusReadBySensor: false,
 	lastChangeEventStatus: null,
 	avgValues: {
@@ -126,6 +128,13 @@ export const getPowerStatus = (locationId: number) => {
 		poweredOn: locationStatus.poweredOn,
 		until: locationStatus.until
 	};
+};
+
+export const getTargetValue = (locationId: number) => {
+	initLocation(locationId);
+	const locationStatus = statusByLocation[locationId];
+
+	return locationStatus.targetValue;
 };
 
 export const togglePower = async (locationId: number) => {
@@ -313,6 +322,9 @@ async function updateHeatingStatusByLocation (locationId: number) {
 			} as HydratedDocument<IConfig>;
 		}
 
+		const target = getTargetTempByLocation(locationId);
+		locationStatus.targetValue = target?.value;
+
 		if (!locationStatus.poweredOn || locationStatus.hasWindowOpen) {
 			console.log(`[${locationId}] turn off because of ` +
 				(!locationStatus.poweredOn ? 'not power on' : 'has window open'));
@@ -330,7 +342,6 @@ async function updateHeatingStatusByLocation (locationId: number) {
 			return;
 		}
 
-		const target = getTargetTempByLocation(locationId);
 		if (target) {
 			const sensors = getSensors(locationId);
 			const [temperatureTrendsFeature, weatherForecastFeature] = await Promise.all([
@@ -374,8 +385,6 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				});
 			}
 
-			console.log(`[${locationId}] Targ temp: ${targetValue}`);
-
 			if (await hasLocationFeatureById(locationId, LOCATION_FEATURE.SOLAR_SYSTEM_HEATING) && solarSystemHeatingStatus.wattHourConsumption &&
 					!locationStatus.shouldIgnoreHoldConditions) {
 				targetValue -= 0.1 * solarSystemHeatingStatus.wattHourConsumption / 700;
@@ -388,6 +397,8 @@ async function updateHeatingStatusByLocation (locationId: number) {
 				turnOffBecauseHighTemperature = true;
 				turnHeatingOff(locationId);
 			}
+
+			locationStatus.targetValue = targetValue;
 
 			if (!locationStatus.isOn) {
 				const conditionWouldStart = locationStatus.avgValues.temperature <= target?.value - (switchThresholdBelow.value as number);
