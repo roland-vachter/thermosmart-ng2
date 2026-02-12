@@ -29,6 +29,7 @@ const updateStatusInternal = () => {
     if (!locationStatus.lastUpdate || moment().diff(locationStatus.lastUpdate, 'minute') > 1) {
       locationStatus.status = GATEWAY_STATUS.DISCONNECTED;
       locationStatus.resetInProgress = false;
+      locationStatus.resetInitiated = false;
 
       gatewayEvts.emit('statusChange', {
         ...statusByLocation[locationId],
