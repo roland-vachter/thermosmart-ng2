@@ -48,6 +48,7 @@
 
 	&:before {
 		content: '';
+		pointer-events: none;
 		position: absolute;
 		width: calc(100% + 14px);
 		height: calc(100% + 14px);
@@ -99,6 +100,7 @@
 
 .thermo-target--value {
 	font-size: 2rem;
+	cursor: default;
 
 	i {
 		font-size: 1.2rem;

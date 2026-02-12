@@ -37,6 +37,10 @@
 			<div class="col-md col-12" *ngIf="hasFeature(LOCATION_FEATURE.HEATING)">
 				<thermo-heating-status class="align"></thermo-heating-status>
 			</div>
+
+			<div class="col-md col-12" *ngIf="hasFeature(LOCATION_FEATURE.GATEWAY_MONITORING)">
+				<gateway-status class="align"></gateway-status>
+			</div>
 		</div>
 
 		<div class="row" *ngIf="hasFeature(LOCATION_FEATURE.HEATING)">

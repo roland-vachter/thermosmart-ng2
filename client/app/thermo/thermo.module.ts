@@ -22,6 +22,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { RefreshEventService } from '../services/refresh-event.service';
 import { LocationService } from '../services/location.service';
 import { SolarSystemHeatingStatusComponent } from './components/solar-system-heating-status/solar-system-heating-status.component';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 @NgModule({
 	imports: [
@@ -29,7 +30,8 @@ import { SolarSystemHeatingStatusComponent } from './components/solar-system-hea
 		SharedModule,
 		FormsModule,
 		BsDropdownModule.forRoot(),
-		BsDatepickerModule.forRoot()
+		BsDatepickerModule.forRoot(),
+		TooltipModule.forRoot()
 	],
 	declarations: [
 		InsideComponent,

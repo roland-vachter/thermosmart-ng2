@@ -13,22 +13,26 @@ import { UserService } from './services/user.service';
 import { RefreshEventService } from './services/refresh-event.service';
 import { LocationService } from './services/location.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { GatewayModule } from "./gateway/gateway.module";
 
 @NgModule({
 	declarations: [
 		AppComponent
 	],
 	imports: [
-		BrowserModule,
-		BrowserAnimationsModule,
-		ModalModule.forRoot(),
-		BsDropdownModule.forRoot(),
-		FormsModule,
-		SharedModule,
-		ThermoModule,
-		SecurityModule,
-		PlantWateringModule
-	],
+    BrowserModule,
+    BrowserAnimationsModule,
+    ModalModule.forRoot(),
+    BsDropdownModule.forRoot(),
+    TooltipModule.forRoot(),
+    FormsModule,
+    SharedModule,
+    ThermoModule,
+    SecurityModule,
+    PlantWateringModule,
+    GatewayModule
+],
 	providers: [
 		LoginStatusService,
 		UserService,

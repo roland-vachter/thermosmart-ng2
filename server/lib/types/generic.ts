@@ -224,3 +224,8 @@ export enum LOCATION_FEATURE {
   SECURITY = 'security',
   SOLAR_SYSTEM_HEATING = 'solar-system-heating'
 }
+
+export enum GATEWAY_STATUS {
+	CONNECTED = 'connected',
+	DISCONNECTED = 'disconnected'
+}

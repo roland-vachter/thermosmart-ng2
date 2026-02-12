@@ -8,6 +8,7 @@ import * as heatingApiCtrl from '../lib/controllers/heating/apiCtrl';
 import * as securityStatusAndMovementApiCtrl from '../lib/controllers/security/statusAndMovementApiCtrl';
 import * as securityHealthApiCtrl from '../lib/controllers/security/healthApiCtrl';
 import * as solarApiCtrl from '../lib/controllers/solar/apiCtrl';
+import * as gatewayApiCtrl from '../lib/controllers/gateway/apiCtrl';
 import handleErrors from '../lib/utils/handle-errors';
 
 const router = Router();
@@ -61,6 +62,11 @@ router.get('/security/sensor/camera/movement', apiKeyMiddleware, cors(), handleE
 router.get('/security/sensor/controller/healthreport', apiKeyMiddleware, cors(), handleErrors(securityHealthApiCtrl.controller.reportHealth));
 router.get('/security/sensor/keypad/healthreport', apiKeyMiddleware, cors(), handleErrors(securityHealthApiCtrl.keypad.reportHealth));
 router.get('/security/sensor/motionsensor/healthreport', apiKeyMiddleware, cors(), handleErrors(securityHealthApiCtrl.motionSensor.reportHealth));
+
+// gateway
+router.get('/gateway/init', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(gatewayApiCtrl.init));
+router.post('/gateway/reset', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(gatewayApiCtrl.reset));
+router.get('/gateway/sensor/updatestatus', apiKeyMiddleware, cors(), handleErrors(gatewayApiCtrl.updateStatus));
 
 // plant watering
 // router.get('/plantwatering/init', apiFlagMiddleware, loginMiddleware, cors(), handleErrors(apiCtrl.plantWateringInit));

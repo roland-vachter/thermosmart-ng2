@@ -16,6 +16,7 @@ import { securityStatusEvents } from '../services/securityStatus';
 import { isSolarHeatingOn, solarSystemEvts } from '../services/solarSystemHeating';
 import { hasLocationFeature } from '../services/location';
 import { LOCATION_FEATURE } from '../types/generic';
+import gatewayEvts from '../services/gatewayEvts';
 
 let initialized = false;
 
@@ -201,7 +202,7 @@ export const init = async () => {
 				security: {
 					controllerHealth: data.health
 				}
-			})
+			});
 		});
 
 		securityHealthEvents.on('keypad-health', data => {
@@ -209,7 +210,7 @@ export const init = async () => {
 				security: {
 					keypadHealth: data.health
 				}
-			})
+			});
 		});
 
 		securityHealthEvents.on('motion-sensor-health', data => {
@@ -217,7 +218,14 @@ export const init = async () => {
 				security: {
 					motionSensorHealth: data.health
 				}
-			})
+			});
+		});
+
+
+		gatewayEvts.on('statusChange', data => {
+			socketIo.of('/frontend/' + data.location).emit('update', {
+				gateway: data
+			});
 		});
 
 
