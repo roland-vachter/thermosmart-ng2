@@ -5,7 +5,7 @@ import GatewayResetHistory from '../models/GatewayResetHistory';
 
 export interface GatewayStatus {
   status: GATEWAY_STATUS;
-  resetInitialized: boolean;
+  resetInitiated: boolean;
   resetInProgress: boolean;
   lastResetAt: Moment;
   initialized: boolean;
@@ -14,7 +14,7 @@ export interface GatewayStatus {
 
 const defaultValues: GatewayStatus = {
   status: GATEWAY_STATUS.CONNECTED,
-  resetInitialized: false,
+  resetInitiated: false,
   resetInProgress: false,
   lastResetAt: null,
   initialized: false,
@@ -65,10 +65,10 @@ export async function getStatus(locationId: number) {
 export async function reset(locationId: number) {
   await initLocation(locationId);
 
-  if (statusByLocation[locationId].resetInitialized || (
+  if (statusByLocation[locationId].resetInitiated || (
       statusByLocation[locationId].status === GATEWAY_STATUS.CONNECTED && !statusByLocation[locationId].resetInProgress
     )) {
-    statusByLocation[locationId].resetInitialized = !statusByLocation[locationId].resetInitialized;
+    statusByLocation[locationId].resetInitiated = !statusByLocation[locationId].resetInitiated;
 
     gatewayEvts.emit('statusChange', {
       ...statusByLocation[locationId],
@@ -89,7 +89,7 @@ export async function updateStatus(locationId: number, wasReset: boolean) {
       location: locationId
     }).save();
 
-    statusByLocation[locationId].resetInitialized = false;
+    statusByLocation[locationId].resetInitiated = false;
     statusByLocation[locationId].resetInProgress = false;
   }
 

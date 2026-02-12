@@ -87,7 +87,7 @@ export async function updateStatus(req: Request, res: Response) {
   await gatewayService.updateStatus(location._id, req.query.wasReset === 'true');
   const status = await gatewayService.getStatus(location._id);
 
-  if (status.resetInitialized) {
+  if (status.resetInitiated) {
     await gatewayService.markReset(location._id);
   }
 

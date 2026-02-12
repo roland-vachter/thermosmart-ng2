@@ -15,7 +15,7 @@ export class GatewayStatusComponent implements OnInit {
 
   status: GATEWAY_STATUS;
   resetInProgress: boolean;
-  resetInitialized: boolean;
+  resetInitiated: boolean;
   lastResetAt: Date;
 
   constructor
@@ -41,8 +41,8 @@ export class GatewayStatusComponent implements OnInit {
 
   handleServerData (data) {
     if (data.gateway) {
-      if (typeof data.gateway.resetInitialized === 'boolean') {
-        this.resetInitialized = data.gateway.resetInitialized;
+      if (typeof data.gateway.resetInitiated === 'boolean') {
+        this.resetInitiated = data.gateway.resetInitiated;
       }
 
       if (typeof data.gateway.resetInProgress === 'boolean') {
