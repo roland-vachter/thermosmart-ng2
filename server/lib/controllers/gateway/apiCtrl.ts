@@ -91,10 +91,5 @@ export async function updateStatus(req: Request, res: Response) {
     await gatewayService.markReset(location._id);
   }
 
-  res.json({
-    status: RESPONSE_STATUS.OK,
-    data: {
-      gateway: status
-    }
-  });
+  res.json(status);
 }
