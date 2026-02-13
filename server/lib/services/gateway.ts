@@ -94,6 +94,11 @@ export async function updateStatus(locationId: number, wasReset: boolean) {
     statusByLocation[locationId].resetInProgress = false;
   }
 
+  if (statusByLocation[locationId].resetInProgress) {
+    statusByLocation[locationId].resetInitiated = false;
+    statusByLocation[locationId].resetInProgress = false;
+  }
+
   gatewayEvts.emit('statusChange', {
     ...statusByLocation[locationId],
     location: locationId
