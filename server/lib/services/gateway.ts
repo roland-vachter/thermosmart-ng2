@@ -13,7 +13,7 @@ export interface GatewayStatus {
 };
 
 const defaultValues: GatewayStatus = {
-  status: GATEWAY_STATUS.CONNECTED,
+  status: null,
   resetInitiated: false,
   resetInProgress: false,
   lastResetAt: null,
@@ -67,7 +67,7 @@ export async function reset(locationId: number) {
   await initLocation(locationId);
 
   if (statusByLocation[locationId].resetInitiated || (
-      statusByLocation[locationId].status === GATEWAY_STATUS.CONNECTED && !statusByLocation[locationId].resetInProgress
+      statusByLocation[locationId].status !== GATEWAY_STATUS.DISCONNECTED && !statusByLocation[locationId].resetInProgress
     )) {
     statusByLocation[locationId].resetInitiated = !statusByLocation[locationId].resetInitiated;
 

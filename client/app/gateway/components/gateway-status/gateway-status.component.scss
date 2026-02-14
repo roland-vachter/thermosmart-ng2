@@ -9,7 +9,7 @@
 	position: relative;
 }
 
-.gateway-reset {
+.gateway-status {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -44,7 +44,7 @@
 
 	i {
 		font-size: 4rem;
-		color: $olive;
+		color: $gray;
 		opacity: 0.6;
 	}
 

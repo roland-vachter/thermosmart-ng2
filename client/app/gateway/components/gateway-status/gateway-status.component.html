@@ -1,7 +1,7 @@
 <div class="component gateway">
-	<div class="gateway-reset gateway-status-{{status}}" [ngClass]="{ 'reset-in-progress': resetInProgress || resetInitiated}" (click)="initiateReset()">
+	<div class="gateway-status gateway-status-{{status}}" [ngClass]="{ 'reset-in-progress': resetInProgress || resetInitiated}" (click)="initiateReset()">
 		<i class="icon-wifi"></i>
-		<span>{{ resetInProgress ? 'Reset in progress' : resetInitiated ? 'Reset initiated' : (status | titlecase) }}</span>
+		<span>{{ resetInProgress ? 'Reset in progress' : resetInitiated ? 'Reset initiated' : !status ? 'Unknown' : (status | titlecase) }}</span>
 	</div>
 
   <div class="last-reset" *ngIf="lastResetAt">Last reset: {{ lastResetAt | date:'YYYY/MM/dd HH:mm' }}</div>
