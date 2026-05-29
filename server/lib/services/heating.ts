@@ -104,7 +104,6 @@ export const isHeatingOn = (locationId: number, readFromControllerSensor: boolea
 	const locationStatus = statusByLocation[locationId];
 
 	if (readFromControllerSensor) {
-		console.log('read from controller sensor', locationId);
 		locationStatus.lastStatusReadBySensor = true;
 
 		if (locationStatus.lastChangeEventStatus !== locationStatus.isOn) {
@@ -403,8 +402,6 @@ async function updateHeatingStatusByLocation (locationId: number) {
 			if (!locationStatus.isOn) {
 				const conditionWouldStart = locationStatus.avgValues.temperature <= target?.value - (switchThresholdBelow.value as number);
 				let conditionToStart = locationStatus.avgValues.temperature <= targetValue - (switchThresholdBelow.value as number);
-
-				console.log(`[${locationId}]`, conditionToStart, conditionWouldStart);
 
 				if (weatherForecastFeature?.value && !locationStatus.shouldIgnoreHoldConditions) {
 					if (turnOffBecauseHighTemperature) {

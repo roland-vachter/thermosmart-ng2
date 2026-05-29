@@ -169,7 +169,6 @@ async function getHuaweiDeviceList(apiUrl: string, authToken: string, stationCod
         console.warn('SOLAR:', resJson.failCode, resJson.message);
         return resJson.message;
       } else {
-        console.log('SOLAR: -> device list successful');
         devices = {};
         resJson?.data?.forEach(d => {
           switch (d.devTypeId) {
@@ -211,7 +210,6 @@ async function getHuaweiData(apiUrl: string, authToken: string, deviceType: DEVI
         console.warn('SOLAR:', deviceType, resJson.failCode, resJson.message);
         return resJson.message;
       } else {
-        console.log('SOLAR:', deviceType, 'successful');
         return resJson.data.length && resJson.data[0]?.dataItemMap || null;
       }
     }
@@ -368,7 +366,6 @@ async function updateByLocation(locationId: number) {
 
   const newLocationStatus = await getStatusByLocation(locationId);
   if (!lastSentStatusByLocations[locationId] || !deepEqual(lastSentStatusByLocations[locationId], newLocationStatus)) {
-    console.log('SOLAR: emit solar event');
     solarSystemEvts.emit('change', {
       location: locationId,
       ...newLocationStatus
@@ -438,7 +435,6 @@ export async function updateRadiatorConsumption(locationId: number, numberOfRadi
   const newLocationStatus = await getStatusByLocation(locationId);
 
   if (!lastSentStatusByLocations[locationId] || !deepEqual(lastSentStatusByLocations[locationId], newLocationStatus)) {
-    console.log('SOLAR: emit solar event');
     solarSystemEvts.emit('change', {
       location: locationId,
       ...newLocationStatus
